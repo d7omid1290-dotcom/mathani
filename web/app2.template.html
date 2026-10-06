@@ -1,0 +1,1927 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A1E3C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>مثاني</title>
+<style>
+:root{
+  /* الهوية: كحلي وسماوي */
+  --bg:#EDF2F8; --surface:#FFFFFF; --surface-2:#F3F7FC; --ink:#0D1A2D; --muted:#5A6A80; --line:#DBE4EF;
+  --deep:#0A1E3C; --green:#14335E; --green-soft:#E2ECF8; --on:#FFFFFF;
+  --sky:#2F9FDB; --sky-2:#7CCBF2; --sky-soft:#E0F2FC;
+  --gold:#B07816; --gold-2:#E2B04E; --gold-soft:#FBF0DA; --err:#C0353F; --err-soft:#FBE6E8; --ok:#1F8A62;
+  --paper:#FCFDFF;
+  --shadow:0 1px 2px rgba(10,30,60,.05),0 6px 18px rgba(10,30,60,.07);
+  --quran:"Amiri Quran","Amiri","Scheherazade New",serif; --naskh:"Amiri",serif;
+  --ui:"Readex Pro","Segoe UI","Tahoma",system-ui,sans-serif;
+  --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
+  --fs:1;
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#081325; --surface:#0F1F38; --surface-2:#152A47; --ink:#E7EEF8; --muted:#94A6BE; --line:#22385A;
+  --deep:#06101F; --green:#8CC8F4; --green-soft:#16304F; --on:#081325;
+  --sky:#5DBDF0; --sky-2:#8FD6F7; --sky-soft:#12324F;
+  --gold:#E6B85C; --gold-2:#E8C77F; --gold-soft:#33291A; --err:#F0939A; --err-soft:#3D2128; --ok:#6FD3A8;
+  --paper:#0C1B31; --shadow:0 1px 2px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --bg:#081325; --surface:#0F1F38; --surface-2:#152A47; --ink:#E7EEF8; --muted:#94A6BE; --line:#22385A;
+  --deep:#06101F; --green:#8CC8F4; --green-soft:#16304F; --on:#081325;
+  --sky:#5DBDF0; --sky-2:#8FD6F7; --sky-soft:#12324F;
+  --gold:#E6B85C; --gold-2:#E8C77F; --gold-soft:#33291A; --err:#F0939A; --err-soft:#3D2128; --ok:#6FD3A8;
+  --paper:#0C1B31; --shadow:0 1px 2px rgba(0,0,0,.35);}
+html,body{height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.65;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.app{max-width:480px;min-height:100%;margin:0 auto;background:var(--bg);position:relative}
+@media (min-width:520px){.app{box-shadow:0 0 0 1px var(--line)}}
+.content{padding:0 16px calc(110px + var(--bottom))}
+
+/* الزخرفة: نجمة ثمانية متكررة */
+.pattern{background:radial-gradient(120% 80% at 85% -10%,rgba(47,159,219,.45),transparent 60%),repeating-linear-gradient(to bottom,transparent 0 27px,rgba(124,203,242,.08) 27px 28px),linear-gradient(165deg,#0A1E3C,#102C55 70%,#163D6E);color:#fff}
+
+/* شريط علوي */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);
+  padding:calc(var(--top) + 10px) 12px 10px;display:flex;align-items:center;gap:8px;margin:0 -16px 6px;padding-inline:16px}
+.bar h1{margin:0;font-size:1.1rem;font-weight:600;flex:1;line-height:1.3}
+.bar h1 small{display:block;font-size:.75rem;font-weight:400;color:var(--muted)}
+.ibtn{width:40px;height:40px;border-radius:12px;border:0;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--ink);flex:none}
+.ibtn svg{width:20px;height:20px}
+
+/* التنقل السفلي مع زر التسميع الأوسط */
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:30;
+  background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:6px 8px calc(8px + var(--bottom))}
+.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;font-size:.7rem;color:var(--muted)}
+.tabs button svg{width:23px;height:23px}
+.tabs button[aria-current="page"]{color:var(--green);font-weight:600}
+.tabs .fab{margin-top:-30px}
+.tabs .fab span.c{width:60px;height:60px;border-radius:50%;background:linear-gradient(140deg,var(--green),var(--sky));color:var(--on);display:grid;place-items:center;box-shadow:0 6px 16px rgba(10,30,60,.35);border:4px solid var(--surface)}
+.tabs .fab[aria-current="page"] span.c{background:var(--deep)}
+.tabs .fab svg{width:26px;height:26px}
+
+/* عناصر عامة */
+.card{background:var(--surface);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.card+.card{margin-top:12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:24px 2px 10px}
+.sec h2{margin:0;font-size:1rem;font-weight:600}
+.sec a,.link{color:var(--green);font-size:.85rem;font-weight:500;background:none;border:0;padding:0}
+.muted{color:var(--muted)} .small{font-size:.82rem} .tiny{font-size:.72rem}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:600;background:var(--green-soft);color:var(--green);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn svg{width:18px;height:18px}
+.btn.primary{background:var(--green);color:var(--on)}
+
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.badge{display:inline-flex;align-items:center;font-size:.68rem;border-radius:999px;padding:1px 9px;font-weight:600}
+.badge.ok{background:var(--green-soft);color:var(--green)} .badge.draft{background:var(--gold-soft);color:var(--gold)}
+.alert{border-radius:14px;padding:12px 14px;background:var(--err-soft);color:var(--err);font-size:.86rem;margin-top:12px}
+.info{border-radius:14px;padding:12px 14px;background:var(--surface-2);color:var(--muted);font-size:.86rem}
+.ayah{font-family:var(--quran);font-size:1.55rem;line-height:2.2}
+.end{display:inline-grid;place-items:center;vertical-align:middle;min-width:1.55em;height:1.55em;margin:0 .15em;padding:0 .2em;
+  font-family:var(--ui);font-size:.5em;font-weight:700;line-height:1;color:var(--green);background:var(--sky-soft);
+  border:1.5px solid var(--sky);border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--sky-2)}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1;min-width:0}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* الرئيسية */
+.hero{margin:0 -16px;padding:calc(var(--top) + 18px) 20px 72px;color:#fff;border-radius:0 0 28px 28px}
+.hero .top{display:flex;justify-content:space-between;align-items:center}
+.hero .logo{font-family:var(--quran);font-size:2.1rem;line-height:1;color:var(--sky-2)}
+.hero .date{font-size:.78rem;opacity:.8}
+.hero h2{font-weight:500;font-size:1.3rem;margin:18px 0 2px}
+.hero p{margin:0;opacity:.8;font-size:.9rem}
+.lift{margin-top:-52px;position:relative}
+.continue{display:flex;gap:14px;align-items:center}
+.ring{--p:0;--s:74px;width:var(--s);height:var(--s);border-radius:50%;flex:none;display:grid;place-items:center;
+  background:radial-gradient(closest-side,var(--surface) 80%,transparent 81%),conic-gradient(var(--green) calc(var(--p)*1%),var(--line) 0)}
+.ring b{font-size:1.05rem;font-weight:700}
+.ring small{display:block;font-size:.6rem;color:var(--muted);margin-top:-4px;text-align:center}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qa button{border:0;text-align:start;background:var(--surface);border-radius:18px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.qa .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.qa .ic svg{width:22px;height:22px}
+.qa b{font-weight:600;font-size:.95rem}
+.qa span.t{font-size:.75rem;color:var(--muted);margin-top:-8px}
+.item{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);width:100%;border:0;text-align:start}
+.item+.item{margin-top:10px}
+.pg{width:42px;height:54px;border-radius:7px;flex:none;display:grid;place-items:center;font-weight:700;color:var(--green);background:var(--h,var(--surface-2));border:1px solid var(--line);position:relative}
+.chip{font-size:.75rem;font-weight:600;border-radius:999px;padding:2px 10px;background:var(--green-soft);color:var(--green);flex:none}
+.chip.mid{background:var(--gold-soft);color:var(--gold)} .chip.low{background:var(--err-soft);color:var(--err)}
+
+/* المصحف */
+.juzhead{border-radius:20px;padding:18px;color:#fff;margin-top:4px}
+.juzhead b{font-family:var(--naskh);font-size:1.4rem;font-weight:700}
+.bar-p{height:6px;border-radius:6px;background:rgba(255,255,255,.18);margin-top:10px;overflow:hidden}
+.bar-p i{display:block;height:100%;background:var(--sky-2)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.74rem;color:var(--muted);margin:14px 2px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid var(--line);margin-inline-end:5px;vertical-align:-1px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{border:0;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;gap:6px;text-align:start}
+.tile .pp{aspect-ratio:4/5;border-radius:6px;border:1px solid var(--line);background:var(--h,var(--surface-2));position:relative;overflow:hidden}
+.tile .pp::before{content:"";position:absolute;inset:7px 6px;background:repeating-linear-gradient(to bottom,var(--line) 0 1.5px,transparent 1.5px 6px);opacity:.9}
+.tile .pp::after{content:"";position:absolute;inset:3px;border:1px solid color-mix(in srgb,var(--sky) 40%,transparent);border-radius:3px}
+.tile b{font-size:.85rem}
+.tile span{font-size:.66rem;color:var(--muted);margin-top:-6px}
+
+/* قارئ الوجه */
+.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-radius:14px;padding:4px;gap:2px;box-shadow:var(--shadow);margin-bottom:14px}
+.seg button{border:0;background:none;border-radius:11px;padding:8px 2px;font-size:.85rem;color:var(--muted);font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--green);color:var(--on)}
+.page{background:var(--paper);border-radius:14px;padding:8px;box-shadow:var(--shadow)}
+.page-in{border:3px double var(--green);border-radius:10px;padding:5px}
+.page-in2{border:1px solid var(--sky-2);border-radius:7px;padding:10px 14px 8px;position:relative}
+.phead{display:flex;justify-content:space-between;align-items:center;font-family:var(--naskh);font-size:.95rem;color:var(--green);
+  border-bottom:1px solid var(--sky-2);padding:0 2px 6px;margin-bottom:8px}
+.phead span{font-weight:700}
+.banner{position:relative;margin:6px 10px 10px;border-radius:10px;padding:6px 10px;background:var(--green);color:#fff;text-align:center;
+  font-family:var(--naskh);font-weight:700;font-size:1.2rem;box-shadow:inset 0 0 0 2px var(--green),inset 0 0 0 3px var(--sky-2)}
+.banner::before,.banner::after{content:"";position:absolute;top:50%;width:14px;height:14px;background:var(--sky);transform:translateY(-50%) rotate(45deg);border:2px solid var(--paper)}
+.banner::before{right:-8px} .banner::after{left:-8px}
+.basmala{text-align:center;font-family:var(--quran);font-size:calc(1.45rem * var(--fs));margin-bottom:4px;color:var(--green)}
+.text{font-family:var(--quran);font-size:calc(1.62rem * var(--fs));line-height:2.35;text-align:justify;text-align-last:center}
+.text .a{border-radius:6px;cursor:pointer;transition:background .15s}
+.text .a:hover,.text .a.sel{background:var(--sky-soft)}
+.text .a.m{text-decoration:underline dotted var(--gold-2);text-decoration-thickness:2px;text-underline-offset:.55em}
+.text .a.m:hover{background-color:var(--gold-soft)}
+.text.hide .w{filter:blur(6px)} .text.hide .w.shown{filter:none}
+.pagefoot{display:flex;justify-content:center;margin-top:6px}
+.pagefoot span{min-width:34px;height:34px;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--green);
+  background:var(--sky-soft);border:1px solid var(--sky-2);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);padding:0 6px}
+.mtool{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:16px;padding:6px;box-shadow:var(--shadow);margin-bottom:12px}
+.mtool .vs{display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1;background:var(--surface-2);border-radius:12px;padding:3px}
+.mtool .vs button{border:0;background:none;border-radius:9px;padding:7px 4px;font-size:.84rem;font-weight:500;color:var(--muted)}
+.mtool .vs button[aria-pressed="true"]{background:var(--green);color:var(--on)}
+.mtool .fz{display:flex;gap:2px}
+.mtool .fz button{width:34px;height:34px;border-radius:10px;border:0;background:var(--surface-2);font-weight:700;color:var(--green)}
+.mtool .eye{width:34px;height:34px;border-radius:10px;border:0;background:var(--surface-2);color:var(--green);display:grid;place-items:center}
+.mtool .eye[aria-pressed="true"]{background:var(--green);color:var(--on)}
+.mtool .eye svg{width:18px;height:18px}
+.tsrc{display:flex;gap:6px;margin:-2px 0 12px;flex-wrap:wrap}
+.tsrc button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.78rem;color:var(--muted)}
+.tsrc button[aria-pressed="true"]{border-color:var(--sky);background:var(--sky-soft);color:var(--green);font-weight:600}
+.tsrc button:disabled{opacity:.45}
+.ta{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.ta+.ta{margin-top:10px}
+.ta .q{padding:12px 16px 8px;font-family:var(--quran);font-size:calc(1.55rem * var(--fs));line-height:2.2;background:var(--paper);border-bottom:1px dashed var(--sky-2);cursor:pointer}
+.ta .tx{padding:10px 16px 12px;line-height:1.95;font-size:calc(.95rem * (0.6 + var(--fs) * .4))}
+.ta .tx .lbl{font-size:.7rem;font-weight:700;color:var(--sky);display:block;margin-bottom:2px}
+.ta .mchip{display:inline-flex;align-items:center;gap:4px;border:0;background:var(--gold-soft);color:var(--gold);font-size:.72rem;font-weight:600;border-radius:999px;padding:2px 10px;margin:0 16px 12px}
+.tgroup{background:var(--sky-soft);border-inline-start:4px solid var(--sky);border-radius:14px;padding:12px 14px;margin:14px 0 10px;line-height:1.95}
+.tgroup .lbl{font-size:.72rem;font-weight:700;color:var(--green);display:block;margin-bottom:4px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.switch{width:48px;height:28px;border-radius:999px;border:0;background:var(--line);position:relative;flex:none}
+.switch::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);transition:inset-inline-start .2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch[aria-checked="true"]{background:var(--green)} .switch[aria-checked="true"]::after{inset-inline-start:23px}
+.recite-cta{position:fixed;bottom:calc(86px + var(--bottom));left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;z-index:25;box-shadow:0 8px 20px rgba(10,30,60,.3)}
+
+.verse{padding:14px 0;border-bottom:1px solid var(--line)} .verse:first-child{padding-top:4px} .verse:last-child{border-bottom:0;padding-bottom:4px}
+.verse p{margin:6px 0 0}
+.gh{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.gh span{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:2px 10px;font-size:.82rem}
+.gh b{font-family:var(--quran);font-weight:400;font-size:1.05rem;margin-inline-end:5px;color:var(--green)}
+.src{font-size:.72rem;color:var(--muted);margin:10px 4px 0}
+.htitle{display:flex;justify-content:space-between;align-items:center;margin:22px 2px 10px}
+.htitle h3{margin:0;font-size:.98rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.htitle h3 svg{width:18px;height:18px;color:var(--sky)}
+.topic{font-family:var(--naskh);font-size:1.2rem;line-height:1.9}
+.today{border-radius:18px;padding:16px;color:#fff;border:1px solid color-mix(in srgb,var(--sky-2) 40%,transparent)}
+.today .ayah{font-size:1.5rem;color:#fff}
+.an{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)} .an:last-child{border-bottom:0}
+.an .t{flex:none;font-size:.7rem;font-weight:700;border-radius:8px;padding:3px 9px;margin-top:9px}
+.an .t.amr{background:var(--green-soft);color:var(--green)} .an .t.nahy{background:var(--err-soft);color:var(--err)}
+.an .ayah{font-size:1.3rem;line-height:1.9}
+.fw{margin:0;padding:0;list-style:none}
+.fw li{position:relative;padding-inline-start:20px} .fw li+li{margin-top:8px}
+.fw li::before{content:"";position:absolute;inset-inline-start:2px;top:.65em;width:8px;height:8px;transform:rotate(45deg);background:var(--sky);border-radius:1px}
+
+/* المقارنة */
+.compare{border-radius:16px;overflow:hidden;margin-top:12px;background:var(--surface);border:1px solid var(--gold-2)}
+.compare header{background:var(--gold-soft);color:var(--gold);padding:9px 14px;font-weight:600;font-size:.85rem}
+.compare .side{padding:12px 14px} .compare .side+.side{border-top:1px dashed var(--line)}
+.compare h4{margin:0;font-size:.78rem;font-weight:600;color:var(--muted)}
+.compare .diff{background:var(--gold-soft);color:var(--gold);border-radius:4px;padding:0 3px;box-shadow:inset 0 -2px 0 var(--gold-2)}
+.compare .ctx{font-size:.8rem;color:var(--muted);margin-top:6px}
+
+/* استوديو التسميع */
+.target{display:flex;align-items:center;gap:12px}
+.target .pg{--h:var(--sky-soft);color:var(--green)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.modes button{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.8rem;font-weight:500;color:var(--muted)}
+.modes button svg{width:22px;height:22px}
+.modes button[aria-pressed="true"]{border-color:var(--green);color:var(--green);background:var(--green-soft)}
+.studio{display:flex;flex-direction:column;align-items:center;padding:26px 16px 18px;margin-top:14px}
+.mic{width:120px;height:120px;border-radius:50%;border:0;background:linear-gradient(140deg,var(--green),var(--sky));color:var(--on);display:grid;place-items:center;position:relative;box-shadow:0 10px 26px rgba(10,30,60,.32)}
+.mic svg{width:44px;height:44px}
+.mic::before{content:"";position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--green-soft)}
+.mic.on{background:var(--err);box-shadow:0 10px 26px rgba(178,58,65,.35)}
+.mic.on::before{border-color:var(--err-soft);transform:scale(calc(1 + var(--lvl,0)*.35))}
+.clock{font-size:1.6rem;font-weight:600;font-variant-numeric:tabular-nums;margin-top:16px;letter-spacing:.5px}
+.wave{width:100%;height:46px;margin-top:6px}
+.cap{font-size:.84rem;color:var(--muted);text-align:center;max-width:30ch}
+.live{width:100%;min-height:3.4em;font-family:var(--quran);font-size:1.3rem;line-height:1.9;color:var(--ink);background:var(--surface-2);border-radius:14px;padding:10px 14px;margin-top:14px}
+.live:empty::before{content:attr(data-empty);color:var(--muted);font-family:var(--ui);font-size:.85rem}
+.player{width:100%;display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:16px;padding:10px 12px;margin-top:16px}
+.play{width:44px;height:44px;border-radius:50%;border:0;background:var(--green);color:var(--on);display:grid;place-items:center;flex:none}
+.play svg{width:20px;height:20px}
+.ptrack{flex:1;height:6px;border-radius:6px;background:var(--line);overflow:hidden}
+.ptrack i{display:block;height:100%;width:0;background:var(--green)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:14px}
+.prog{width:100%;height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;background:var(--green);transition:width .2s}
+textarea{width:100%;min-height:150px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-family:var(--quran);font-size:1.3rem;line-height:2;resize:vertical}
+.hint{background:var(--sky-soft);border-radius:14px;padding:12px 14px;margin-top:14px;width:100%}
+.hint .lvl{font-size:.74rem;color:var(--muted);font-weight:500}
+
+/* النتيجة */
+.score{display:flex;align-items:center;gap:16px}
+.score .ring{--s:92px} .score .ring b{font-size:1.35rem}
+.res{background:var(--surface);border-radius:16px;padding:12px 14px;margin-top:10px;box-shadow:var(--shadow);border-inline-start:4px solid var(--ok)}
+.res.error{border-color:var(--err)} .res.transition{border-color:var(--gold-2)} .res.notReached{border-color:var(--line)}
+.res .tag{font-size:.8rem;font-weight:600}
+.w-del{color:var(--err);text-decoration:line-through;opacity:.85}
+.w-sub{color:var(--err);box-shadow:inset 0 -2px 0 var(--err)}
+.w-note{font-family:var(--ui);font-size:.66rem;color:var(--err);vertical-align:super;margin-inline-start:2px}
+.w-ins{font-family:var(--ui);font-size:.72rem;color:var(--err);background:var(--err-soft);border-radius:5px;padding:0 5px}
+
+/* اختبار */
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.opt{text-align:start;border:1px solid var(--line);background:var(--surface-2);border-radius:14px;padding:8px 14px;font-family:var(--quran);font-size:1.3rem;line-height:1.85}
+.opt.ui{font-family:var(--ui);font-size:.95rem;padding:12px 14px}
+.opt.right{border-color:var(--ok);background:var(--green-soft)} .opt.wrong{border-color:var(--err);background:var(--err-soft)}
+.opt .pick{font-family:var(--ui);font-size:.72rem;color:var(--on);background:var(--green);border-radius:999px;padding:1px 8px;margin-inline-start:6px}
+.qprog{height:5px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:12px} .qprog i{display:block;height:100%;background:var(--sky)}
+
+/* الورقة السفلية */
+.scrim{position:fixed;inset:0;background:rgba(10,15,13,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:480px;max-height:88vh;overflow:auto;border-radius:24px 24px 0 0;padding:8px 16px calc(20px + var(--bottom))}
+.sheet .grab{width:42px;height:5px;border-radius:5px;background:var(--line);margin:4px auto 12px}
+.sheet h3{margin:0 0 4px;font-size:1.05rem}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .24s cubic-bezier(.2,.8,.2,1)}@keyframes up{from{transform:translateY(40px);opacity:.5}}}
+.pick-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.pick-grid button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 0;font-weight:600}
+.pick-grid button[aria-pressed="true"]{background:var(--green);color:var(--on);border-color:var(--green)}
+.selects{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.selects label{font-size:.75rem;color:var(--muted)}
+.selects select{width:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+input[type=text]{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+.empty{text-align:center;padding:30px 16px;color:var(--muted)}
+.empty svg{width:44px;height:44px;color:var(--gold-2);margin-bottom:6px}
+
+/* التسميع المباشر: الوجه مخفي وينكشف مع القراءة */
+.fstat{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 2px 8px}
+.fstat .prog{flex:1;margin:0}
+.fpage .text{text-align:justify;text-align-last:auto}
+.fw{border-radius:5px;transition:color .3s ease,background-color .3s ease;-webkit-user-select:none;user-select:none}
+.fw.h{color:transparent;background-image:linear-gradient(var(--line),var(--line));background-size:100% 34%;background-position:center 58%;background-repeat:no-repeat}
+.fw.cur{background-image:linear-gradient(var(--sky),var(--sky))}
+.fw.ok{color:var(--ink)}
+.fw.new{color:var(--green)}
+.fw.skip{color:var(--err);text-decoration:line-through;text-decoration-thickness:1px}
+.fw.hint{color:var(--gold)}
+.fw.bad{background-image:linear-gradient(var(--err),var(--err))}
+@media (prefers-reduced-motion:no-preference){.fw.cur{animation:blink 1.2s ease-in-out infinite}@keyframes blink{50%{opacity:.45}}.fw.bad{animation:shake .3s}@keyframes shake{25%{transform:translateX(3px)}75%{transform:translateX(-3px)}}}
+.fpage .end{opacity:.55}
+.ctrl{position:fixed;bottom:calc(84px + var(--bottom));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:456px;z-index:26;
+  background:var(--surface);border-radius:22px;box-shadow:0 8px 28px rgba(23,34,31,.18);padding:10px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.ctrl .mic{width:64px;height:64px;box-shadow:none} .ctrl .mic svg{width:28px;height:28px} .ctrl .mic::before{inset:-6px}
+.ctrl .side{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--muted);font-size:.72rem;font-weight:500}
+.ctrl .side svg{width:22px;height:22px;color:var(--green)}
+.heard{font-size:.78rem;color:var(--muted);text-align:center;min-height:1.4em;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heard b{font-family:var(--quran);font-weight:400;font-size:1.05rem;color:var(--ink)}
+.toast{border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:.86rem;display:flex;align-items:center;gap:10px}
+.toast.gold{background:var(--gold-soft);color:var(--gold)} .toast.red{background:var(--err-soft);color:var(--err)}
+.toast button{margin-inline-start:auto;border:0;background:var(--surface);color:inherit;border-radius:10px;padding:5px 10px;font-weight:600;font-size:.8rem}
+.typein{display:flex;gap:8px;margin-top:10px}
+.typein input{flex:1}
+
+.search{width:100%;background:var(--surface);border:0;box-shadow:var(--shadow);border-radius:14px;padding:12px 16px;margin-top:12px}
+.sl{display:flex;align-items:center;gap:12px;width:100%;border:0;background:var(--surface);border-radius:16px;padding:10px 14px;box-shadow:var(--shadow);text-align:start}
+.sl+.sl{margin-top:8px}
+.sl .no{width:38px;height:38px;flex:none;display:grid;place-items:center;font-weight:700;font-size:.85rem;color:var(--green);
+  background:var(--sky-soft);clip-path:polygon(50% 0,64% 14%,85% 15%,86% 36%,100% 50%,86% 64%,85% 85%,64% 86%,50% 100%,36% 86%,15% 85%,14% 64%,0 50%,14% 36%,15% 15%,36% 14%)}
+.sl .nm{font-family:var(--naskh);font-weight:700;font-size:1.2rem;line-height:1.3}
+.jz{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);margin-top:10px;overflow:hidden}
+.jz summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.jz summary::-webkit-details-marker{display:none}
+.jz .grid{padding:0 12px 12px;grid-template-columns:repeat(5,1fr);gap:8px}
+.jz .tile{box-shadow:none;border:1px solid var(--line);padding:6px}
+.pnav{display:flex;gap:6px}
+
+.dsec{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);margin-top:10px;overflow:hidden}
+.dsec summary{list-style:none;cursor:pointer;padding:12px 16px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dsec summary::-webkit-details-marker{display:none}
+.dsec summary::after{content:"";width:8px;height:8px;border-inline-start:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .2s;flex:none}
+.dsec[open] summary::after{transform:rotate(135deg)}
+.dsec .body{padding:0 16px 14px;white-space:pre-line;line-height:1.95}
+.dsrc{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted);margin:10px 4px 0}
+.dsrc b{color:var(--sky);font-weight:600}
+.ijmali{background:var(--sky-soft);border-inline-start:4px solid var(--sky);border-radius:16px;padding:14px 16px;line-height:2}
+.ijmali .tiny{color:var(--green);font-weight:600;margin-bottom:4px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{background:var(--surface);border-radius:14px;padding:10px 8px;text-align:center;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:1.1rem;font-weight:700;color:var(--green)}
+.stat span{font-size:.72rem;color:var(--muted)}
+
+/* ===== شريط المصحف: ٦٠٤ وجه في خط واحد ===== */
+.qstrip{position:relative;height:70px;margin-top:26px;cursor:pointer;touch-action:pan-y}
+.qstrip canvas{width:100%;height:100%;display:block}
+.qstrip .lbls{display:flex;justify-content:space-between;font-size:.66rem;opacity:.7;margin-top:6px}
+.qstrip .here{position:absolute;top:-6px;bottom:18px;width:2px;background:#fff;border-radius:2px;pointer-events:none}
+.qstrip .here.edgeR::after{transform:none;right:-2px}
+.qstrip .here.edgeL::after{transform:translateX(100%);right:auto;left:-2px}
+.qstrip .here::after{content:attr(data-p);position:absolute;top:-20px;transform:translateX(50%);right:0;font-size:.68rem;font-weight:700;background:#fff;color:var(--deep);border-radius:6px;padding:1px 6px;white-space:nowrap}
+/* ===== الرئيسية ===== */
+.h2{margin:0 -16px;padding:calc(var(--top) + 16px) 20px 22px;border-radius:0 0 30px 30px}
+.h2 .top{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;opacity:.85}
+.h2 .word{font-family:var(--quran);font-size:4.6rem;line-height:1.1;margin:10px 0 0;letter-spacing:0;color:#fff}
+.h2 .word small{display:block;font-family:var(--quran);font-size:1.05rem;color:var(--sky-2);margin-top:4px}
+.h2 .greet{font-size:.95rem;opacity:.9;margin-top:10px}
+.now{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-top:18px}
+.now .big{font-family:var(--naskh);font-weight:700;font-size:3.4rem;line-height:1;color:var(--green);border-inline-end:2px solid var(--sky);padding-inline-end:16px}
+.now .big small{display:block;font-family:var(--ui);font-size:.68rem;font-weight:500;color:var(--muted);margin-top:6px}
+.now .t{font-weight:600}
+.journey{position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin:26px 0 6px}
+.journey::before{content:"";position:absolute;top:22px;right:12.5%;left:12.5%;height:2px;background:linear-gradient(to left,var(--green),var(--sky))}
+.journey button{position:relative;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--ink);font-weight:600;font-size:.86rem}
+.journey .dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:2px solid var(--sky);color:var(--green)}
+.journey .dot svg{width:21px;height:21px}
+.journey button:first-child .dot{background:var(--green);border-color:var(--green);color:#fff}
+.journey small{font-weight:400;font-size:.68rem;color:var(--muted);margin-top:-6px}
+.rail{border-inline-start:2px solid var(--sky);padding-inline-start:14px;margin-top:26px}
+.rail h2{margin:0 0 2px;font-size:.98rem;font-weight:700}
+.rail .sub{font-size:.75rem;color:var(--muted);margin-bottom:10px}
+.row2{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;background:none;border-inline:0;border-top:0;text-align:start}
+.row2:last-child{border-bottom:0}
+.row2 .n{font-family:var(--naskh);font-weight:700;font-size:1.5rem;color:var(--green);min-width:44px;text-align:center}
+/* ===== لوحة التفسير تحت المصحف ===== */
+.tpanel{margin-top:12px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;border-top:3px solid var(--sky)}
+.tpanel .th{display:flex;align-items:center;gap:8px;padding:10px 12px 8px 14px}
+.tpanel .th b{flex:1;font-size:.92rem}
+.tpanel .th button{width:34px;height:34px;border-radius:10px;border:0;background:var(--surface-2);color:var(--green);display:grid;place-items:center}
+.tpanel .th button svg{width:18px;height:18px}
+.tpanel .tabs3{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto}
+.tpanel .tabs3 button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.76rem;color:var(--muted)}
+.tpanel .tabs3 button[aria-pressed="true"]{border-color:var(--sky);background:var(--sky-soft);color:var(--green);font-weight:600}
+.tpanel .tb{padding:4px 16px 16px;line-height:2;font-size:calc(.98rem * (0.6 + var(--fs) * .4))}
+.tpanel .tb .ay{font-family:var(--quran);font-size:calc(1.3rem * var(--fs));line-height:2;color:var(--green);margin-bottom:6px}
+.tpanel .mbtn{margin:0 16px 14px}
+.text .a.sel{background:var(--sky-soft);box-shadow:0 0 0 2px var(--sky-soft)}
+
+/* ================= التصميم المحسّن ================= */
+body{background:#F3F7FC;background-image:linear-gradient(180deg,#E6EFFA 0,#F3F7FC 520px);background-repeat:no-repeat}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(180deg,#0B1A33 0,#081325 340px)}}
+.app{background:transparent}
+.card,.item,.tile,.qa button,.sl,.dsec,.ta,.tpanel,.res,.stat,.jz,.seg,.mtool{border-radius:22px;box-shadow:0 10px 30px rgba(20,51,94,.07);border:1px solid rgba(20,51,94,.05)}
+.btn{border-radius:16px}
+.btn.primary{background:linear-gradient(135deg,var(--green),var(--sky));box-shadow:0 8px 18px rgba(47,159,219,.28)}
+.bar{background:transparent;backdrop-filter:none}
+.bar h1{font-size:1.45rem;font-weight:700}
+/* شريط التنقل العائم */
+.tabs{bottom:calc(10px + var(--bottom));width:calc(100% - 24px);max-width:456px;border-radius:26px;border:1px solid rgba(20,51,94,.08);
+  background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(14px);box-shadow:0 14px 34px rgba(10,30,60,.16);padding:6px 6px 8px}
+.tabs button[aria-current="page"]{color:var(--green)}
+.tabs button[aria-current="page"] svg{filter:drop-shadow(0 4px 8px rgba(47,159,219,.35))}
+.tabs .fab{margin-top:-34px}
+.tabs .fab span.c{border:5px solid var(--bg)}
+.content{padding-bottom:calc(126px + var(--bottom))}
+.recite-cta{bottom:calc(98px + var(--bottom));border-radius:18px}
+.ctrl{bottom:calc(96px + var(--bottom))}
+/* الرئيسية */
+.hd{display:flex;align-items:center;gap:12px;padding:calc(var(--top) + 18px) 2px 6px}
+.hd .av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--green),var(--sky));font-size:1.1rem}
+.hd .hi{flex:1}.hd .hi small{display:block;color:var(--muted);font-size:.78rem}.hd .hi b{font-size:1.2rem}
+.hd .date{font-size:.72rem;color:var(--muted);text-align:left}
+.heroC{position:relative;overflow:hidden;margin-top:16px;border-radius:28px;padding:20px;color:#fff;
+  background:radial-gradient(90% 120% at 0% 0%,rgba(124,203,242,.55),transparent 55%),linear-gradient(145deg,#0A1E3C,#14335E 55%,#1F5F96)}
+.heroC::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;left:-70px;bottom:-110px;background:radial-gradient(circle,rgba(124,203,242,.35),transparent 70%)}
+.heroC .in{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.heroC .k{font-size:.78rem;opacity:.8}.heroC .t{font-size:1.35rem;font-weight:700;margin:4px 0 2px}.heroC .s{font-size:.82rem;opacity:.85}
+.heroC .go{margin-top:16px;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:14px;padding:10px 16px;background:#fff;color:var(--deep);font-weight:700}
+.heroC .go svg{width:18px;height:18px}
+.ring2{--p:0;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(closest-side,#13305A 79%,transparent 80% 100%),conic-gradient(#7CCBF2 calc(var(--p)*1%),rgba(255,255,255,.14) 0)}
+.ring2 b{font-size:1.5rem;line-height:1}.ring2 small{display:block;font-size:.62rem;opacity:.75;text-align:center;margin-top:2px}
+.sec2{display:flex;justify-content:space-between;align-items:baseline;margin:26px 4px 12px}
+.sec2 h2{margin:0;font-size:1.08rem;font-weight:700}
+.sec2 button{border:0;background:none;color:var(--sky);font-weight:600;font-size:.82rem}
+.hs{display:flex;gap:12px;overflow-x:auto;margin:0 -16px;padding:4px 16px 10px;scrollbar-width:none}.hs::-webkit-scrollbar{display:none}
+.qc{flex:none;width:132px;border:0;text-align:start;background:var(--surface);border-radius:22px;padding:14px;box-shadow:0 10px 30px rgba(20,51,94,.07);display:flex;flex-direction:column;gap:12px}
+.qc .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff}
+.qc .ic svg{width:22px;height:22px}
+.qc b{font-size:.95rem}.qc span.t{font-size:.72rem;color:var(--muted);margin-top:-8px}
+.votd{border-radius:26px;padding:20px 18px;background:var(--surface);box-shadow:0 10px 30px rgba(20,51,94,.07);position:relative;overflow:hidden;text-align:center}
+.votd::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:linear-gradient(90deg,var(--sky),var(--green))}
+.votd .lbl{font-size:.75rem;color:var(--sky);font-weight:700}
+.votd .ay{font-family:var(--quran);font-size:1.6rem;line-height:2.2;margin:8px 0 6px;color:var(--ink)}
+.votd .rf{font-size:.78rem;color:var(--muted)}
+.votd details{margin-top:12px;text-align:start}
+.votd summary{list-style:none;cursor:pointer;text-align:center;color:var(--green);font-weight:600;font-size:.85rem}
+.votd summary::-webkit-details-marker{display:none}
+.votd .tx{margin-top:10px;line-height:1.95;background:var(--surface-2);border-radius:16px;padding:12px 14px}
+.mini{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:20px;padding:12px 14px;box-shadow:0 10px 30px rgba(20,51,94,.06);width:100%;border:0;text-align:start}
+.mini+.mini{margin-top:10px}
+.mini .pn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:700;background:var(--sky-soft);color:var(--green)}
+/* شاشة التفسير */
+.tfh{display:flex;align-items:center;gap:8px;margin:6px 0 12px}
+.tfh .pick{flex:1;display:flex;align-items:center;gap:10px;border:0;background:var(--surface);border-radius:18px;padding:10px 14px;box-shadow:0 10px 30px rgba(20,51,94,.07);text-align:start}
+.tfh .pick b{font-family:var(--naskh);font-size:1.25rem}
+.tfh .pick small{display:block;font-size:.72rem;color:var(--muted)}
+.tfh .ibtn{border-radius:14px}
+.srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface);border-radius:16px;padding:4px;box-shadow:0 10px 30px rgba(20,51,94,.06);margin-bottom:14px}
+.srcs button{border:0;background:none;border-radius:12px;padding:9px 4px;font-size:.8rem;font-weight:500;color:var(--muted)}
+.srcs button[aria-pressed="true"]{background:linear-gradient(135deg,var(--green),var(--sky));color:#fff;font-weight:700}
+
+/* ================= قارئ المصحف: وجه وجه ================= */
+.pv{position:relative}
+.pv .page{padding:7px;border-radius:18px;background:var(--paper);box-shadow:0 14px 34px rgba(20,51,94,.10);border:1px solid rgba(20,51,94,.06)}
+.pv .page-in{border:2px solid var(--green);border-radius:13px;padding:4px}
+.pv .page-in2{border:1px solid var(--sky-2);border-radius:10px;padding:10px 14px 6px;display:flex;flex-direction:column;overflow:hidden}
+.pv .phead{flex:none;margin-bottom:4px}
+.pv .pbody{flex:none;margin-block:auto}
+.pv .text{font-size:var(--pf,26px);line-height:2.05;text-align:justify;text-align-last:center}
+.pv .basmala{font-size:calc(var(--pf,26px) * .92);margin:0 0 2px}
+.pv .banner{font-size:calc(var(--pf,26px) * .7);margin:4px 8px 6px;padding:3px 10px}
+.pv .pagefoot{flex:none;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:18px}
+.pv .pagefoot button{width:30px;height:30px;border-radius:50%;border:1px solid var(--sky-2);background:var(--surface);color:var(--green);display:grid;place-items:center}
+.pv .pagefoot button:disabled{opacity:.3}
+.pv .pagefoot button svg{width:15px;height:15px}
+.pv .text .a{cursor:pointer;border-radius:6px}
+.pv .text .a.m{text-decoration:none}
+.pv .text .a.m + .end{border-color:var(--gold-2);background:var(--gold-soft);color:var(--gold);box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--gold-2)}
+.pv .text .a:active{background:var(--sky-soft)}
+.pv.go-next .page{animation:pgN .28s ease-out} .pv.go-prev .page{animation:pgP .28s ease-out}
+@keyframes pgN{from{transform:translateX(-40px);opacity:.3}} @keyframes pgP{from{transform:translateX(40px);opacity:.3}}
+@media (prefers-reduced-motion:reduce){.pv.go-next .page,.pv.go-prev .page{animation:none}}
+.pnav2{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px}
+.pnav2 button{width:40px;height:40px;border-radius:50%;border:0;background:var(--surface);box-shadow:0 6px 16px rgba(20,51,94,.08);color:var(--green);display:grid;place-items:center}
+.pnav2 button:disabled{opacity:.35}
+.pnav2 button svg{width:18px;height:18px}
+.pnav2 span{font-size:.82rem;color:var(--muted);min-width:90px;text-align:center}
+.pnav2 span b{color:var(--ink)}
+.opt2{display:flex;align-items:center;gap:12px;width:100%;border:0;background:var(--surface);border-radius:18px;padding:12px 14px;text-align:start;box-shadow:0 6px 16px rgba(20,51,94,.05)}
+.opt2+.opt2{margin-top:8px}
+.opt2 .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--sky-soft);color:var(--green);flex:none}
+.opt2 .ic svg{width:20px;height:20px}
+
+/* ================= وضع القراءة الغامر ================= */
+body.immersive .tabs,body.immersive #view > .bar{display:none}
+body.immersive .content{padding:0}
+body.immersive{background:var(--rpaper)}
+:root{--rpaper:#FFFDF8;--rink:#13223A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--rpaper:#0D1828;--rink:#E6EDF7}}
+:root[data-theme="dark"]{--rpaper:#0D1828;--rink:#E6EDF7}
+.rd{position:fixed;inset:0;max-width:480px;margin:0 auto;background:var(--rpaper);color:var(--rink);
+  padding:calc(var(--top) + 10px) 12px calc(var(--bottom) + 10px);display:flex;flex-direction:column;z-index:15;touch-action:pan-y}
+.rd .frame{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid color-mix(in srgb,var(--sky) 45%,transparent);border-radius:6px;
+  box-shadow:inset 0 0 0 3px var(--rpaper),inset 0 0 0 4px color-mix(in srgb,var(--green) 35%,transparent);padding:8px 12px 6px}
+.rd .rh{flex:none;display:flex;justify-content:space-between;font-family:var(--naskh);font-size:.82rem;color:color-mix(in srgb,var(--rink) 55%,transparent);padding:0 2px 4px}
+.rd .rb{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none}
+.rd .rb::-webkit-scrollbar{display:none}
+.rd .rb > .inner{margin-block:auto}
+.rd .text{font-size:var(--pf,28px);line-height:2.15;color:var(--rink);text-align:justify;text-align-last:center}
+.rd .basmala{font-size:calc(var(--pf,28px) * .9);color:var(--rink);margin:0 0 2px}
+.rd .banner{font-size:calc(var(--pf,28px) * .62);margin:4px 14px 6px;padding:3px 10px}
+.rd .rf{flex:none;text-align:center;font-size:.8rem;color:color-mix(in srgb,var(--rink) 55%,transparent);padding-top:4px}
+.rd .text .a{border-radius:6px;transition:background .2s}
+.rd .text .a.hold{background:var(--sky-soft)}
+.rd .text .a.m{text-decoration:none}
+.rd .text .a.m + .end{border-color:var(--gold-2);background:var(--gold-soft);color:var(--gold);box-shadow:0 0 0 2px var(--rpaper),0 0 0 3px var(--gold-2)}
+.rd .end{box-shadow:0 0 0 2px var(--rpaper),0 0 0 3px var(--sky-2)}
+.rd.go-next .frame{animation:pgN .26s ease-out} .rd.go-prev .frame{animation:pgP .26s ease-out}
+/* الأدوات تظهر باللمس */
+.rtop,.rbot{position:fixed;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:460px;z-index:16;display:flex;align-items:center;gap:8px;
+  background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);border-radius:20px;padding:8px;box-shadow:0 12px 30px rgba(10,30,60,.18);
+  transition:opacity .2s,transform .2s;opacity:0;pointer-events:none}
+.rtop{top:calc(var(--top) + 10px);transform:translate(-50%,-12px)}
+.rbot{bottom:calc(var(--bottom) + 10px);transform:translate(-50%,12px)}
+.rd.ui ~ .rtop,.rd.ui ~ .rbot{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.rtop .t{flex:1;line-height:1.3}.rtop .t b{display:block;font-size:.95rem}.rtop .t small{font-size:.72rem;color:var(--muted)}
+.rbot .pgi{flex:1;text-align:center;font-size:.85rem;color:var(--muted)}.rbot .pgi b{color:var(--ink)}
+.rhint{position:fixed;left:50%;bottom:calc(var(--bottom) + 24px);transform:translateX(-50%);z-index:17;background:var(--deep);color:#fff;font-size:.8rem;
+  border-radius:14px;padding:8px 14px;max-width:90%;text-align:center;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+@media (prefers-reduced-motion:reduce){.rtop,.rbot{transition:none}.rd.go-next .frame,.rd.go-prev .frame{animation:none}}
+
+/* ===== مصحف المدينة: ١٥ سطراً موزونة ===== */
+.rd .lines{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--quran);font-size:var(--pf,22px);color:var(--rink);padding:.35em 0 .2em}
+.rd .lines.c{justify-content:center;gap:.55em}
+.rd .ln{display:flex;justify-content:space-between;align-items:center;white-space:nowrap;line-height:1.45;column-gap:.16em}
+.rd .ln.one{justify-content:center}
+.rd .lines.c .ln{justify-content:center;column-gap:.32em}
+.rd .ln.hdr{justify-content:center}
+.rd .ln.hdr .banner{font-size:.6em;margin:0;width:86%;padding:.18em .6em}
+.rd .ln.bsm{justify-content:center;font-size:.92em}
+.rd .lines.measure .ln{justify-content:flex-start;width:max-content;column-gap:.22em}
+.rd .lines.c.measure .ln{column-gap:.32em}
+.rd .ln .a{border-radius:5px;padding:0 .02em}
+.rd .ln .end{font-size:.48em;min-width:1.7em;height:1.7em}
+.rd .ln .end.m{border-color:var(--gold-2);background:var(--gold-soft);color:var(--gold);box-shadow:0 0 0 2px var(--rpaper),0 0 0 3px var(--gold-2)}
+.rd .lines.hide .w{filter:blur(6px)} .rd .lines.hide .w.shown{filter:none}
+
+/* ===== راحة العين: مظاهر القراءة ===== */
+.rd{--rpaper:#F7F1E3;--rink:#3A2E21;--rmut:#8F7C60;--rline:#D8C7A4;--mk-b:#BE9B5C;--mk-bg:#EFE3C7;--mk-c:#6B5326;
+  --mm-b:#C27A1C;--mm-bg:#F4D9A6;--mm-c:#7A4708;--bn-bg:transparent;--bn-b:#BE9B5C;--bn-c:#5A4422}
+.rd[data-rt="light"]{--rpaper:#FFFEFB;--rink:#1C2433;--rmut:#7A8597;--rline:#C9DCEB;--mk-b:#5FB3E4;--mk-bg:#E6F4FC;--mk-c:#14335E;
+  --mm-b:#D9A441;--mm-bg:#FBEFD5;--mm-c:#8A5A0A;--bn-bg:#14335E;--bn-b:#14335E;--bn-c:#FFFFFF}
+.rd[data-rt="night"]{--rpaper:#141B24;--rink:#D9D3C3;--rmut:#7F8A99;--rline:#2A3646;--mk-b:#4E7FA3;--mk-bg:#1B2838;--mk-c:#A9C7DE;
+  --mm-b:#A77B2E;--mm-bg:#2D2414;--mm-c:#E2C084;--bn-bg:transparent;--bn-b:#4E7FA3;--bn-c:#B9CCDD}
+.rd{background:var(--rpaper);color:var(--rink);padding:calc(var(--top) + 6px) 6px calc(var(--bottom) + 6px);transition:background .25s}
+body.immersive{background:#F7F1E3}
+.rd .frame{border:1px solid var(--rline);box-shadow:none;border-radius:4px;padding:6px 7px 4px}
+.rd .rh{color:var(--rmut);font-size:.78rem;padding:0 4px 2px}
+.rd .rf{color:var(--rmut);font-size:.78rem;padding-top:2px}
+.rd .lines{color:var(--rink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.rd .ln{column-gap:.12em}
+.rd .lines.measure .ln{column-gap:.16em}
+.rd .ln .end{border:1.3px solid var(--mk-b);background:var(--mk-bg);color:var(--mk-c);box-shadow:none;font-weight:600}
+.rd .ln .end.m{border:1.6px solid var(--mm-b);background:var(--mm-bg);color:var(--mm-c);box-shadow:none}
+.rd .ln.hdr .banner{background:var(--bn-bg);color:var(--bn-c);border:1.5px solid var(--bn-b);box-shadow:none;border-radius:999px}
+.rd .ln.hdr .banner::before,.rd .ln.hdr .banner::after{background:var(--bn-b);border-color:var(--rpaper)}
+.rd .ln.bsm{color:var(--rink)}
+.rd .ln .a:active,.rd .ln .a.hold{background:color-mix(in srgb,var(--mk-b) 22%,transparent)}
+.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.themes button{border:2px solid transparent;border-radius:16px;padding:12px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.8rem;font-weight:600}
+.themes button span{font-family:var(--quran);font-size:1.25rem;line-height:1.2}
+.themes button[aria-pressed="true"]{border-color:var(--sky)}
+
+/* ===== ميزة السماع ===== */
+.mp{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(98px + var(--bottom));width:calc(100% - 24px);max-width:456px;z-index:28;
+  background:linear-gradient(135deg,#0A1E3C,#14335E 70%,#1F5F96);color:#fff;border-radius:22px;padding:10px 12px;box-shadow:0 14px 34px rgba(10,30,60,.32);
+  display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+body.immersive .mp{bottom:calc(var(--bottom) + 12px)}
+body.immersive.rui .mp{bottom:calc(var(--bottom) + 84px)}
+.mp .who{min-width:0}.mp .who b{display:block;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp .who small{font-size:.72rem;opacity:.8}
+.mp .ctl{display:flex;align-items:center;gap:4px}
+.mp .ctl button{width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center}
+.mp .ctl button svg{width:18px;height:18px}
+.mp .ctl .pp{width:46px;height:46px;background:#fff;color:#0A1E3C}
+.mp .ctl .pp svg{width:22px;height:22px}
+.mp .bar2{grid-column:1/-1;height:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+.mp .bar2 i{display:block;height:100%;width:0;background:#7CCBF2}
+.mp .err{grid-column:1/-1;font-size:.76rem;background:rgba(240,147,154,.18);color:#FFD9DC;border-radius:10px;padding:6px 10px}
+.mp .rep{font-size:.68rem;font-weight:700;color:#7CCBF2;min-width:22px;text-align:center}
+.rd .ln .a.pl{background:color-mix(in srgb,var(--mk-b) 26%,transparent);box-shadow:-.09em 0 0 color-mix(in srgb,var(--mk-b) 26%,transparent),.09em 0 0 color-mix(in srgb,var(--mk-b) 26%,transparent);border-radius:2px}
+.rd .ln .end.pl{background:var(--mk-b);color:var(--rpaper)}
+.ta .q.pl{background:var(--sky-soft)}
+.rcl{display:flex;align-items:center;gap:12px;width:100%;border:0;background:var(--surface);border-radius:16px;padding:10px 12px;text-align:start;box-shadow:0 4px 12px rgba(20,51,94,.05)}
+.rcl+.rcl{margin-top:8px}
+.rcl .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--sky-soft);color:var(--green);font-weight:700;flex:none}
+.rcl[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--sky)}
+.rcl .tag{display:inline-block;font-size:.66rem;font-weight:700;background:var(--gold-soft);color:var(--gold);border-radius:999px;padding:1px 8px;margin-inline-start:10px;vertical-align:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:.82rem}
+.chips button[aria-pressed="true"]{background:var(--green);color:var(--on);border-color:var(--green)}
+</style>
+</head>
+<body>
+<div class="app"><main class="content" id="view"></main><nav class="tabs" id="tabs" aria-label="التنقل"></nav></div>
+<div id="sheetRoot"></div>
+<div id="mp" class="mp" hidden></div>
+
+<script>/*CORE*/</script>
+<script>
+const DATA = /*DATA*/;
+const CONTENT = /*CONTENT*/;
+const LAYOUT = /*LAYOUT*/;
+/* موسوعة التفسير — الدرر السنية: ما ضُمِّن هنا، والباقي يُحمَّل من dorar/{رقم السورة}.json عند النشر */
+const DORAR_INLINE = /*DORAR*/;
+const DORAR_CACHE = {};
+async function getDorar(n) {
+  if (DORAR_INLINE[n]) return DORAR_INLINE[n];
+  if (n in DORAR_CACHE) return DORAR_CACHE[n];
+  try { const r = await fetch(`dorar/${n}.json`); DORAR_CACHE[n] = r.ok ? await r.json() : null; } catch (e) { DORAR_CACHE[n] = null; }
+  return DORAR_CACHE[n];
+}
+async function dorarGroups(p) {
+  const out = [];
+  for (const n of [...new Set(DATA.pages[p].map(k => V(k).s))]) {
+    const d = await getDorar(n); if (!d) continue;
+    const ay = DATA.pages[p].filter(k => V(k).s === n).map(k => V(k).a), a = ay[0], b = ay.at(-1);
+    for (const g of d.groups) if (g.from != null && g.from <= b && g.to >= a && Object.keys(g.sections || {}).length) out.push({ n, ...g });
+  }
+  return out;
+}
+const DSRC = `<div class="dsrc">المصدر: <b>موسوعة التفسير</b> — الدرر السنية</div>`;
+const dsec = (sec, open) => sec ? `<details class="dsec" ${open ? "open" : ""}><summary>${esc(sec.title)}</summary><div class="body">${esc(sec.text)}</div></details>` : "";
+/* عنوان خادم التعرف على التلاوة (اختياري): إن وُضع، يُرسل إليه التسجيل بدل نموذج Whisper داخل المتصفح */
+const ASR_ENDPOINT = "";
+const WHISPER_MODEL = "Xenova/whisper-base";
+const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/transformers.min.js";
+
+const M = window.Mathani;
+const AR = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const V = k => DATA.verses[k];
+const sName = k => DATA.surahs[V(k).s];
+const ref = k => `${sName(k)} ${AR(V(k).a)}`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ayat = n => n === 1 ? "آية واحدة" : n === 2 ? "آيتان" : n <= 10 ? `${AR(n)} آيات` : `${AR(n)} آية`;
+const $ = s => document.querySelector(s);
+const PAGES = Object.keys(DATA.pages).map(Number);
+const SURAHS = Object.keys(DATA.surahs).map(Number);
+
+const juzOf = p => +Object.keys(DATA.juz).find(j => p >= DATA.juz[j][0] && p <= DATA.juz[j][1]);
+const juzPages = j => { const [a, b] = DATA.juz[j]; return Array.from({ length: b - a + 1 }, (_, i) => a + i); };
+const JUZ_NAMES = ["","الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر","الحادي عشر","الثاني عشر","الثالث عشر","الرابع عشر","الخامس عشر","السادس عشر","السابع عشر","الثامن عشر","التاسع عشر","العشرون","الحادي والعشرون","الثاني والعشرون","الثالث والعشرون","الرابع والعشرون","الخامس والعشرون","السادس والعشرون","السابع والعشرون","الثامن والعشرون","التاسع والعشرون","الثلاثون"];
+const surahPages = s => { const out = []; for (const p of PAGES) if (DATA.pages[p].some(k => V(k).s === s)) out.push(p); return out; };
+const pageSurah = p => [...new Set(DATA.pages[p].map(sName))].join(" و");
+const pageRange = p => `${AR(V(DATA.pages[p][0]).a)}–${AR(V(DATA.pages[p].at(-1)).a)}`;
+
+const I = (d, extra = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+const ICON = {
+  home: I('<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
+  book: I('<path d="M12 6c-2-1.5-5-2-8-1.5V19c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V4.5C17 4 14 4.5 12 6z"/><path d="M12 6v14.5"/>'),
+  mic: I('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+  review: I('<path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/>'),
+  user: I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
+  tafsir: I('<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M9 9h6M9 13h4"/>'),
+  back: I('<path d="M5 12h14M13 6l6 6-6 6"/>'), next: I('<path d="M15 6l-6 6 6 6"/>'), prev: I('<path d="M9 6l6 6-6 6"/>'), chev: I('<path d="M15 6l-6 6 6 6"/>'),
+  stop: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="3"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  wave: I('<path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 7v10M21 12h0"/>'),
+  pen: I('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>'),
+  layers: I('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>'),
+  bulb: I('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'),
+  check: I('<path d="M4 12l5 5L20 6"/>'),
+  star: I('<path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>'),
+  quiz: I('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h0"/>'),
+};
+
+/* ---------- التخزين ---------- */
+const KEY = "mathani:app:v2";
+let ST = { name: "", pages: {}, mistakes: [], sessions: [], approved: {}, last: 3 };
+try { const r = localStorage.getItem(KEY); if (r) ST = Object.assign(ST, JSON.parse(r)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} };
+function record(page, errors, detail, acc, kind) {
+  ST.pages[page] = M.schedule(ST.pages[page], errors, Date.now());
+  (detail || []).forEach(d => ST.mistakes.push({ ...d, page, at: Date.now() }));
+  ST.mistakes = ST.mistakes.slice(-300);
+  if (acc != null) ST.sessions.push({ page, acc, at: Date.now(), kind: kind || "tasmee" });
+  ST.sessions = ST.sessions.slice(-200); save();
+}
+const DB = {
+  db: null,
+  open() { return this.db ? Promise.resolve(this.db) : new Promise((res, rej) => { try {
+    const r = indexedDB.open("mathani", 1); r.onupgradeneeded = () => r.result.createObjectStore("rec", { keyPath: "id" });
+    r.onsuccess = () => res(this.db = r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }); },
+  async put(o) { try { const db = await this.open(); await new Promise(r => { const t = db.transaction("rec", "readwrite"); t.objectStore("rec").put(o); t.oncomplete = r; t.onerror = r; }); return true; } catch (e) { return false; } },
+  async all() { try { const db = await this.open(); return await new Promise(r => { const q = db.transaction("rec").objectStore("rec").getAll(); q.onsuccess = () => r(q.result || []); q.onerror = () => r([]); }); } catch (e) { return []; } },
+  async del(id) { try { const db = await this.open(); await new Promise(r => { const t = db.transaction("rec", "readwrite"); t.objectStore("rec").delete(id); t.oncomplete = r; }); } catch (e) {} },
+};
+function heat(p) { const r = ST.pages[p]; if (!r) return "var(--surface-2)"; return r.errors === 0 ? "var(--green-soft)" : r.errors <= 3 ? "var(--gold-soft)" : "var(--err-soft)"; }
+const accChip = a => `<span class="chip ${a >= .9 ? "" : a >= .7 ? "mid" : "low"}">${AR(Math.round(a * 100))}٪</span>`;
+
+/* ---------- الحالة والتنقل ---------- */
+const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
+  T: { page: 3, from: null, to: null, mode: "live", phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, progText: "" },
+  quiz: null };
+function go(tab) { document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
+function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); }
+function openTasmee(p) {
+  stopRec(true); resetT(); S.T.page = +p; S.T.surah = null; S.T.from = null; S.T.to = null; S.tab = "tasmee"; S.reader = null; render(); scrollTo(0, 0);
+}
+function resetT() { F = null; if (S.T.url) { /* يبقى الرابط صالحاً للتسجيلات المحفوظة */ } Object.assign(S.T, { phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, recId: null }); }
+
+function render() {
+  setTimeout(() => { highlight(); drawMP(); }, 0);
+  if (!(S.reader && S.rview === "mushaf")) { document.body.classList.remove("immersive"); document.body.style.background = ""; }
+  $("#tabs").innerHTML = [["home", "الرئيسية", "home"], ["mushaf", "المصحف", "book"], ["tasmee", "سمّع", "mic"], ["tafsir", "التفسير", "tafsir"], ["profile", "حسابي", "user"]]
+    .map(([id, t, ic]) => id === "tasmee" && !(S.tab === "tasmee" && !S.reader)
+      ? `<button class="fab" data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}><span class="c">${ICON[ic]}</span>${t}</button>`
+      : `<button data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}>${ICON[ic]}${t}</button>`).join("");
+  if (S.reader) return reader();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab })[S.tab]();
+}
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.tab); });
+function bar(title, sub, back, action) {
+  return `<header class="bar">${back ? `<button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>` : ""}
+    <h1>${title}${sub ? `<small>${sub}</small>` : ""}</h1>${action || ""}</header>`;
+}
+function bindAll() {
+  document.querySelectorAll("[data-read]").forEach(b => b.onclick = () => openReader(b.dataset.read, b.dataset.view));
+  document.querySelectorAll("[data-tas]").forEach(b => b.onclick = () => openTasmee(b.dataset.tas));
+  document.querySelectorAll("[data-mut]").forEach(b => b.onclick = () => ayahSheet(b.dataset.mut));
+}
+
+
+/* ---------- شريط المصحف: كل وجه خط، ولونه بحسب الحفظ ---------- */
+function stripHTML(id, cur) { return `<div class="qstrip" id="${id}"><canvas aria-label="خريطة المصحف"></canvas><div class="here" data-p="الوجه ${AR(cur)}"></div><div class="lbls"><span>الفاتحة</span><span>ارتفاع الخط: كثافة المتشابهات</span><span>الناس</span></div></div>`; }
+function drawStrip(id, cur, onPick) { try { drawStrip0(id, cur, onPick); } catch (e) {} }
+const raf = f => (window.requestAnimationFrame || (g => setTimeout(g, 16)))(f);
+function drawStrip0(id, cur, onPick) {
+  const box = document.getElementById(id); if (!box) return;
+  const cv = box.querySelector("canvas"), W = box.clientWidth || 360, H = 46, dpr = window.devicePixelRatio || 1;
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + "px";
+  const g = cv.getContext && cv.getContext("2d"); if (!g || !g.scale) return; g.scale(dpr, dpr);
+  const n = PAGES.length, bw = W / n, juzStarts = new Set(Object.values(DATA.juz).map(r => r[0]));
+  // ارتفاع كل خط = كثافة المتشابهات في الوجه، فيصير الشريط بصمةً للقرآن كله
+  if (!drawStrip.dens) drawStrip.dens = PAGES.map(p => { const k = DATA.pages[p]; return k.filter(x => DATA.mutashabihat[x]).length / k.length; });
+  for (let p = 1; p <= n; p++) {
+    const x = W - p * bw, h = H * (0.18 + 0.82 * drawStrip.dens[p - 1]);
+    g.fillStyle = juzStarts.has(p) ? "rgba(124,203,242,.75)" : "rgba(124,203,242,.32)";
+    g.fillRect(x, (H - h) / 2, Math.max(bw - .2, .5), h);
+  }
+  for (const [pp, r] of Object.entries(ST.pages)) { // الأوجه المسمَّعة فوق كل شيء وبعرض واضح
+    const p = +pp, x = W - p * bw, w = Math.max(bw, 2.5);
+    g.fillStyle = r.errors === 0 ? "#FFFFFF" : r.errors <= 3 ? "#E2B04E" : "#F0939A";
+    g.fillRect(x - (w - bw) / 2, 2, w, H - 4);
+  }
+  const here = box.querySelector(".here"), rx = (cur - .5) * bw; here.style.right = rx + "px";
+  here.classList.toggle("edgeR", rx < 34); here.classList.toggle("edgeL", rx > W - 34);
+  box.onclick = e => { const rc = box.getBoundingClientRect(), p = Math.min(n, Math.max(1, Math.ceil((rc.right - e.clientX) / bw))); onPick(p); };
+}
+
+/* ---------- الرئيسية ---------- */
+function home() {
+  const now = Date.now();
+  const due = Object.entries(ST.pages).filter(([, r]) => r.due <= now).sort((a, b) => b[1].errors - a[1].errors);
+  const last = ST.last || 3, jz = juzOf(last), jp = juzPages(jz);
+  const mastered = jp.filter(p => ST.pages[p] && ST.pages[p].errors === 0).length;
+  let hijri = ""; try { hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", { day: "numeric", month: "long" }).format(new Date()); } catch (e) {}
+  const hr = new Date().getHours(), greet = hr < 12 ? "صباح الخير" : "مساء الخير";
+  // آية اليوم: من الآيات التي لها متشابه، تتغير يومياً
+  const pool = Object.keys(DATA.mutashabihat), vk = pool[Math.floor(now / 864e5) % pool.length], vv = V(vk);
+  const qcs = [["سمّع", "الوجه مخفي", ICON.mic, "linear-gradient(135deg,#14335E,#2F9FDB)", () => openTasmee(last)],
+    ["التفسير", "آية وتفسيرها", ICON.tafsir, "linear-gradient(135deg,#1F5F96,#7CCBF2)", () => { S.tp = last; go("tafsir"); }],
+    ["استمع", "تلاوة وتكرار", ICON.listen, "linear-gradient(135deg,#0E7490,#22D3EE)", () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
+    ["المتشابهات", "قارن وافهم", ICON.layers, "linear-gradient(135deg,#B07816,#E2B04E)", () => openReader(last, "mushaf")],
+    ["اختبر", "أسئلة الوجه", ICON.quiz, "linear-gradient(135deg,#0A1E3C,#14335E)", () => openReader(last, "quiz")]];
+  $("#view").innerHTML = `
+    <div class="hd"><span class="av">${esc((ST.name || "م").trim()[0])}</span>
+      <div class="hi"><small>${greet}</small><b>${ST.name ? esc(ST.name) : "حافظ القرآن"}</b></div><div class="date">${hijri}</div></div>
+    <section class="heroC"><div class="in">
+      <div><div class="k">تابع حفظك</div><div class="t">سورة ${pageSurah(last)}</div><div class="s">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div>
+        <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
+      <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div><b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small></div></div>
+    </div></section>
+    <div class="sec2"><h2>ابدأ من هنا</h2></div>
+    <div class="hs">${qcs.map(([t, sub, ic, bg], i) => `<button class="qc" data-q="${i}"><span class="ic" style="background:${bg}">${ic}</span><b>${t}</b><span class="t">${sub}</span></button>`).join("")}</div>
+    <div class="sec2"><h2>آية اليوم</h2><button data-read="${vv.p}">افتح الوجه</button></div>
+    <div class="votd"><div class="lbl">سورة ${sName(vk)}، الآية ${AR(vv.a)}</div><div class="ay">﴿${esc(vv.t)}﴾</div>
+      <div class="rf">لهذه الآية متشابه؛ هل تعرف أين؟</div>
+      <details><summary>اعرض التفسير والمتشابه</summary><div class="tx">${esc(vv.tf)}</div>
+        <button class="btn block" style="margin-top:10px;background:var(--gold-soft);color:var(--gold)" data-mut="${vk}">${ICON.layers}قارن بمتشابهها</button></details></div>
+    <div class="sec2"><h2>ورد المراجعة</h2>${due.length ? `<button id="allRev">عرض الكل</button>` : ""}</div>
+    ${due.length ? due.slice(0, 3).map(([p, r]) => `<button class="mini" data-tas="${p}"><span class="pn">${AR(p)}</span><span class="grow"><div style="font-weight:600">سورة ${pageSurah(+p)}</div>
+      <div class="tiny muted">${r.errors ? `${AR(r.errors)} مواضع ضعف` : "مراجعة تثبيت"}</div></span>${ICON.chev.replace("<svg", '<svg width="18" height="18" style="color:var(--muted)"')}</button>`).join("")
+      : `<div class="mini" style="color:var(--muted)">لا مراجعة مستحقة الآن. سمّع وجهاً وسيُبنى وردك من أخطائك.</div>`}`;
+  document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][4]());
+  if ($("#allRev")) $("#allRev").onclick = () => go("review");
+  bindAll();
+}
+function pageItem(p, sub, tas = true) {
+  return `<button class="item" ${tas ? `data-tas="${p}"` : `data-read="${p}"`}><span class="pg" style="--h:${heat(+p)}">${AR(p)}</span>
+    <span class="grow"><div style="font-weight:600">الوجه ${AR(p)}: سورة ${pageSurah(p)}</div><div class="tiny muted">${sub}</div></span><span class="muted" style="width:18px">${ICON.chev}</span></button>`;
+}
+
+/* ---------- المصحف ---------- */
+function mushaf() {
+  S.mview = S.mview || "surah";
+  const done = Object.keys(ST.pages).length;
+  $("#view").innerHTML = bar("المصحف", "برواية حفص عن عاصم") + `
+    <div class="juzhead pattern"><div class="tiny" style="opacity:.8">مصحف المدينة برواية حفص</div><b style="font-size:1.3rem">${AR(SURAHS.length)} سورة، ${AR(30)} جزءاً، ${AR(PAGES.length)} وجهاً</b>
+      ${stripHTML("mStrip", ST.last || 3)}</div>
+    <div class="seg" style="grid-template-columns:1fr 1fr;margin-top:14px" role="group">
+      <button data-mv="surah" aria-pressed="${S.mview === "surah"}">السور</button><button data-mv="juz" aria-pressed="${S.mview === "juz"}">الأجزاء</button></div>
+    ${S.mview === "surah" ? `<input class="search" id="q" type="search" placeholder="ابحث عن سورة…" value="${esc(S.q || "")}" aria-label="ابحث عن سورة"><div id="slist" style="margin-top:12px"></div>`
+      : `<div class="legend"><span><i style="background:var(--surface-2)"></i>لم يُسمَّع</span><span><i style="background:var(--green-soft)"></i>متقن</span><span><i style="background:var(--gold-soft)"></i>يحتاج مراجعة</span><span><i style="background:var(--err-soft)"></i>ضعيف</span></div>
+        ${Object.keys(DATA.juz).map(j => { const ps = juzPages(+j), dn = ps.filter(p => ST.pages[p]).length, open = juzOf(ST.last || 3) === +j;
+          return `<details class="jz" ${open ? "open" : ""}><summary><span class="no" style="width:38px;height:38px;display:grid;place-items:center;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:12px">${AR(j)}</span>
+            <span class="grow"><div style="font-weight:600">الجزء ${JUZ_NAMES[j]}</div><div class="tiny muted">${pageSurah(ps[0])} ${AR(V(DATA.pages[ps[0]][0]).a)}، الأوجه ${AR(ps[0])}–${AR(ps.at(-1))}</div></span>
+            ${dn ? `<span class="chip">${AR(dn)}/${AR(ps.length)}</span>` : ""}</summary>
+            <div class="grid">${ps.map(p => `<button class="tile" data-read="${p}" aria-label="الوجه ${AR(p)}"><span class="pp" style="--h:${heat(p)}"></span><b>${AR(p)}</b></button>`).join("")}</div></details>`; }).join("")}`}`;
+  document.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { S.mview = b.dataset.mv; mushaf(); });
+  raf(() => drawStrip("mStrip", ST.last || 3, p => openReader(p, "mushaf")));
+  if (S.mview === "surah") {
+    const draw = () => {
+      const q = (S.q || "").trim(), qn = M.norm(q).join(" ");
+      const qd = q.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+      const list = SURAHS.filter(n => !q || (/^\d+$/.test(qd) ? String(n) === qd : qn && M.norm(DATA.surahs[n]).join(" ").includes(qn)));
+      $("#slist").innerHTML = list.length ? list.map(n => { const I2 = DATA.surahInfo[n];
+        return `<button class="sl" data-read="${I2.page}"><span class="no">${AR(n)}</span><span class="grow"><div class="nm">${DATA.surahs[n]}</div>
+          <div class="tiny muted">${I2.rev}، ${ayat(I2.n)}، الوجه ${AR(I2.page)}</div></span><span class="link" data-sinfo="${n}" role="button" tabindex="0" style="padding:8px 4px">عن السورة</span></button>`; }).join("")
+        : `<div class="info">لا توجد سورة بهذا الاسم.</div>`;
+      bindAll();
+      document.querySelectorAll("[data-sinfo]").forEach(b => b.onclick = e => { e.stopPropagation(); surahSheet(+b.dataset.sinfo); });
+    };
+    $("#q").oninput = e => { S.q = e.target.value; draw(); };
+    draw();
+  }
+  bindAll();
+}
+
+/* ---------- عن السورة: بيانات السورة وروابطها في الموسوعة القرآنية ---------- */
+function surahSheet(n) {
+  const I2 = DATA.surahInfo[n], ps = surahPages(n);
+  const juzs = [...new Set(ps.map(juzOf))];
+  const mut = Object.keys(DATA.mutashabihat).filter(k => +k.split(":")[0] === n).length;
+  openSheet(`<div class="row" style="margin-bottom:10px"><span class="no" style="width:46px;height:46px;flex:none;display:grid;place-items:center;font-weight:700;color:var(--green);background:var(--sky-soft);clip-path:polygon(50% 0,64% 14%,85% 15%,86% 36%,100% 50%,86% 64%,85% 85%,64% 86%,50% 100%,36% 86%,15% 85%,14% 64%,0 50%,14% 36%,15% 15%,36% 14%)">${AR(n)}</span>
+      <div class="grow"><div style="font-family:var(--naskh);font-weight:700;font-size:1.5rem;line-height:1.2">سورة ${DATA.surahs[n]}</div><div class="tiny muted">${I2.rev}، ${ayat(I2.n)}</div></div></div>
+    <div class="stats" style="margin-top:0">
+      <div class="stat"><b>${AR(ps[0])}${ps.length > 1 ? "–" + AR(ps.at(-1)) : ""}</b><span>${ps.length > 1 ? "أوجهها" : "وجهها"}</span></div>
+      <div class="stat"><b>${juzs.map(AR).join("، ")}</b><span>${juzs.length > 1 ? "الأجزاء" : "الجزء"}</span></div>
+      <div class="stat"><b>${AR(mut)}</b><span>آية لها متشابه</span></div></div>
+    <div class="two" style="margin-top:12px"><button class="btn primary" data-sread="${I2.page}">${ICON.book}اقرأ السورة</button><button class="btn" data-stas="${I2.page}" data-sn="${n}">${ICON.mic}سمّعها</button></div>
+    <div id="dintro"><div class="info" style="margin-top:14px">جارٍ تحميل مقدمة السورة…</div></div>`);
+  getDorar(n).then(d => { const box = $("#dintro"); if (!box) return;
+    const I3 = d && d.intro;
+    box.innerHTML = I3 && Object.keys(I3).length
+      ? `<div class="htitle"><h3>${ICON.star}مقدمة السورة</h3></div>${dsec(I3.maqasid, true)}${dsec(I3.mawdoat, true)}${dsec(I3.fadael)}${dsec(I3.names)}${dsec(I3.makki)}${DSRC}`
+      : `<div class="info" style="margin-top:14px">مقدمة هذه السورة من موسوعة التفسير لم تُضمَّن في هذه النسخة بعد.</div>`; });
+  document.querySelectorAll("[data-sread]").forEach(b => b.onclick = () => { closeSheet(); openReader(b.dataset.sread, "mushaf"); });
+  document.querySelectorAll("[data-stas]").forEach(b => b.onclick = () => { closeSheet(); openTasmee(b.dataset.stas);
+    const sn = +b.dataset.sn, ks = DATA.pages[S.T.page].filter(k => V(k).s === sn); S.T.from = ks[0]; S.T.to = ks.at(-1); tasmee(); });
+}
+
+/* ---------- قارئ الوجه: الفهم والتدبر (منفصل عن التسميع) ---------- */
+function reader() {
+  const p = S.reader;
+  if (S.rview === "mushaf") return pageReader(p);
+  const views = [["mushaf", "المصحف"], ["meaning", "المعاني"], ["tadabbur", "التدبّر"], ["quiz", "اختبر"]];
+  if (S.rview === "mushaf") return pageReader(p);
+  const nav = `<div class="pnav"><button class="ibtn" id="pprev" ${p <= 1 ? "disabled" : ""} aria-label="الوجه السابق">${ICON.prev}</button><button class="ibtn" id="pnext" ${p >= PAGES.length ? "disabled" : ""} aria-label="الوجه التالي">${ICON.next}</button></div>`;
+  $("#view").innerHTML = bar(`الوجه ${AR(p)}`, `سورة ${pageSurah(p)}، الجزء ${JUZ_NAMES[juzOf(p)]}`, true, nav) + `
+    <div class="row" style="gap:8px;margin-bottom:10px;flex-wrap:wrap">${[...new Set(DATA.pages[p].map(k => V(k).s))].map(n => `<button class="chip" data-sinfo="${n}" style="border:0;padding:5px 12px;background:var(--sky-soft);color:var(--green)">${ICON.star.replace("<svg", '<svg width="13" height="13" style="vertical-align:-2px;margin-inline-end:4px"')}عن سورة ${DATA.surahs[n]}</button>`).join("")}</div>
+    <div class="seg" role="group">${views.map(([id, t]) => `<button data-v="${id}" aria-pressed="${S.rview === id}">${t}</button>`).join("")}</div>
+    <div id="rv" style="padding-bottom:64px"></div>
+    <button class="btn primary recite-cta" data-tas="${p}">${ICON.mic}سمّع هذا الوجه</button>`;
+  $("#back").onclick = () => go(S.tab === "tasmee" ? "mushaf" : S.tab);
+  $("#pprev").onclick = () => p > 1 && openReader(p - 1, S.rview);
+  $("#pnext").onclick = () => p < PAGES.length && openReader(p + 1, S.rview);
+  document.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { S.rview = b.dataset.v; reader(); });
+  document.querySelectorAll("[data-sinfo]").forEach(b => b.onclick = () => surahSheet(+b.dataset.sinfo));
+  ({ mushaf: rMushaf, meaning: rMeaning, tadabbur: rTadabbur, quiz: rQuiz })[S.rview]();
+  bindAll();
+}
+function mushafText(keys, hide) {
+  let html = "", open = false;
+  for (const k of keys) {
+    const v = V(k);
+    if (v.a === 1) {
+      if (open) html += `</div>`;
+      html += `<div class="banner">سورة ${DATA.surahs[v.s]}</div>${v.s !== 1 && v.s !== 9 ? `<div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>` : ""}<div class="text${hide ? " hide" : ""}">`;
+      open = true;
+    } else if (!open) { html += `<div class="text${hide ? " hide" : ""}">`; open = true; }
+    const words = M.tokens(v.t).map(w => hide ? `<span class="w">${esc(w)}</span>` : esc(w)).join(" ");
+    html += `<span class="a${DATA.mutashabihat[k] ? " m" : ""}" data-k="${k}">${words}</span> <span class="end">${AR(v.a)}</span> `;
+  }
+  return html + (open ? "</div>" : "");
+}
+const EYE = I('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/>');
+function setFs(d) { ST.fs = Math.min(1.6, Math.max(0.8, Math.round(((ST.fs || 1) + d) * 10) / 10)); save(); document.documentElement.style.setProperty("--fs", ST.fs); }
+function rMushaf() {
+  const p = S.reader, keys = DATA.pages[p], n = keys.filter(k => DATA.mutashabihat[k]).length;
+  const mode = ST.mview2 || "mushaf";
+  $("#rv").innerHTML = `
+    <div class="mtool">
+      <div class="vs" role="group" aria-label="طريقة العرض"><button data-mm="mushaf" aria-pressed="${mode === "mushaf"}">المصحف</button><button data-mm="tafsir" aria-pressed="${mode === "tafsir"}">مع التفسير</button></div>
+      <div class="fz"><button id="fzm" aria-label="تصغير الخط">ـأ</button><button id="fzp" aria-label="تكبير الخط" style="font-size:1.1rem">أ</button></div>
+      ${mode === "mushaf" ? `<button class="eye" id="hideSw" aria-pressed="${S.hide}" aria-label="إخفاء الآيات">${EYE}</button>` : ""}
+    </div>
+    <div id="mbody"></div>`;
+  document.querySelectorAll("[data-mm]").forEach(b => b.onclick = () => { ST.mview2 = b.dataset.mm; save(); S.hide = false; rMushaf(); });
+  $("#fzm").onclick = () => setFs(-0.1); $("#fzp").onclick = () => setFs(0.1);
+  if (mode === "tafsir") return rMushafTafsir(p, keys);
+  if ($("#hideSw")) $("#hideSw").onclick = () => { S.hide = !S.hide; rMushaf(); };
+  if (!S.sel || !keys.includes(S.sel)) S.sel = keys[0];
+  $("#mbody").innerHTML = `
+    <div class="page"><div class="page-in"><div class="page-in2" id="ptext">
+      <div class="phead"><span>سورة ${pageSurah(p)}</span><span>الجزء ${JUZ_NAMES[juzOf(p)]}</span></div>
+      ${mushafText(keys, S.hide)}
+      <div class="pagefoot"><span>${AR(p)}</span></div></div></div></div>
+    ${S.hide ? `<p class="small muted" style="margin:12px 4px">اضغط الكلمة لتكشفها.</p>` : `<div class="tpanel" id="tpanel"></div>`}`;
+  $("#ptext").onclick = e => {
+    const w = e.target.closest(".w"); if (w) { w.classList.add("shown"); return; }
+    const a = e.target.closest(".a"); if (a && !S.hide) { S.sel = a.dataset.k; markSel(); drawPanel(p); }
+  };
+  if (!S.hide) { markSel(); drawPanel(p); }
+  bindSwipe($("#mbody"), p);
+}
+
+
+
+
+/* ---------- ميزة السماع: آية آية مع التظليل والتكرار ----------
+   أسماء القرّاء كما في الموسوعة القرآنية (quranpedia.net/reciters)، والملفات آية آية من EveryAyah */
+const AUDIO_BASE = "https://everyayah.com/data/";
+const RECITERS = [
+  ["Husary_Muallim_128kbps", "محمود خليل الحصري", "المصحف المعلّم"], ["Minshawy_Teacher_128kbps", "محمد صديق المنشاوي", "المصحف المعلّم"],
+  ["Alafasy_128kbps", "مشاري العفاسي"], ["Husary_128kbps", "محمود خليل الحصري"], ["Husary_128kbps_Mujawwad", "محمود خليل الحصري", "مجوّد"],
+  ["Minshawy_Murattal_128kbps", "محمد صديق المنشاوي"], ["Minshawy_Mujawwad_192kbps", "محمد صديق المنشاوي", "مجوّد"],
+  ["Abdul_Basit_Murattal_192kbps", "عبدالباسط عبدالصمد"], ["Abdul_Basit_Mujawwad_128kbps", "عبدالباسط عبدالصمد", "مجوّد"],
+  ["Abdurrahmaan_As-Sudais_192kbps", "عبدالرحمن السديس"], ["Saood_ash-Shuraym_128kbps", "سعود الشريم"], ["MaherAlMuaiqly128kbps", "ماهر المعيقلي"],
+  ["Yasser_Ad-Dussary_128kbps", "ياسر الدوسري"], ["Ghamadi_40kbps", "سعد الغامدي"], ["Hudhaify_128kbps", "علي بن عبدالرحمن الحذيفي"],
+  ["Muhammad_Ayyoub_128kbps", "محمد أيوب"], ["Muhammad_Jibreel_128kbps", "محمد جبريل"], ["Abdullah_Basfar_192kbps", "عبدالله بصفر"],
+  ["Abdullaah_3awwaad_Al-Juhaynee_128kbps", "عبدالله عواد الجهني"], ["Nasser_Alqatami_128kbps", "ناصر القطامي"], ["Hani_Rifai_192kbps", "هاني الرفاعي"],
+  ["Abu_Bakr_Ash-Shaatree_128kbps", "شيخ أبو بكر الشاطري"], ["Salah_Al_Budair_128kbps", "صلاح البدير"], ["Khaalid_Abdullaah_al-Qahtaanee_192kbps", "خالد القحطاني"],
+  ["Fares_Abbad_64kbps", "فارس عباد"], ["ahmed_ibn_ali_al_ajamy_128kbps", "أحمد بن علي العجمي"], ["Mohammad_al_Tablaway_128kbps", "محمد الطبلاوي"],
+  ["Ali_Jaber_64kbps", "علي جابر"], ["Muhsin_Al_Qasim_192kbps", "عبدالمحسن القاسم"], ["Abdullah_Matroud_128kbps", "عبدالله المطرود"],
+  ["Akram_AlAlaqimy_128kbps", "أكرم العلاقمي"], ["Salaah_AbdulRahman_Bukhatir_128kbps", "صلاح بو خاطر"], ["Sahl_Yassin_128kbps", "سهل ياسين"],
+  ["Yaser_Salamah_128kbps", "ياسر سلامة"], ["Ahmed_Neana_128kbps", "أحمد نعينع"], ["Mustafa_Ismail_48kbps", "مصطفى إسماعيل"],
+  ["mahmoud_ali_al_banna_32kbps", "محمود علي البنا"], ["Ibrahim_Akhdar_64kbps", "إبراهيم الأخضر"], ["Ali_Hajjaj_AlSuesy_128kbps", "علي حجاج السويسي"],
+  ["khalefa_al_tunaiji_64kbps", "خليفة الطنيجي"], ["Muhammad_AbdulKareem_128kbps", "محمد عبدالكريم"], ["Nabil_Rifa3i_48kbps", "نبيل الرفاعي"]];
+const ALLK = Object.keys(DATA.verses).sort((a, b) => { const [x, y] = a.split(":").map(Number), [u, v] = b.split(":").map(Number); return x - u || y - v; });
+const KIDX = Object.fromEntries(ALLK.map((k, i) => [k, i]));
+const pad3 = n => String(n).padStart(3, "0");
+const recOf = () => RECITERS.find(r => r[0] === ST.rec) || RECITERS[2];
+const audioUrl = (s, a) => `${AUDIO_BASE}${recOf()[0]}/${pad3(s)}${pad3(a)}.mp3`;
+const P = { k: null, on: false, playing: false, cnt: 0, bsm: false, err: "", el: null, nextEl: null, gapT: null };
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+const ICON_X = I('<path d="M6 6l12 12M18 6L6 18"/>'), ICON_GEAR = I('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>');
+ICON.listen = I('<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/>');
+
+function audioEl() {
+  if (P.el) return P.el;
+  const a = new Audio(); a.preload = "auto";
+  a.onended = onAyahEnd;
+  a.ontimeupdate = () => { const b = document.querySelector("#mp .bar2 i"); if (b && a.duration) b.style.width = (a.currentTime / a.duration * 100) + "%"; };
+  a.onerror = () => { P.playing = false; P.err = "تعذّر تحميل التلاوة. تحقق من الاتصال، أو اختر قارئاً آخر. (صفحة المعاينة هنا تمنع الصوت الخارجي؛ يعمل من رابطك المنشور)"; drawMP(); };
+  return P.el = a;
+}
+function playFrom(k) {
+  P.k = k; P.on = true; P.cnt = 0; P.err = ""; clearTimeout(P.gapT);
+  const v = V(k); P.bsm = v.a === 1 && v.s !== 1 && v.s !== 9;
+  loadAndPlay();
+}
+function loadAndPlay() {
+  const a = audioEl(), v = V(P.k);
+  a.src = P.bsm ? audioUrl(1, 1) : audioUrl(v.s, v.a);
+  a.playbackRate = ST.rate || 1;
+  const pr = a.play(); P.playing = true;
+  if (pr && pr.catch) pr.catch(() => { if (!P.err) { P.playing = false; drawMP(); } });
+  highlight(); followPage(); drawMP(); preloadNext();
+}
+function preloadNext() {
+  const i = KIDX[P.k]; if (i == null || i + 1 >= ALLK.length) return;
+  const n = V(ALLK[i + 1]); P.nextEl = P.nextEl || new Audio(); P.nextEl.preload = "auto"; P.nextEl.src = audioUrl(n.s, n.a);
+}
+function onAyahEnd() {
+  if (P.bsm) { P.bsm = false; return loadAndPlay(); }
+  const go2 = () => {
+    P.cnt++;
+    const rep = ST.rep == null ? 1 : ST.rep;           // ٠ = تكرار بلا نهاية
+    if (rep === 0 || P.cnt < rep) return loadAndPlay();
+    const i = KIDX[P.k]; if (i + 1 >= ALLK.length) { P.playing = false; return drawMP(); }
+    P.cnt = 0; P.k = ALLK[i + 1]; const v = V(P.k); P.bsm = v.a === 1 && v.s !== 1 && v.s !== 9; loadAndPlay();
+  };
+  // وقت للترديد بعد كل آية (بقدر مدتها) لمن يحفظ
+  if (ST.gap && P.el && P.el.duration) { P.playing = true; drawMP("ردّد الآية…"); P.gapT = setTimeout(go2, P.el.duration * 1000 / (ST.rate || 1)); }
+  else go2();
+}
+function togglePlay() {
+  const a = audioEl(); clearTimeout(P.gapT);
+  if (P.playing) { a.pause(); P.playing = false; }
+  else { if (!a.src) return playFrom(P.k); const pr = a.play(); P.playing = true; if (pr && pr.catch) pr.catch(() => {}); }
+  drawMP();
+}
+function stepAyah(d) { const i = KIDX[P.k] + d; if (i >= 0 && i < ALLK.length) playFrom(ALLK[i]); }
+function stopAudio() { clearTimeout(P.gapT); if (P.el) { P.el.pause(); P.el.removeAttribute("src"); } Object.assign(P, { on: false, playing: false, k: null }); highlight(); drawMP(); }
+function highlight() {
+  document.querySelectorAll(".pl").forEach(e => e.classList.remove("pl"));
+  if (!P.k || !P.on) return;
+  document.querySelectorAll(`#lines [data-k="${P.k}"], #tlist .q[data-k="${P.k}"]`).forEach(e => e.classList.add("pl"));
+}
+function followPage() { if (S.reader && S.rview === "mushaf" && V(P.k).p !== S.reader) { S.reader = V(P.k).p; ST.last = S.reader; save(); pageReader(S.reader, "next"); highlight(); } }
+function drawMP(note) {
+  const box = $("#mp"); if (!box) return;
+  if (!P.on) { box.hidden = true; return; }
+  box.hidden = false;
+  const r = recOf(), rep = ST.rep == null ? 1 : ST.rep;
+  box.innerHTML = `<div class="who"><b>${r[1]}${r[2] ? ` <small>(${r[2]})</small>` : ""}</b><small>${note || (P.bsm ? "البسملة، " : "")}${ref(P.k)}</small></div>
+    <div class="ctl"><span class="rep" title="التكرار">${rep === 0 ? "∞" : rep > 1 ? "×" + AR(rep) : ""}</span>
+      <button id="mpNext" aria-label="الآية التالية">${ICON.next}</button>
+      <button class="pp" id="mpPP" aria-label="${P.playing ? "إيقاف مؤقت" : "تشغيل"}">${P.playing ? ICON_PAUSE : ICON_PLAY}</button>
+      <button id="mpPrev" aria-label="الآية السابقة">${ICON.prev}</button>
+      <button id="mpSet" aria-label="إعدادات السماع">${ICON_GEAR}</button>
+      <button id="mpX" aria-label="إغلاق">${ICON_X}</button></div>
+    <div class="bar2"><i></i></div>${P.err ? `<div class="err">${P.err}</div>` : ""}`;
+  $("#mpPP").onclick = togglePlay; $("#mpNext").onclick = () => stepAyah(1); $("#mpPrev").onclick = () => stepAyah(-1);
+  $("#mpX").onclick = stopAudio; $("#mpSet").onclick = listenSheet;
+}
+function listenSheet() {
+  const rep = ST.rep == null ? 1 : ST.rep, rate = ST.rate || 1;
+  openSheet(`<h3>إعدادات السماع</h3>
+    <div class="small muted" style="margin:12px 0 6px">تكرار كل آية</div>
+    <div class="chips">${[[1, "مرة"], [2, "مرتان"], [3, "٣ مرات"], [5, "٥ مرات"], [10, "١٠ مرات"], [0, "بلا توقف"]].map(([v, t]) => `<button data-rep="${v}" aria-pressed="${rep === v}">${t}</button>`).join("")}</div>
+    <div class="small muted" style="margin:14px 0 6px">سرعة التلاوة</div>
+    <div class="chips">${[0.75, 1, 1.25, 1.5].map(v => `<button data-rate="${v}" aria-pressed="${rate === v}">${AR(v)}×</button>`).join("")}</div>
+    <div class="card row" style="margin-top:14px;padding:12px 14px"><div class="grow"><b>وقت للترديد</b><div class="tiny muted">بعد كل آية يتوقف بقدر مدتها لتردّدها</div></div>
+      <button class="switch" role="switch" aria-checked="${!!ST.gap}" id="gapSw" aria-label="وقت للترديد"></button></div>
+    <div class="small muted" style="margin:16px 0 6px">القارئ</div>
+    <input class="search" id="rq" type="search" placeholder="ابحث عن قارئ" style="margin:0 0 10px"><div id="rlist"></div>
+    <div class="src">أسماء القرّاء من الموسوعة القرآنية، والتلاوات آيةً آية من EveryAyah.</div>`);
+  document.querySelectorAll("[data-rep]").forEach(b => b.onclick = () => { ST.rep = +b.dataset.rep; save(); P.cnt = 0; listenSheet(); drawMP(); });
+  document.querySelectorAll("[data-rate]").forEach(b => b.onclick = () => { ST.rate = +b.dataset.rate; save(); if (P.el) P.el.playbackRate = ST.rate; listenSheet(); });
+  $("#gapSw").onclick = () => { ST.gap = !ST.gap; save(); $("#gapSw").setAttribute("aria-checked", ST.gap); };
+  const draw = () => { const q = M.norm($("#rq").value || "").join(" ");
+    $("#rlist").innerHTML = RECITERS.filter(r => !q || M.norm(r[1]).join(" ").includes(q)).map(r => `<button class="rcl" data-rec="${r[0]}" aria-pressed="${recOf()[0] === r[0]}">
+      <span class="av">${r[1].trim().split(/\s+/).at(-1).replace(/^ال(?=..)/, "")[0]}</span><span class="grow"><b>${r[1]}</b>${r[2] ? `<span class="tag">${r[2]}</span>` : ""}<div class="tiny muted">حفص عن عاصم</div></span></button>`).join("");
+    document.querySelectorAll("[data-rec]").forEach(b => b.onclick = () => { ST.rec = b.dataset.rec; save(); if (P.on && P.k) playFrom(P.k); draw(); drawMP(); }); };
+  $("#rq").oninput = draw; draw();
+}
+
+/* ---------- رسم الوجه بأسطره الخمسة عشر كما في مصحف المدينة ---------- */
+const MT = {};
+const mt = k => MT[k] || (MT[k] = M.mtokens(V(k).t));
+function layoutHTML(p, hide) {
+  const L = LAYOUT.pages[p], centered = p <= 2;
+  let h = `<div class="lines${centered ? " c" : ""}${hide ? " hide" : ""}" id="lines">`;
+  for (const l of L) {
+    if (l[0] === "h") { h += `<div class="ln hdr"><div class="banner">سورة ${DATA.surahs[l[1]]}</div></div>`; continue; }
+    if (l[0] === "b") { h += `<div class="ln bsm">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`; continue; }
+    let words = 0, row = "";
+    for (const [k, i0, i1] of l[1]) {
+      const T = mt(k), m = DATA.mutashabihat[k] ? " m" : "";
+      for (let i = i0; i <= i1 && i < T.length; i++) { words++;
+        row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}">${esc(T[i])}</span>`;
+        if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">${AR(V(k).a)}</span>`; }
+    }
+    h += `<div class="ln${words <= 1 ? " one" : ""}">${row}</div>`;
+  }
+  return h + `</div>`;
+}
+
+
+/* ---------- ضبط السطر بالمدّ (الكشيدة) كما في المصحف المطبوع، بدل توسيع الفراغات ---------- */
+const DUAL = new Set("بتثجحخسشصضطظعغفقكلمنهيئىپچگک");      // حروف تتصل بما بعدها
+const ALEFS = new Set("اأإآٱ");
+const isMark = c => /[\u064B-\u065F\u0670\u06D6-\u06ED]/.test(c);
+function kashidaSlots(w) {
+  if (M.norm(w).join("").includes("لله")) return [];             // لفظ الجلالة له رسم خاص
+  const base = []; for (let i = 0; i < w.length; i++) if (/[\u0621-\u064A\u0671-\u06D3]/.test(w[i])) base.push(i);
+  if (base.length < 3) return [];
+  const slots = [];
+  for (let j = 0; j + 1 < base.length; j++) {
+    const a = w[base[j]], b = w[base[j + 1]];
+    if (!DUAL.has(a) || b === "ء") continue;
+    if (a === "ل" && ALEFS.has(b)) continue;                       // لا تُكسر «لا»
+    let pos = base[j] + 1; while (pos < w.length && isMark(w[pos])) pos++;
+    if (pos === base[j + 1]) slots.push(pos);
+  }
+  return slots.reverse();                                         // الأفضل: قرب آخر الكلمة
+}
+function kashidaJustify(L, W) {
+  if (L.classList.contains("c")) return;
+  const probe = document.createElement("span"); probe.textContent = "ـــــــــــــــــــ"; probe.style.cssText = "position:absolute;visibility:hidden";
+  L.appendChild(probe); const tw = probe.getBoundingClientRect().width / 10; probe.remove(); if (!tw) return;
+  L.classList.add("measure");
+  for (const ln of L.children) {
+    if (!ln.classList.length || ln.classList.length > 1 && !ln.classList.contains("one")) { if (ln.classList.contains("hdr") || ln.classList.contains("bsm")) continue; }
+    const ws = [...ln.querySelectorAll(".a")]; if (ws.length < 2) continue;
+    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.8 / tw); if (n <= 0) continue;
+    const C = ws.map(el => ({ el, t: el.dataset.o || el.textContent, sl: kashidaSlots(el.dataset.o || el.textContent), c: 0 }));
+    const cand = C.filter(x => x.sl.length); if (!cand.length) continue;
+    const cap = 4;
+    while (n > 0 && cand.some(x => x.c < cap * Math.min(2, x.sl.length))) {
+      for (const x of cand) { if (n <= 0) break; if (x.c < cap * Math.min(2, x.sl.length)) { x.c++; n--; } }
+    }
+    for (const x of C) {
+      if (!x.c) continue;
+      x.el.dataset.o = x.t;
+      const use = x.sl.slice(0, Math.min(2, x.sl.length)), per = use.map((_, i) => Math.floor(x.c / use.length) + (i < x.c % use.length ? 1 : 0));
+      let t = x.t; use.map((pos, i) => [pos, per[i]]).sort((a, b) => b[0] - a[0]).forEach(([pos, k]) => { t = t.slice(0, pos) + "ـ".repeat(k) + t.slice(pos); });
+      x.el.textContent = t;
+    }
+  }
+  L.classList.remove("measure");
+}
+
+/* ---------- المصحف وجهاً وجهاً ---------- */
+const DOTS = I('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
+const readTheme = () => ST.rt || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia");
+const RT_BG = { sepia: "#F7F1E3", light: "#FFFEFB", night: "#141B24" };
+function pageReader(p, dir) {
+  const keys = DATA.pages[p];
+  document.body.classList.add("immersive"); document.body.style.background = RT_BG[readTheme()];
+  $("#view").innerHTML = `
+    <div class="rd ${dir ? "go-" + dir : ""}" id="rd" data-rt="${readTheme()}">
+      <div class="frame">
+        <div class="rh"><span>سورة ${pageSurah(p)}</span><span>الجزء ${JUZ_NAMES[juzOf(p)]}</span></div>
+        <div class="rb" id="rb" style="overflow:hidden"><div id="ptext" style="display:flex;flex-direction:column;flex:1;min-height:0">${layoutHTML(p, S.hide)}</div></div>
+        <div class="rf">${AR(p)}</div>
+      </div>
+    </div>
+    <div class="rtop"><button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>
+      <div class="t"><b>سورة ${pageSurah(p)}</b><small>الجزء ${JUZ_NAMES[juzOf(p)]}، الوجه ${AR(p)}</small></div>
+      <button class="ibtn" id="hideSw" aria-pressed="${S.hide}" aria-label="إخفاء الآيات" style="${S.hide ? "background:var(--green);color:var(--on)" : ""}">${EYE}</button>
+      <button class="ibtn" id="more" aria-label="المزيد">${DOTS}</button></div>
+    <div class="rbot"><button class="ibtn" id="pgPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
+      <div class="pgi"><b>${AR(p)}</b> من ${AR(PAGES.length)}</div>
+      <button class="btn" id="rPlay" style="padding:9px 12px">${ICON.listen}استمع</button>
+      <button class="btn primary" id="rTas" style="padding:9px 12px">${ICON.mic}سمّع</button>
+      <button class="ibtn" id="pgNext" aria-label="الوجه التالي" ${p >= PAGES.length ? "disabled" : ""}>${ICON.next}</button></div>
+    ${ST.rhint ? "" : `<div class="rhint" id="rhint">المس الصفحة لإظهار الأدوات، واضغط مطوّلاً على الآية لمعناها ومتشابهها</div>`}`;
+  const rd = $("#rd");
+  if (!ST.rhint) { ST.rhint = 1; save(); setTimeout(() => { const h = $("#rhint"); if (h) h.remove(); }, 4500); }
+  $("#back").onclick = () => { document.body.classList.remove("immersive"); go(S.tab === "tasmee" ? "mushaf" : S.tab); };
+  $("#hideSw").onclick = () => { S.hide = !S.hide; S.ui = true; pageReader(p); };
+  $("#more").onclick = () => moreSheet(p);
+  $("#pgPrev").onclick = () => turn(p, -1);
+  $("#pgNext").onclick = () => turn(p, 1);
+  $("#rTas").onclick = () => { document.body.classList.remove("immersive"); openTasmee(p); };
+  $("#rPlay").onclick = () => playFrom(P.on && P.k && V(P.k).p === p ? P.k : DATA.pages[p][0]);
+  highlight(); drawMP();
+  // لمسة: إظهار الأدوات أو إخفاؤها. ضغطة مطوّلة على الآية: معناها ومتشابهها
+  let holdT = null, held = false;
+  const setUI = v => { S.ui = v; rd.classList.toggle("ui", v); document.body.classList.toggle("rui", v); clearTimeout(S.uiT); if (v) S.uiT = setTimeout(() => setUI(false), 5000); };
+  setUI(!!S.ui);
+  $("#ptext").addEventListener("pointerdown", e => {
+    const a = e.target.closest(".a"); held = false; if (!a || S.hide) return;
+    holdT = setTimeout(() => { held = true; a.classList.add("hold"); setTimeout(() => a.classList.remove("hold"), 400); ayahSheet(a.dataset.k); }, 450);
+  });
+  ["pointerup", "pointerleave", "pointercancel"].forEach(ev => $("#ptext").addEventListener(ev, () => clearTimeout(holdT)));
+  rd.addEventListener("contextmenu", e => e.preventDefault());
+  rd.onclick = e => {
+    if (held) { held = false; return; }
+    const w = e.target.closest(".w"); if (w) { w.classList.add("shown"); return; }
+    setUI(!S.ui);
+  };
+  bindSwipePage(rd, p);
+  fitPage();
+}
+function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); }
+// يتسع الوجه للشاشة: يُحسب ارتفاع الصفحة ثم يُصغَّر الخط حتى يسع الوجه كله بلا تمرير
+function fitPage() {
+  const box = $("#rb"), pv = $("#rd"), L = $("#lines"); if (!box || !pv || !L) return;
+  const W = box.clientWidth, H = box.clientHeight; if (!W || !H) return;
+  const n = L.children.length, F0 = 20;
+  L.querySelectorAll(".a[data-o]").forEach(el => { el.textContent = el.dataset.o; delete el.dataset.o; });
+  pv.style.setProperty("--pf", F0 + "px");
+  L.classList.add("measure");
+  let w0 = 1; for (const ln of L.children) w0 = Math.max(w0, ln.scrollWidth);
+  L.classList.remove("measure");
+  const byW = F0 * (W / w0) * 0.985, byH = H / (n * (p2 => p2)(1.62));
+  let F = Math.max(13, Math.min(byW, byH, 40 * (ST.fs || 1)));
+  pv.style.setProperty("--pf", F + "px");
+  // تصحيح بالقياس الفعلي لارتفاع الأسطر (يختلف بحسب مقاييس الخط)
+  const used = () => [...L.children].reduce((a, c) => a + c.getBoundingClientRect().height, 0);
+  for (let i = 0; i < 4 && used() > H * 0.97; i++) { F = Math.max(13, F * (H * 0.97 / used())); pv.style.setProperty("--pf", F + "px"); }
+  L.querySelectorAll(".a[data-o]").forEach(el => { el.textContent = el.dataset.o; delete el.dataset.o; });
+  kashidaJustify(L, W);
+}
+window.addEventListener("resize", () => { if (S.reader && S.rview === "mushaf") fitPage(); });
+
+function bindSwipePage(el, p) {
+  let x0 = null, y0 = null;
+  el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  el.addEventListener("touchend", e => {
+    if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
+    turn(p, dx > 0 ? 1 : -1); // كالمصحف الورقي: السحب لليمين إلى الوجه التالي
+  }, { passive: true });
+}
+function moreSheet(p) {
+  const ss = [...new Set(DATA.pages[p].map(k => V(k).s))];
+  const o = (id, ic, t, sub) => `<button class="opt2" data-o="${id}"><span class="ic">${ic}</span><span class="grow"><div style="font-weight:600">${t}</div><div class="tiny muted">${sub}</div></span></button>`;
+  openSheet(`<h3>الوجه ${AR(p)}</h3><div class="tiny muted" style="margin-bottom:12px">سورة ${pageSurah(p)}</div>
+    ${o("tas", ICON.mic, "سمّع هذا الوجه", "الوجه مخفي وينكشف مع قراءتك")}
+    ${o("tafsir", ICON.tafsir, "تفسير الوجه", "الآيات وتفسيرها في تبويب التفسير")}
+    ${o("tadabbur", ICON.bulb, "تدبّر الوجه", "الفوائد والأوامر والنواهي")}
+    ${o("quiz", ICON.quiz, "اختبر نفسك", "أسئلة من هذا الوجه")}
+    ${ss.map(n => o("s" + n, ICON.star, `عن سورة ${DATA.surahs[n]}`, "المقاصد والموضوعات والفضائل")).join("")}
+    <div class="small muted" style="margin-top:16px">مظهر القراءة</div>
+    <div class="themes">${[["sepia", "ورقي", "#F7F1E3", "#3A2E21"], ["light", "فاتح", "#FFFEFB", "#1C2433"], ["night", "ليلي", "#141B24", "#D9D3C3"]].map(([id, t, bg, fg]) =>
+      `<button data-rt="${id}" aria-pressed="${readTheme() === id}" style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"><span>بِسْمِ اللَّه</span>${t}</button>`).join("")}</div>
+    <div class="row" style="margin-top:14px;justify-content:space-between"><span class="small muted">حجم الخط</span>
+      <div class="row" style="gap:6px"><button class="btn" id="fzm2" style="padding:8px 14px">أصغر</button><button class="btn" id="fzp2" style="padding:8px 14px">أكبر</button></div></div>`);
+  document.querySelectorAll("[data-o]").forEach(b => b.onclick = () => { const id = b.dataset.o; closeSheet(); if (id !== "tafsir" && id[0] !== "s") document.body.classList.remove("immersive");
+    if (id === "tas") openTasmee(p); else if (id === "tafsir") { S.tp = p; go("tafsir"); }
+    else if (id[0] === "s") surahSheet(+id.slice(1)); else openReader(p, id); });
+  $("#fzm2").onclick = () => { setFs(-0.1); fitPage(); }; $("#fzp2").onclick = () => { setFs(0.1); fitPage(); };
+  document.querySelectorAll(".themes [data-rt]").forEach(b => b.onclick = () => { ST.rt = b.dataset.rt; save(); closeSheet(); pageReader(p); });
+}
+
+/* ---------- لوحة التفسير تحت المصحف: تتبع الآية المختارة ---------- */
+function markSel() { document.querySelectorAll("#ptext .a").forEach(a => a.classList.toggle("sel", a.dataset.k === S.sel)); }
+function drawPanel(p) {
+  const box = $("#tpanel"); if (!box) return;
+  const keys = DATA.pages[p], k = S.sel, v = V(k), i = keys.indexOf(k), src = ST.psrc || "muyassar";
+  const tabs = [["muyassar", "التفسير الميسر"], ["dorar", "موسوعة التفسير"], ["gharib", "غريب الكلمات"]];
+  box.innerHTML = `<div class="th">
+      <button id="pPrev" aria-label="الآية السابقة" ${i <= 0 ? "disabled" : ""}>${ICON.prev}</button>
+      <b>تفسير ${ref(k)}</b>
+      <button id="pNext" aria-label="الآية التالية" ${i >= keys.length - 1 ? "disabled" : ""}>${ICON.next}</button></div>
+    <div class="tabs3" role="group" aria-label="مصدر التفسير">${tabs.map(([id, t]) => `<button data-ps="${id}" aria-pressed="${src === id}">${t}</button>`).join("")}</div>
+    <div class="tb" id="pBody"><div class="muted small">جارٍ التحميل…</div></div>
+    ${DATA.mutashabihat[k] ? `<button class="btn block mbtn" style="background:var(--gold-soft);color:var(--gold)" data-mut="${k}">${ICON.layers}قارن بمتشابهها</button>` : ""}`;
+  $("#pPrev").onclick = () => { S.sel = keys[i - 1]; markSel(); drawPanel(p); };
+  $("#pNext").onclick = () => { S.sel = keys[i + 1]; markSel(); drawPanel(p); };
+  box.querySelectorAll("[data-ps]").forEach(b => b.onclick = () => { ST.psrc = b.dataset.ps; save(); drawPanel(p); });
+  const m = box.querySelector("[data-mut]"); if (m) m.onclick = () => ayahSheet(k);
+  const body = $("#pBody"), ay = `<div class="ay">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>`;
+  if (src === "muyassar") body.innerHTML = ay + esc(v.tf) + `<div class="src">التفسير الميسر، مجمع الملك فهد.</div>`;
+  else if (src === "gharib") body.innerHTML = ay + (v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<div class="muted small">لا كلمات غريبة في هذه الآية.</div>`) + `<div class="src">السراج في بيان غريب القرآن.</div>`;
+  else dorarGroups(p).then(gs => { if (S.sel !== k || !$("#pBody")) return;
+    const g = gs.find(g => g.n === v.s && g.from <= v.a && g.to >= v.a && g.sections.ijmali);
+    $("#pBody").innerHTML = g ? `<span class="tiny" style="color:var(--sky);font-weight:700">المعنى الإجمالي للآيات ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span><div>${esc(g.sections.ijmali.text)}</div>${DSRC}`
+      : ay + `<div class="info">موسوعة التفسير غير متاحة لهذه الآية بعد. اختر «التفسير الميسر».</div>`; });
+}
+function rMushafTafsir(p, keys) {
+  const src = ST.tsrc || "muyassar";
+  $("#mbody").innerHTML = `<div class="tsrc" role="group" aria-label="مصدر التفسير">
+      <button data-ts="muyassar" aria-pressed="${src === "muyassar"}">التفسير الميسر</button>
+      <button data-ts="dorar" aria-pressed="${src === "dorar"}" id="tsDorar">موسوعة التفسير</button>
+      <button data-ts="gharib" aria-pressed="${src === "gharib"}">غريب الكلمات</button></div><div id="tlist"><div class="info">جارٍ التحميل…</div></div>`;
+  document.querySelectorAll("[data-ts]").forEach(b => b.onclick = () => { ST.tsrc = b.dataset.ts; save(); rMushafTafsir(p, keys); });
+  dorarGroups(p).then(gs => {
+    if (S.reader !== p || !$("#tlist")) return;
+    const hasD = gs.some(g => g.sections.ijmali);
+    if (!hasD) $("#tsDorar").disabled = true;
+    const useSrc = src === "dorar" && !hasD ? "muyassar" : src;
+    let html = "", shown = new Set();
+    if (src === "dorar" && !hasD) html += `<div class="info" style="margin-bottom:10px">موسوعة التفسير غير متاحة لهذا الوجه بعد؛ يُعرض التفسير الميسر.</div>`;
+    for (const k of keys) {
+      const v = V(k);
+      if (useSrc === "dorar") {
+        const g = gs.find(g => g.n === v.s && g.from <= v.a && g.to >= v.a && g.sections.ijmali);
+        if (g && !shown.has(g)) { shown.add(g);
+          html += `<div class="tgroup"><span class="lbl">المعنى الإجمالي للآيات ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span>${esc(g.sections.ijmali.text)}</div>`; }
+      }
+      const tx = useSrc === "muyassar" ? `<span class="lbl">التفسير الميسر</span>${esc(v.tf)}`
+        : useSrc === "gharib" ? (v.gh.length ? `<span class="lbl">غريب الكلمات</span><div class="gh" style="margin-top:4px">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`)
+        : "";
+      html += `<div class="ta"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
+        ${DATA.mutashabihat[k] ? `<button class="mchip" data-mut="${k}">${ICON.layers.replace("<svg", '<svg width="13" height="13"')}لها متشابه</button>` : ""}</div>`;
+    }
+    html += useSrc === "dorar" ? DSRC : `<div class="src">${useSrc === "muyassar" ? "التفسير الميسر، مجمع الملك فهد." : "السراج في بيان غريب القرآن."}</div>`;
+    $("#tlist").innerHTML = html;
+    document.querySelectorAll("#tlist .q").forEach(q => q.onclick = () => ayahSheet(q.dataset.k));
+    document.querySelectorAll("#tlist [data-mut]").forEach(b => b.onclick = () => ayahSheet(b.dataset.mut));
+  });
+  bindSwipe($("#mbody"), p);
+}
+function bindSwipe(el, p) {
+  let x0 = null, y0 = null;
+  el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  el.addEventListener("touchend", e => {
+    if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
+    const to = dx > 0 ? p + 1 : p - 1; // كالمصحف الورقي: السحب لليمين يقلب إلى الوجه التالي
+    if (to >= 1 && to <= PAGES.length) openReader(to, "mushaf");
+  }, { passive: true });
+}
+function compareHTML(k, other, title) {
+  const d = M.diffWords(V(k).t, V(other).t);
+  const side = (key, arr) => `<div class="side"><h4>${ref(key)}</h4><div class="ayah">${arr.map(x => x.same ? esc(x.w) : `<span class="diff">${esc(x.w)}</span>`).join(" ")}</div>
+    <div class="ctx"><b>السياق:</b> ${esc(V(key).tf)}</div></div>`;
+  return `<section class="compare"><header>${title}</header>${side(k, d.a)}${side(other, d.b)}</section>`;
+}
+function ayahSheet(k) {
+  const v = V(k), ps = DATA.mutashabihat[k] || [];
+  openSheet(`<div class="row"><h3 class="grow" style="margin:0">${ref(k)}</h3><button class="btn" id="ayPlay" style="padding:8px 14px">${ICON.listen}استمع من هنا</button></div>
+    <div class="ayah" style="margin:6px 0">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>
+    <div class="card"><div class="tiny muted" style="margin-bottom:4px">المعنى</div>${esc(v.tf)}
+      ${v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}</div>
+    ${ps.length ? `<div class="htitle"><h3>${ICON.layers}متشابهاتها</h3></div><div class="small muted">مواضع الاختلاف ملوّنة. سياق كل موضع هو مفتاح التفريق.</div>
+      ${ps.map(p => p.r >= 1 ? `<section class="compare"><header>تتكرر بلفظها في ${ref(p.k)}</header><div class="side ctx">اللفظ واحد؛ ما قبلها في كل موضع هو ما يفرّق بينهما عند التسميع.</div></section>`
+        : compareHTML(k, p.k, `${ref(k)} و${ref(p.k)}`)).join("")}` : ""}
+    <div class="src">المعنى: التفسير الميسر. الغريب: السراج. المتشابهات: حساب نصي على القرآن كاملاً.</div>`);
+  $("#ayPlay").onclick = () => { closeSheet(); playFrom(k); };
+}
+const badgeFor = ok => ok ? `<span class="badge ok">معتمد</span>` : `<span class="badge draft">بانتظار المراجعة</span>`;
+function rMeaning() {
+  const keys = DATA.pages[S.reader], p0 = S.reader;
+  $("#rv").innerHTML = `<div id="dmean"></div>
+    <div class="htitle"><h3>${ICON.book}معاني الآيات</h3><span class="badge ok">مصدر معتمد</span></div>
+    <div class="card">${keys.map(k => `<div class="verse"><div class="ayah">${esc(V(k).t)} <span class="end">${AR(V(k).a)}</span></div>
+      <p>${esc(V(k).tf)}</p>${V(k).gh.length ? `<div class="gh">${V(k).gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}</div>`).join("")}</div>
+    <div class="src">المعنى: التفسير الميسر، مجمع الملك فهد. الغريب: السراج في بيان غريب القرآن.</div>
+    <div class="htitle"><h3>${ICON.star}أسباب النزول</h3></div><div id="dasbab"><div class="info">لا يُعرض إلا ما ورد في موسوعة التفسير من أسباب النزول.</div></div>`;
+  dorarGroups(p0).then(gs => { if (S.reader !== p0 || S.rview !== "meaning") return;
+    const m = $("#dmean"), a = $("#dasbab"); if (!m) return;
+    m.innerHTML = gs.filter(g => g.sections.ijmali).map(g => `<div class="htitle" style="margin-top:4px"><h3>${ICON.bulb}المعنى الإجمالي</h3><span class="tiny muted">${DATA.surahs[g.n]} ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span></div>
+      <div class="ijmali">${esc(g.sections.ijmali.text)}</div>${g.sections.gharib ? dsec(g.sections.gharib) : ""}`).join("") + (gs.some(g => g.sections.ijmali) ? DSRC : "");
+    const as = gs.flatMap(g => (g.asbab || []).map(x => ({ ...x, n: g.n })));
+    if (as.length) a.innerHTML = as.map(x => `<div class="card"><div class="tiny muted">${DATA.surahs[x.n]}${x.ayah ? " " + AR(x.ayah) : ""}</div><div style="white-space:pre-line">${esc(x.text)}</div></div>`).join("") + DSRC;
+    else if (gs.length) a.innerHTML = `<div class="info">لم يرد في موسوعة التفسير سبب نزول لآيات هذا الوجه.</div>`; });
+}
+function rTadabbur() {
+  const p = S.reader, C = CONTENT.pages[p], keys = DATA.pages[p];
+  $("#rv").innerHTML = `<div class="info">جارٍ التحميل…</div>`;
+  dorarGroups(p).then(gs => { if (S.reader !== p || S.rview !== "tadabbur") return;
+    const withF = gs.filter(g => g.sections.tarbawi || g.sections.ilmi);
+    if (withF.length) return rTadabburDorar(p, C, withF);
+    rTadabburLocal(p, C, keys); });
+}
+function rTadabburDorar(p, C, gs) {
+  const today = C && (C.awamir.find(a => a.type === "أمر") || C.awamir[0]);
+  $("#rv").innerHTML = `
+    ${today ? `<div class="htitle"><h3>${ICON.check}عمل اليوم</h3></div>
+      <div class="today pattern"><div class="ayah">﴿${esc(today.q)}﴾</div><div class="tiny" style="opacity:.8">${ref(today.k)}. احفظها واعمل بها اليوم.</div></div>` : ""}
+    ${C && C.awamir.length ? `<div class="htitle"><h3>${ICON.layers}الأوامر والنواهي</h3><span class="badge ok">نص الآية</span></div>
+      <div class="card" style="padding-block:6px">${C.awamir.map(a => `<div class="an"><span class="t ${a.type === "أمر" ? "amr" : "nahy"}">${a.type}</span>
+      <div><div class="ayah">${esc(a.q)}</div><div class="tiny muted">${ref(a.k)}</div></div></div>`).join("")}</div>` : ""}
+    ${gs.map(g => `<div class="htitle"><h3>${ICON.bulb}فوائد وهدايات</h3><span class="tiny muted">${DATA.surahs[g.n]} ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span></div>
+      ${dsec(g.sections.tarbawi, true)}${dsec(g.sections.ilmi)}${dsec(g.sections.balagha)}`).join("")}
+    ${DSRC}`;
+}
+function rTadabburLocal(p, C, keys) {
+  if (!C) { $("#rv").innerHTML = `<div class="card empty">${ICON.bulb}<div style="font-weight:600;color:var(--ink)">محتوى التدبّر لهذا الوجه قيد الإعداد</div>
+    <div class="small">موضوع الوجه والفوائد والأوامر والنواهي متاحة الآن للجزء الأول، وتُضاف بقية الأجزاء بعد مراجعة المتخصص الشرعي.</div>
+    <button class="btn" style="margin-top:14px" data-v2="meaning">${ICON.book}اقرأ معاني الآيات</button></div>`;
+    $("[data-v2]").onclick = () => { S.rview = "meaning"; reader(); }; return; }
+  const surahs = [...new Set(keys.map(k => V(k).s))];
+  const today = C.awamir.find(a => a.type === "أمر") || C.awamir[0];
+  $("#rv").innerHTML = `
+    <div class="htitle"><h3>${ICON.star}موضوع الوجه</h3>${badgeFor(ST.approved[p])}</div>
+    <div class="card topic">${esc(C.topic)}</div>
+    ${today ? `<div class="htitle"><h3>${ICON.check}عمل اليوم</h3></div>
+      <div class="today pattern"><div class="ayah">﴿${esc(today.q)}﴾</div><div class="tiny" style="opacity:.8">${ref(today.k)}. احفظها واعمل بها اليوم.</div></div>` : ""}
+    <div class="htitle"><h3>${ICON.layers}الأوامر والنواهي</h3><span class="badge ok">نص الآية</span></div>
+    <div class="card" style="padding-block:6px">${C.awamir.length ? C.awamir.map(a => `<div class="an"><span class="t ${a.type === "أمر" ? "amr" : "nahy"}">${a.type}</span>
+      <div><div class="ayah">${esc(a.q)}</div><div class="tiny muted">${ref(a.k)}</div></div></div>`).join("") : `<div class="an small muted">لا أوامر أو نواهٍ صريحة في هذا الوجه؛ آياته خبر وعبرة.</div>`}</div>
+    <div class="htitle"><h3>${ICON.bulb}فوائد وهدايات</h3>${badgeFor(ST.approved[p])}</div>
+    <div class="card"><ul class="fw">${C.fawaid.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>
+    ${surahs.map(s => `<div class="htitle"><h3>${ICON.book}مقاصد سورة ${DATA.surahs[s]}</h3>${badgeFor(ST.approved[p])}</div><div class="card small">${esc(CONTENT.surah[s] || "")}</div>`).join("")}
+    <div class="src">المسودات تُطابَق بموسوعة التفسير ويعتمدها المتخصص الشرعي.</div>`;
+}
+
+/* اختبار الوجه */
+function rQuiz() {
+  const p = S.reader;
+  if (!S.quiz) S.quiz = { qs: M.makeQuiz(p, DATA, Date.now() % 1e6), i: 0, score: 0, miss: [], picked: [], answered: false, done: false };
+  $("#rv").innerHTML = `<div class="card" id="quiz"></div>`; drawQuiz();
+}
+function drawQuiz() {
+  const Q = S.quiz, box = $("#quiz");
+  if (Q.i >= Q.qs.length) {
+    if (!Q.done) { record(S.reader, Q.miss.length, Q.miss, Q.score / Q.qs.length, "quiz"); Q.done = true; }
+    box.innerHTML = `<div style="text-align:center"><div class="ring" style="--p:${Q.score / Q.qs.length * 100};margin:4px auto 10px"><b>${AR(Q.score)}/${AR(Q.qs.length)}</b></div>
+      <b>${Q.score === Q.qs.length ? "أحسنت" : "سُجّلت مواضع الخطأ"}</b><p class="small muted">${Q.score === Q.qs.length ? "سيتباعد موعد مراجعة هذا الوجه." : "سيعود هذا الوجه في ورد مراجعتك."}</p>
+      <button class="btn primary block" id="newQ">اختبار جديد</button></div>`;
+    $("#newQ").onclick = () => { S.quiz = null; rQuiz(); }; return;
+  }
+  const q = Q.qs[Q.i];
+  let h = `<div class="qprog"><i style="width:${(Q.i / Q.qs.length) * 100}%"></i></div><div class="tiny muted">سؤال ${AR(Q.i + 1)} من ${AR(Q.qs.length)}</div>`;
+  if (q.type === "complete") h += `<b>أكمل الآية</b><div class="ayah">${esc(q.prompt)} …</div><div class="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>${q.mutashabih ? `<div class="tiny muted" style="margin-top:8px">تنبّه: أحد الخيارات صيغة آية متشابهة.</div>` : ""}`;
+  if (q.type === "where") h += `<b>في أي موضع وردت هذه الصيغة؟</b><div class="ayah">${esc(q.text)}</div><div class="opts">${q.options.map((o, i) => `<button class="opt ui" data-i="${i}">${ref(o)}</button>`).join("")}</div>`;
+  if (q.type === "next") h += `<b>بماذا يبدأ الوجه التالي؟</b><div class="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}">${esc(o.t)} …</button>`).join("")}</div>`;
+  if (q.type === "order") h += `<b>رتّب الآيات كما في المصحف</b><div class="tiny muted">اضغط عليها بالترتيب</div><div class="opts">${q.items.map((k, i) => `<button class="opt" data-i="${i}">${esc(M.tokens(V(k).t).slice(0, 7).join(" "))} …${Q.picked.includes(i) ? `<span class="pick">${AR(Q.picked.indexOf(i) + 1)}</span>` : ""}</button>`).join("")}</div>`;
+  box.innerHTML = h + `<div id="fb" style="margin-top:12px"></div>`;
+  box.onclick = e => {
+    const b = e.target.closest(".opt"); if (!b || Q.answered) return; const i = +b.dataset.i;
+    if (q.type === "order") {
+      if (Q.picked.includes(i)) return; Q.picked.push(i);
+      if (Q.picked.length < q.items.length) return drawQuiz();
+      return answer(Q.picked.every((p, n) => q.items[p] === q.answer[n]), q.answer[0], `الترتيب الصحيح: ${q.answer.map(ref).join("، ثم ")}`);
+    }
+    const val = n => q.type === "next" ? q.options[n].k : q.options[n];
+    box.querySelectorAll(".opt").forEach((el, n) => { if (val(n) === q.answer) el.classList.add("right"); else if (n === i) el.classList.add("wrong"); });
+    answer(val(i) === q.answer, q.k || q.answer, "");
+  };
+}
+function answer(ok, k, extra) {
+  const Q = S.quiz; Q.answered = true;
+  if (ok) Q.score++; else Q.miss.push({ k, type: "quiz-" + Q.qs[Q.i].type });
+  $("#fb").innerHTML = `<div style="color:${ok ? "var(--ok)" : "var(--err)"};font-weight:600;margin-bottom:10px">${ok ? "إجابة صحيحة" : "ليست هذه"}${extra ? `<div class="small" style="font-weight:400">${esc(extra)}</div>` : ""}</div>
+    <button class="btn primary block" id="nq">${Q.i + 1 < Q.qs.length ? "السؤال التالي" : "عرض النتيجة"}</button>`;
+  $("#nq").onclick = () => { Q.i++; Q.answered = false; Q.picked = []; drawQuiz(); };
+}
+
+/* ---------- استوديو التسميع ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let REC = null;
+const fmt = ms => { const s = Math.floor(ms / 1000); return AR(String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0")); };
+function tKeys() {
+  const T = S.T, keys = DATA.pages[T.page];
+  const a = keys.indexOf(T.from || keys[0]), b = keys.indexOf(T.to || keys.at(-1));
+  if (a < 0 || b < 0) return keys;
+  return keys.slice(Math.min(a, b), Math.max(a, b) + 1);
+}
+function tasmee() {
+  const T = S.T;
+  if (T.phase === "result") return tResult();
+  const keys = tKeys();
+  const modes = [["live", "تسميع مباشر", ICON.wave], ["record", "تسجيل صوتي", ICON.mic], ["text", "بالكتابة", ICON.pen]];
+  $("#view").innerHTML = bar("التسميع", "سمّع من حفظك، ويكشف مثاني أخطاءك") + `
+    <div class="card target"><span class="pg">${AR(T.page)}</span>
+      <div class="grow"><div style="font-weight:600">الوجه ${AR(T.page)}: سورة ${pageSurah(T.page)}</div>
+        <div class="tiny muted">من ${ref(keys[0])} إلى ${ref(keys.at(-1))}، ${ayat(keys.length)}</div></div>
+      <button class="link" id="change" ${T.phase !== "ready" ? "disabled" : ""}>تغيير</button></div>
+    <div class="modes" role="group" aria-label="طريقة التسميع">${modes.map(([id, t, ic]) => `<button data-m="${id}" aria-pressed="${T.mode === id}" ${T.phase !== "ready" ? "disabled" : ""}>${ic}${t}</button>`).join("")}</div>
+    <div class="${T.mode === "live" ? "" : "card studio"}" id="studio"></div>`;
+  $("#change").onclick = rangeSheet;
+  document.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } T.mode = b.dataset.m; F = null; resetT(); tasmee(); });
+  drawStudio();
+}
+function drawStudio() { drawStudio0(); document.querySelectorAll("[data-diag]").forEach(b => b.onclick = diagSheet); }
+function drawStudio0() {
+  const T = S.T, box = $("#studio"); if (!box) return;
+  if (T.mode === "live") return drawFollow(box);
+  const hintBtn = `<button class="btn ghost" id="hintBtn">${ICON.bulb}تلميح</button>`;
+  const err = T.err ? `<div class="alert" style="width:100%">${T.err}<div style="margin-top:8px"><button class="link" style="color:var(--err);text-decoration:underline" data-diag>افحص سبب المشكلة</button></div></div>` : "";
+  const hint = `<div id="hint" style="width:100%"></div>`;
+  if (T.mode === "text") {
+    box.innerHTML = `<textarea id="ta" placeholder="اكتب الآيات من حفظك، ولا حاجة إلى التشكيل">${esc(T.transcript)}</textarea>
+      <div class="two"><button class="btn primary" id="evalBtn">${ICON.check}قيّم</button>${hintBtn}</div>${hint}${err}`;
+    $("#ta").oninput = e => T.transcript = e.target.value;
+    $("#evalBtn").onclick = () => evaluate(T.transcript);
+    $("#hintBtn").onclick = showHint; return;
+  }
+  if (T.phase === "ready" || T.phase === "recording") {
+    const on = T.phase === "recording";
+    box.innerHTML = `<button class="mic ${on ? "on" : ""}" id="micBtn" aria-label="${on ? "أوقف التسجيل" : "ابدأ"}">${on ? ICON.stop : ICON.mic}</button>
+      <div class="clock" id="clock">${on ? fmt(Date.now() - REC.start) : "٠٠:٠٠"}</div>
+      <canvas class="wave" id="wave" width="600" height="92" aria-hidden="true"></canvas>
+      <div class="cap">${on ? (T.mode === "record" ? "اقرأ من حفظك، ثم اضغط لإيقاف التسجيل." : "أستمع إليك… اضغط للإيقاف والتقييم.")
+        : (T.mode === "record" ? "اضغط وابدأ القراءة من حفظك. يُحفظ تسجيلك لتسمعه أنت أو معلمك." : "يكتب مثاني ما يسمعه منك مباشرة. يحتاج متصفح Google Chrome.")}</div>
+      ${T.mode === "live" ? `<div class="live" id="live" data-empty="ما أسمعه منك يظهر هنا">${esc(T.transcript)}</div>` : ""}
+      <div class="two">${hintBtn}<span></span></div>${hint}${err}`;
+    $("#micBtn").onclick = () => on ? stopRec() : startRec();
+    $("#hintBtn").onclick = showHint;
+    if (!on) drawIdleWave();
+    return;
+  }
+  if (T.phase === "recorded" || T.phase === "transcribing") {
+    const busy = T.phase === "transcribing";
+    box.innerHTML = `<div class="tiny muted">تسجيلك جاهز، ${fmt(T.dur)}</div>
+      <div class="player"><button class="play" id="playBtn" aria-label="تشغيل">${ICON.play}</button><div class="ptrack"><i id="pbar"></i></div><span class="tiny muted" id="ptime">${fmt(T.dur)}</span></div>
+      <audio id="aud" src="${T.url}" preload="metadata"></audio>
+      ${busy ? `<div class="prog"><i style="width:${T.prog}%"></i></div><div class="tiny muted" style="margin-top:6px">${T.progText}</div>`
+        : `<div class="two"><button class="btn primary" id="evalRec">${ICON.check}قيّم التسجيل</button><button class="btn ghost" id="redo">سجّل من جديد</button></div>
+           <div class="tiny muted" style="margin-top:10px;text-align:center">يتعرّف نموذج Whisper على تلاوتك داخل جهازك. أول مرة يُحمَّل النموذج (قرابة ٨٠ ميجابايت).</div>`}
+      ${err}`;
+    const aud = $("#aud"), pb = $("#playBtn");
+    pb.onclick = () => aud.paused ? aud.play() : aud.pause();
+    aud.onplay = () => pb.innerHTML = ICON.pause; aud.onpause = aud.onended = () => pb.innerHTML = ICON.play;
+    aud.ontimeupdate = () => { const d = aud.duration && isFinite(aud.duration) ? aud.duration : T.dur / 1000; $("#pbar").style.width = Math.min(100, aud.currentTime / d * 100) + "%"; $("#ptime").textContent = fmt(aud.currentTime * 1000); };
+    if (!busy) { $("#evalRec").onclick = transcribeRecording; $("#redo").onclick = () => { resetT(); drawStudio(); }; }
+  }
+}
+function drawIdleWave() {
+  const c = $("#wave"); if (!c) return; const g = c.getContext("2d"); g.clearRect(0, 0, c.width, c.height);
+  g.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--line");
+  for (let i = 0; i < 40; i++) { const x = i * 15 + 5; g.fillRect(x, 42, 6, 8); }
+}
+function pickMime() {
+  if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+  return ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/aac"].find(t => MediaRecorder.isTypeSupported(t)) || "";
+}
+async function startRec() {
+  const T = S.T; T.err = ""; T.transcript = "";
+  if (T.mode === "live" && !SR) { T.err = "التسميع المباشر يحتاج متصفح Google Chrome. استخدم «تسجيل صوتي» أو «بالكتابة»."; return drawStudio(); }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { T.err = "هذا المتصفح لا يسمح بالوصول إلى الميكروفون. افتح مثاني في Chrome أو Safari من رابط https."; return drawStudio(); }
+  REC = { chunks: [], start: Date.now() };
+  REC.clock = setInterval(() => { const ck = $("#clock"); if (ck && REC) ck.textContent = fmt(Date.now() - REC.start); }, 250);
+  if (T.mode === "record") {
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { LAST_MIC_ERR = (e && e.name) + (e && e.message ? ": " + e.message : ""); clearInterval(REC.clock); REC = null; T.err = e && e.name === "NotAllowedError" ? "لم يُسمح باستخدام الميكروفون. اسمح به من إعدادات المتصفح للموقع، ثم أعد المحاولة." : "تعذّر تشغيل الميكروفون. تأكد أنه متصل وغير مستخدم في تطبيق آخر."; return drawStudio(); }
+    REC.stream = stream;
+    try { // مؤشر الصوت (في التسجيل فقط، حتى لا يُفتح الميكروفون مرتين في التسميع المباشر)
+      REC.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const an = REC.ctx.createAnalyser(); an.fftSize = 128; REC.ctx.createMediaStreamSource(stream).connect(an);
+      const buf = new Uint8Array(an.frequencyBinCount), color = getComputedStyle(document.documentElement).getPropertyValue("--green");
+      const loop = () => { if (!REC) return; an.getByteFrequencyData(buf);
+        const c = $("#wave"); if (c) { const g = c.getContext("2d"); g.clearRect(0, 0, c.width, c.height); g.fillStyle = color;
+          let sum = 0; for (let i = 0; i < 40; i++) { const v = buf[i + 2] / 255; sum += v; const h = Math.max(6, v * 86); g.fillRect(i * 15 + 5, (92 - h) / 2, 6, h); }
+          const m = $("#micBtn"); if (m) m.style.setProperty("--lvl", Math.min(1, sum / 20)); }
+        REC.raf = requestAnimationFrame(loop); };
+      REC.raf = requestAnimationFrame(loop);
+    } catch (e) {}
+  }
+  if (T.mode === "record") {
+    // التسجيل وحده؛ لا يُشغَّل التعرف المباشر معه حتى لا يتنازعا الميكروفون
+    const mime = pickMime();
+    try { REC.mr = mime ? new MediaRecorder(REC.stream, { mimeType: mime }) : new MediaRecorder(REC.stream); }
+    catch (e) { cleanup(REC); REC = null; T.err = "تسجيل الصوت غير مدعوم في هذا المتصفح. استخدم «بالكتابة»."; return drawStudio(); }
+    REC.mr.ondataavailable = e => { if (e.data && e.data.size) REC && REC.chunks.push(e.data); };
+    REC.mr.start(500);
+  } else {
+    const sr = new SR(); sr.lang = "ar-SA"; sr.continuous = true; sr.interimResults = true; REC.final = "";
+    sr.onresult = e => { let interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { if (e.results[i].isFinal) REC.final += e.results[i][0].transcript + " "; else interim += e.results[i][0].transcript; }
+      T.transcript = REC.final.trim(); const l = $("#live"); if (l) l.textContent = (REC.final + interim).trim(); };
+    sr.onerror = e => { LAST_MIC_ERR = "SpeechRecognition: " + e.error; if (e.error === "not-allowed" || e.error === "service-not-allowed") { stopRec(true); T.err = "لم يُسمح بالتعرف على الكلام. اسمح بالميكروفون، أو استخدم «تسجيل صوتي»."; drawStudio(); } };
+    sr.onend = () => { if (REC && REC.sr === sr) setTimeout(() => { if (REC && REC.sr === sr) try { sr.start(); } catch (e) {} }, 250); };
+    try { sr.start(); REC.sr = sr; } catch (e) { clearInterval(REC.clock); REC = null; T.err = "تعذّر بدء التعرف على الكلام. أعد المحاولة."; return drawStudio(); }
+  }
+  T.phase = "recording"; tasmee();
+}
+function cleanup(R) { if (!R) return; clearInterval(R.clock); cancelAnimationFrame(R.raf); try { R.stream && R.stream.getTracks().forEach(t => t.stop()); } catch (e) {} try { R.ctx && R.ctx.close(); } catch (e) {} }
+function stopRec(silent) {
+  const R = REC; if (!R) return; REC = null; const T = S.T;
+  T.dur = Date.now() - R.start;
+  if (R.sr) { try { R.sr.stop(); } catch (e) {} }
+  if (silent) { try { R.mr && R.mr.state !== "inactive" && R.mr.stop(); } catch (e) {} cleanup(R); T.phase = "ready"; return; }
+  if (R.mr) {
+    R.mr.onstop = async () => {
+      cleanup(R);
+      if (!R.chunks.length) { T.phase = "ready"; T.err = "لم يُلتقط صوت في التسجيل. تأكد من الميكروفون ثم أعد المحاولة."; return tasmee(); }
+      T.blob = new Blob(R.chunks, { type: R.mr.mimeType || "audio/webm" }); T.url = URL.createObjectURL(T.blob);
+      T.phase = "recorded"; T.recId = Date.now() + "";
+      const keys = tKeys();
+      await DB.put({ id: T.recId, page: T.page, from: keys[0], to: keys.at(-1), at: Date.now(), acc: null, blob: T.blob, dur: T.dur });
+      tasmee();
+    };
+    try { R.mr.requestData && R.mr.state === "recording" && R.mr.requestData(); R.mr.stop(); } catch (e) { cleanup(R); T.phase = "ready"; tasmee(); }
+  } else { cleanup(R); T.phase = "ready"; drawStudio(); setTimeout(() => evaluate(T.transcript), 600); }
+}
+
+/* ---------- التسميع المباشر: الوجه مخفي وينكشف مع القراءة الصحيحة ---------- */
+let F = null;
+function buildFollow() {
+  const keys = tKeys(); const E = [], disp = [], owner = [];
+  let html = "", open = false, n = 0;
+  for (const k of keys) {
+    const v = V(k);
+    if (v.a === 1) { if (open) html += "</div>"; html += `<div class="banner">سورة ${DATA.surahs[v.s]}</div>${v.s !== 1 && v.s !== 9 ? `<div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>` : ""}<div class="text">`; open = true; }
+    else if (!open) { html += `<div class="text">`; open = true; }
+    const toks = M.tokens(v.t), nn = M.norm(v.t);
+    toks.forEach((w, wi) => { E.push(nn[wi]); disp.push(w); owner.push(k); html += `<span class="fw h" data-i="${n++}">${esc(w)}</span> `; });
+    html += `<span class="end">${AR(v.a)}</span> `;
+  }
+  html += open ? "</div>" : "";
+  return { keys, E, disp, owner, html, forced: new Set(), prev: [], finals: [], session: [], interim: "", typed: "", done: false, last: null };
+}
+function followHeard() {
+  const finalText = F.finals.concat(F.session).join(" ") + " " + F.typed.replace(/\S+$/, m => F.typed.endsWith(" ") ? m : "");
+  const pendingTyped = F.typed.endsWith(" ") ? "" : (F.typed.match(/\S+$/) || [""])[0];
+  const fin = M.norm(finalText), tail = M.norm(F.interim + " " + pendingTyped);
+  return { H: fin.concat(tail), nFinal: fin.length, text: finalText };
+}
+function drawFollow(box) {
+  const T = S.T;
+  if (!F || F.page !== T.page || F.from !== tKeys()[0] || F.to !== tKeys().at(-1)) { F = buildFollow(); F.page = T.page; F.from = F.keys[0]; F.to = F.keys.at(-1); }
+  const on = !!REC && T.phase === "recording";
+  box.innerHTML = `
+    <div class="fstat"><div class="prog"><i id="fprog" style="width:0"></i></div><span class="tiny muted" id="fcount"></span></div>
+    <div id="ftoast"></div>
+    <div class="page fpage"><div class="page-in"><div class="page-in2" id="fpage">${F.html}</div></div></div>
+    <div class="heard" id="fheard">${on ? "" : "اضغط الميكروفون واقرأ من حفظك؛ كل كلمة صحيحة تنكشف في مكانها."}</div>
+    ${T.err ? `<div class="alert">${T.err}<div style="margin-top:8px"><button class="link" style="color:var(--err);text-decoration:underline" data-diag>افحص سبب المشكلة</button></div></div>` : ""}
+    <details style="margin-top:10px"><summary class="tiny muted" style="cursor:pointer">لا يعمل الميكروفون؟ جرّب بالكتابة</summary>
+      <div class="typein"><input type="text" id="ftype" placeholder="اكتب من حفظك، كلمة بعد كلمة" value="${esc(F.typed)}"></div></details>
+    <div style="height:110px"></div>
+    <div class="ctrl">
+      <button class="side" id="fhint">${ICON.bulb}اكشف كلمة</button>
+      <button class="mic ${on ? "on" : ""}" id="fmic" aria-label="${on ? "أوقف" : "ابدأ التسميع"}">${on ? ICON.stop : ICON.mic}</button>
+      <button class="side" id="fend">${ICON.check}${F.done ? "النتيجة" : "أنهِ وقيّم"}</button>
+    </div>`;
+  $("#fmic").onclick = () => on ? stopFollow(false) : startFollow();
+  $("#fhint").onclick = () => { const f = M.follow(F.E, followHeard().H, followHeard().nFinal, F.forced); if (f.pos < F.E.length) { F.forced.add(f.pos); updateFollow(); } };
+  $("#fend").onclick = () => stopFollow(true);
+  $("#ftype").oninput = e => { F.typed = e.target.value; updateFollow(); };
+  updateFollow(true);
+}
+function updateFollow(initial) {
+  if (!F || !$("#fpage")) return;
+  const { H, nFinal } = followHeard();
+  const f = M.follow(F.E, H, nFinal, F.forced);
+  const spans = document.querySelectorAll("#fpage .fw");
+  spans.forEach((el, i) => {
+    const s = f.st[i], was = F.prev[i] || 0;
+    const cls = s === 1 ? "fw ok" : s === 2 ? "fw skip" : s === 3 ? "fw hint" : "fw h" + (i === f.pos ? (f.lastWrong === i ? " cur bad" : " cur") : "");
+    if (el.className !== cls) el.className = cls;
+    if (s === 1 && was !== 1 && !initial) { el.classList.add("new"); setTimeout(() => el.classList.remove("new"), 700); }
+  });
+  F.prev = f.st.slice(); F.last = f;
+  const revealed = f.st.filter(x => x).length, errs = f.wrong.size + f.st.filter(x => x === 2).length;
+  $("#fprog").style.width = (revealed / F.E.length * 100) + "%";
+  $("#fcount").textContent = `${AR(revealed)} / ${AR(F.E.length)} كلمة${errs ? `، ${AR(errs)} خطأ` : ""}${F.forced.size ? `، ${AR(F.forced.size)} تلميح` : ""}`;
+  const cur = spans[f.pos]; if (cur && !initial) { const r = cur.getBoundingClientRect(); if (r.top > innerHeight - 220 || r.top < 80) cur.scrollIntoView({ block: "center", behavior: "smooth" }); }
+  const tail = H.slice(-5).join(" ");
+  if (H.length) $("#fheard").innerHTML = `سمعتُ: <b>${esc(tail)}</b>`;
+  // تنبيه الخطأ والمتشابه لحظياً
+  const toast = $("#ftoast");
+  if (f.lastWrong >= 0 && f.wrong.size) {
+    const k = F.owner[f.lastWrong];
+    let a0 = f.lastWrong; while (a0 > 0 && F.owner[a0 - 1] === k) a0--;
+    const ctx = F.E.slice(Math.max(a0, f.lastWrong - 2), f.lastWrong), W = H.slice(f.wrongStart, f.wrongStart + 2);
+    const to = M.slipTo(k, ctx, W, DATA), best = to ? { k: to } : null;
+    if (to) { F.slips = F.slips || {}; F.slips[k] = to; }
+    toast.innerHTML = best
+      ? `<div class="toast gold">${ICON.layers.replace("<svg", '<svg width="20" height="20"')}<span>انتقلتَ إلى صيغة ${ref(best.k)}. المطلوب ${ref(k)}.</span><button data-cmp="${k}">قارن</button></div>`
+      : `<div class="toast red"><span>توقّف هنا: قلتَ «${esc(f.heardAtWrong)}». أعد الكلمة الصحيحة، أو اضغط «اكشف كلمة».</span></div>`;
+    const b = toast.querySelector("[data-cmp]"); if (b) b.onclick = () => ayahSheet(b.dataset.cmp);
+  } else toast.innerHTML = "";
+  if (f.pos >= F.E.length && !F.done) { F.done = true; setTimeout(() => stopFollow(true), 700); }
+}
+function startFollow() {
+  const T = S.T; T.err = "";
+  if (!SR) { T.err = "التسميع المباشر بالصوت يحتاج متصفح Google Chrome. يمكنك التجربة بالكتابة من الأسفل، أو استخدام «تسجيل صوتي»."; return drawStudio(); }
+  const sr = new SR(); sr.lang = "ar-SA"; sr.continuous = true; sr.interimResults = true;
+  REC = { sr, start: Date.now() };
+  sr.onresult = e => {
+    const fin = [];
+    let interim = "";
+    for (let i = 0; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript.trim();
+      if (e.results[i].isFinal) { // بعض أجهزة أندرويد تكرر النص التراكمي في كل نتيجة
+        if (fin.length && t.startsWith(fin[fin.length - 1])) fin[fin.length - 1] = t; else fin.push(t);
+      } else interim += " " + t;
+    }
+    F.session = fin; F.interim = interim.trim(); updateFollow();
+  };
+  sr.onerror = e => { LAST_MIC_ERR = "SpeechRecognition: " + e.error;
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") { REC = null; T.phase = "ready"; T.err = "لم يُسمح بالتعرف على الكلام في هذه الصفحة."; drawStudio(); } };
+  sr.onend = () => { if (REC && REC.sr === sr) { F.finals.push(...F.session); F.session = []; F.interim = "";
+    setTimeout(() => { if (REC && REC.sr === sr) try { sr.start(); } catch (e) {} }, 200); } };
+  try { sr.start(); } catch (e) { REC = null; T.err = "تعذّر بدء التعرف على الكلام. أعد المحاولة."; return drawStudio(); }
+  T.phase = "recording"; drawStudio();
+}
+function stopFollow(evaluateNow) {
+  const T = S.T, R = REC;
+  if (R && R.sr) { REC = null; try { R.sr.stop(); } catch (e) {} F.finals.push(...F.session); F.session = []; F.interim = ""; }
+  T.phase = "ready";
+  if (!evaluateNow) return drawStudio();
+  const { text } = followHeard();
+  const hinted = [...F.forced].map(i => F.disp[i]);
+  if (!text.trim() && !hinted.length) { T.err = "لم يصل شيء من التسميع بعد. اضغط الميكروفون واقرأ، أو اكتب من حفظك."; return drawStudio(); }
+  const slips = F.slips || {}; F = null; evaluate(text, slips);
+}
+
+/* التعرف على التلاوة المسجلة: خادم (إن وُجد) أو Whisper داخل المتصفح */
+let ASR = null;
+async function decode16k(blob) {
+  const C = window.AudioContext || window.webkitAudioContext; const ctx = new C();
+  const buf = await ctx.decodeAudioData(await blob.arrayBuffer()); try { ctx.close(); } catch (e) {}
+  const off = new OfflineAudioContext(1, Math.ceil(buf.duration * 16000), 16000);
+  const src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
+async function transcribeRecording() {
+  const T = S.T; T.phase = "transcribing"; T.err = ""; T.prog = 5; T.progText = "تجهيز التسجيل…"; drawStudio();
+  const upd = (p, t) => { T.prog = p; T.progText = t; const el = document.querySelector("#studio .prog i"); if (el) { el.style.width = p + "%"; el.parentElement.nextElementSibling.textContent = t; } };
+  try {
+    let text = "";
+    if (ASR_ENDPOINT) {
+      upd(40, "إرسال التسجيل إلى خادم التعرف على التلاوة…");
+      const fd = new FormData(); fd.append("audio", T.blob, "recitation"); const r = await fetch(ASR_ENDPOINT, { method: "POST", body: fd });
+      if (!r.ok) throw new Error("server"); text = (await r.json()).text || "";
+    } else {
+      const audio = await decode16k(T.blob);
+      if (!ASR) {
+        upd(10, "تحميل نموذج Whisper (أول مرة فقط)…");
+        const tf = await import(TRANSFORMERS_URL);
+        const files = {};
+        ASR = await tf.pipeline("automatic-speech-recognition", WHISPER_MODEL, { dtype: "q8",
+          progress_callback: d => { if (d.status === "progress" && d.total) { files[d.file] = [d.loaded, d.total];
+            const [l, t] = Object.values(files).reduce((a, [x, y]) => [a[0] + x, a[1] + y], [0, 0]);
+            upd(10 + Math.round(l / t * 70), `تحميل نموذج Whisper (أول مرة فقط)… ${AR(Math.round(l / t * 100))}٪`); } } });
+      }
+      upd(85, "يتعرّف Whisper على تلاوتك…");
+      const out = await ASR(audio, { language: "arabic", task: "transcribe", chunk_length_s: 30, stride_length_s: 5 });
+      text = (out && out.text) || "";
+    }
+    upd(100, "تم");
+    if (!text.trim()) { T.phase = "recorded"; T.err = "لم يُتعرَّف على كلام في التسجيل. اقرأ بصوت أوضح وأقرب إلى الميكروفون."; return drawStudio(); }
+    evaluate(text);
+  } catch (e) {
+    T.phase = "recorded";
+    T.err = "تعذّر تحميل نموذج التعرف على التلاوة (يحتاج اتصالاً بالإنترنت في أول مرة). تسجيلك محفوظ في «حسابي». جرّب «تسميع مباشر» في Chrome أو «بالكتابة».";
+    drawStudio();
+  }
+}
+function showHint() {
+  const T = S.T, keys = tKeys(); const ta = $("#ta"); const text = ta ? ta.value : T.transcript;
+  const ev = M.evaluate(keys, text || "", DATA);
+  const k = keys[Math.min(ev.stoppedAt + 1, keys.length - 1)];
+  T.hintLvl = T.hintFor === k ? Math.min(T.hintLvl + 1, 3) : 1; T.hintFor = k;
+  const body = ["",
+    `<div class="lvl">تذكّر بالمعنى، التفسير الميسر</div>${esc(V(k).tf.split(/\s+/).slice(0, 14).join(" "))}…`,
+    `<div class="lvl">أول كلمة</div><span class="ayah">${esc(M.tokens(V(k).t)[0])}…</span>`,
+    `<div class="lvl">الآية كاملة</div><span class="ayah">${esc(V(k).t)}</span>`][T.hintLvl];
+  $("#hint").innerHTML = `<div class="hint"><div class="lvl">${ref(k)}${T.hintLvl < 3 ? "، اضغط «تلميح» مرة أخرى لتلميح أوضح" : ""}</div>${body}</div>`;
+}
+async function evaluate(text, slips) {
+  const T = S.T, keys = tKeys();
+  if (!text || !text.trim()) { T.phase = "ready"; T.err = "لم يصل شيء من التسميع. اقرأ بصوت واضح، أو اكتب من حفظك."; return tasmee(); }
+  const res = M.evaluate(keys, text, DATA);
+  for (const r of res.results) if (slips && slips[r.k] && r.status !== "notReached" && r.status !== "transition") {
+    r.status = "transition"; r.transition = { k: slips[r.k] }; r.errors = Math.max(1, r.errors); }
+  const done = res.results.filter(r => r.status !== "notReached");
+  record(T.page, done.reduce((s, r) => s + r.errors, 0), done.filter(r => r.status !== "ok").map(r => ({ k: r.k, type: r.status, to: r.transition && r.transition.k })), res.accuracy);
+  if (T.recId && T.blob) await DB.put({ id: T.recId, page: T.page, from: keys[0], to: keys.at(-1), at: +T.recId, acc: res.accuracy, blob: T.blob, dur: T.dur, text });
+  T.result = { keys, res, text }; T.phase = "result"; tasmee(); scrollTo(0, 0);
+}
+function tResult() {
+  const T = S.T, { res } = T.result;
+  const done = res.results.filter(r => r.status !== "notReached");
+  const okN = done.filter(r => r.status === "ok").length, trN = done.filter(r => r.status === "transition").length;
+  const pct = Math.round(res.accuracy * 100);
+  const words = r => r.words.map(w => w.op === "ok" ? esc(w.word) : w.op === "del" ? `<span class="w-del">${esc(w.word)}</span>`
+    : w.op === "sub" ? `<span class="w-sub">${esc(w.word)}</span><span class="w-note">قلتَ: ${esc(w.heard)}</span>` : `<span class="w-ins">+ ${esc(w.heard)}</span>`).join(" ");
+  $("#view").innerHTML = bar("نتيجة التسميع", `الوجه ${AR(T.page)}: سورة ${pageSurah(T.page)}`, true) + `
+    <div class="card score"><div class="ring" style="--p:${pct}"><b>${AR(pct)}٪</b></div>
+      <div class="grow"><b style="font-size:1.05rem">${okN === done.length ? "تسميع متقن، بارك الله فيك" : `${AR(done.length - okN)} من ${AR(done.length)} تحتاج علاجاً`}</b>
+        <div class="small muted">${trN ? `منها ${trN === 1 ? "انتقال واحد" : AR(trN) + " انتقالات"} إلى آية متشابهة` : "لا انتقال إلى متشابه"}${res.stoppedAt < res.results.length - 1 ? "، وتوقفتَ قبل نهاية المقطع" : ""}</div></div></div>
+    ${T.url ? `<div class="player"><button class="play" id="playBtn" aria-label="تشغيل">${ICON.play}</button><div class="ptrack"><i id="pbar"></i></div><span class="tiny muted">تسجيلك</span></div><audio id="aud" src="${T.url}"></audio>` : ""}
+    <div class="sec"><h2>تفصيل الآيات</h2><span class="tiny muted">الأحمر: سقط أو أُبدل، الذهبي: متشابه</span></div>
+    ${res.results.map(r => r.status === "notReached" ? `<div class="res notReached"><div class="tag muted">${ref(r.k)}: لم تُسمَّع</div></div>` : `
+      <div class="res ${r.status}"><div class="tag" style="color:${r.status === "ok" ? "var(--ok)" : r.status === "transition" ? "var(--gold)" : "var(--err)"}">
+        ${ref(r.k)}: ${r.status === "ok" ? "صحيحة" : r.status === "transition" ? `انتقلتَ إلى صيغة ${ref(r.transition.k)}` : "فيها خطأ"}</div><div class="ayah">${words(r)}</div></div>
+      ${r.status === "transition" ? compareHTML(r.k, r.transition.k, `العلاج: المطلوب ${ref(r.k)}، وما قرأتَه صيغة ${ref(r.transition.k)}`) : ""}`).join("")}
+    <div class="two" style="margin-top:18px"><button class="btn primary" id="again">${ICON.mic}أعد التسميع</button><button class="btn" data-read="${T.page}" data-view="meaning">${ICON.book}افهم الوجه</button></div>
+    <p class="tiny muted" style="text-align:center;margin-top:12px">سُجّلت أخطاؤك، وسيعود هذا الوجه في ورد المراجعة بحسبها.</p>`;
+  $("#back").onclick = () => { resetT(); tasmee(); };
+  $("#again").onclick = () => { resetT(); tasmee(); };
+  const aud = $("#aud"); if (aud) { const pb = $("#playBtn"); pb.onclick = () => aud.paused ? aud.play() : aud.pause();
+    aud.onplay = () => pb.innerHTML = ICON.pause; aud.onpause = aud.onended = () => pb.innerHTML = ICON.play;
+    aud.ontimeupdate = () => { const d = isFinite(aud.duration) && aud.duration ? aud.duration : T.dur / 1000; $("#pbar").style.width = Math.min(100, aud.currentTime / d * 100) + "%"; }; }
+  bindAll();
+}
+function rangeSheet() {
+  const T = S.T;
+  const draw = () => {
+    const keys = DATA.pages[T.page], s0 = V(keys[0]).s;
+    const sp = surahPages(T.surah || s0);
+    const opt = sel => keys.map(k => `<option value="${k}" ${k === sel ? "selected" : ""}>${ref(k)}</option>`).join("");
+    openSheet(`<h3>ماذا تسمّع؟</h3><div class="small muted">اختر السورة، ثم الوجه، ثم حدّد الآيات إن أردت جزءاً منه.</div>
+      <div class="selects" style="grid-template-columns:1fr"><label>السورة<select id="ss">${SURAHS.map(n => `<option value="${n}" ${n === (T.surah || s0) ? "selected" : ""}>${AR(n)}. ${DATA.surahs[n]}</option>`).join("")}</select></label></div>
+      <div class="tiny muted" style="margin:12px 2px 6px">الوجه</div>
+      <div class="pick-grid">${sp.map(p => `<button data-pp="${p}" aria-pressed="${p === T.page}">${AR(p)}</button>`).join("")}</div>
+      <div class="selects"><label>من الآية<select id="sf">${opt(T.from || keys[0])}</select></label><label>إلى الآية<select id="st">${opt(T.to || keys.at(-1))}</select></label></div>
+      <button class="btn primary block" style="margin-top:14px" id="okR">تم</button>`, true);
+    $("#ss").onchange = e => { T.surah = +e.target.value; T.page = DATA.surahInfo[T.surah].page; T.from = T.to = null; draw(); };
+    document.querySelectorAll("[data-pp]").forEach(b => b.onclick = () => { T.page = +b.dataset.pp; T.from = T.to = null; draw(); });
+    $("#sf").onchange = e => T.from = e.target.value; $("#st").onchange = e => T.to = e.target.value;
+    $("#okR").onclick = () => { closeSheet(); F = null; tasmee(); };
+  };
+  draw();
+}
+/* ---------- فحص الميكروفون: يحدد سبب المنع بدقة ---------- */
+let LAST_MIC_ERR = "";
+async function micDiagnosis() {
+  const c = [];
+  let inFrame = true; try { inFrame = window.self !== window.top; } catch (e) {}
+  const pol = document.permissionsPolicy || document.featurePolicy;
+  let policy = null; try { policy = pol && pol.allowsFeature ? pol.allowsFeature("microphone") : null; } catch (e) {}
+  let perm = "غير معروف"; try { perm = (await navigator.permissions.query({ name: "microphone" })).state; } catch (e) {}
+  let inputs = null; try { inputs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "audioinput").length; } catch (e) {}
+  const ua = navigator.userAgent, inApp = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|Twitter|; wv\)|GSA\//i.test(ua);
+  c.push(["الصفحة آمنة (https)", isSecureContext, location.protocol]);
+  c.push(["مفتوح مباشرة (ليس داخل إطار)", !inFrame, inFrame ? "داخل إطار" : "مباشر"]);
+  c.push(["الإطار يسمح بالميكروفون", policy !== false, policy === false ? "ممنوع" : "مسموح"]);
+  c.push(["متصفح كامل (ليس داخل تطبيق آخر)", !inApp, inApp ? "متصفح داخل تطبيق" : "نعم"]);
+  c.push(["إذن الميكروفون للموقع", perm !== "denied", { granted: "مسموح", denied: "مرفوض", prompt: "سيُسأل" }[perm] || perm]);
+  c.push(["يوجد ميكروفون في الجهاز", inputs !== 0, inputs == null ? "غير معروف" : AR(inputs)]);
+  c.push(["التسجيل مدعوم", !!window.MediaRecorder, window.MediaRecorder ? "نعم" : "لا"]);
+  c.push(["التسميع المباشر مدعوم", !!SR, SR ? "نعم" : "يحتاج Chrome"]);
+  let why = "";
+  if (location.protocol === "file:") why = "فتحتَ الملف مباشرة من الجهاز. المتصفح يمنع الميكروفون للملفات المحلية؛ ارفع مجلد dist على Netlify وافتح الرابط.";
+  else if (!isSecureContext) why = "الرابط ليس https، والمتصفح لا يعطي الميكروفون إلا لروابط https.";
+  else if (policy === false || (inFrame && /NotAllowed|not-allowed/.test(LAST_MIC_ERR))) why = "التطبيق مفتوح داخل إطار يمنع الميكروفون، مثل صفحة المعاينة في Claude. هذا المنع لا تغيّره أذونات المتصفح؛ افتح التطبيق من رابطك المنشور مباشرة.";
+  else if (inApp) why = "الرابط مفتوح داخل متصفح تطبيق آخر (واتساب أو تويتر أو غيرهما)، وهذه لا تعطي الميكروفون. افتحه في Chrome أو Safari.";
+  else if (perm === "denied") why = "الموقع مرفوض في أذونات المتصفح. غيّره إلى «سماح» من أيقونة القفل بجانب الرابط، ثم حدّث الصفحة.";
+  else if (inputs === 0) why = "لم يجد المتصفح أي ميكروفون متصل بالجهاز.";
+  else if (/NotReadable/.test(LAST_MIC_ERR)) why = "الميكروفون مستخدم في تطبيق آخر (مكالمة أو تسجيل). أغلقه ثم أعد المحاولة.";
+  else if (/NotAllowed/.test(LAST_MIC_ERR)) why = "رفض نظام التشغيل الوصول. تأكد أن Chrome أو Safari مسموح له بالميكروفون في إعدادات الجهاز نفسه.";
+  else why = "لا يظهر مانع واضح. اضغط «ابدأ» واسمح عند السؤال.";
+  return { c, why };
+}
+async function diagSheet() {
+  const { c, why } = await micDiagnosis();
+  openSheet(`<h3>فحص الميكروفون</h3>
+    <div class="card" style="margin-top:10px;border-inline-start:4px solid var(--gold-2)"><b>السبب الأرجح</b><div class="small" style="margin-top:4px">${why}</div></div>
+    <div class="card" style="padding-block:6px">${c.map(([t, ok, v]) => `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)">
+      <span style="color:${ok ? "var(--ok)" : "var(--err)"};width:20px">${ok ? "✓" : "✗"}</span><span class="grow small">${t}</span><span class="tiny muted">${esc(v)}</span></div>`).join("")}
+      ${LAST_MIC_ERR ? `<div class="tiny muted" style="padding:8px 0">آخر خطأ: ${esc(LAST_MIC_ERR)}</div>` : ""}</div>
+    <div class="tiny muted" style="margin-top:8px">${esc(navigator.userAgent)}</div>`);
+}
+
+
+/* ---------- شاشة التفسير (من الشريط السفلي) ---------- */
+function tafsirTab() {
+  const p = S.tp = S.tp || ST.last || 3, src = ST.tsrc || "muyassar";
+  $("#view").innerHTML = bar("التفسير", "اقرأ الآيات وتفسيرها") + `
+    <div class="tfh">
+      <button class="ibtn" id="tpPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
+      <button class="pick" id="tpPick"><span class="grow"><b>سورة ${pageSurah(p)}</b><small>الوجه ${AR(p)}، الآيات ${pageRange(p)}، الجزء ${JUZ_NAMES[juzOf(p)]}</small></span>${ICON.chev.replace("<svg", '<svg width="18" height="18" style="color:var(--muted);transform:rotate(-90deg)"')}</button>
+      <button class="ibtn" id="tpNext" aria-label="الوجه التالي" ${p >= PAGES.length ? "disabled" : ""}>${ICON.next}</button>
+    </div>
+    <div class="srcs" role="group" aria-label="مصدر التفسير">
+      <button data-ts="muyassar" aria-pressed="${src === "muyassar"}">الميسر</button>
+      <button data-ts="dorar" aria-pressed="${src === "dorar"}" id="tsDorar">موسوعة التفسير</button>
+      <button data-ts="gharib" aria-pressed="${src === "gharib"}">غريب الكلمات</button></div>
+    <div id="tlist"><div class="info">جارٍ التحميل…</div></div>
+    <div class="two" style="margin-top:16px"><button class="btn" id="tpPrev2" ${p <= 1 ? "disabled" : ""}>الوجه السابق</button><button class="btn primary" id="tpNext2" ${p >= PAGES.length ? "disabled" : ""}>الوجه التالي</button></div>`;
+  const goP = q => { if (q >= 1 && q <= PAGES.length) { S.tp = q; tafsirTab(); scrollTo(0, 0); } };
+  $("#tpPrev").onclick = $("#tpPrev2").onclick = () => goP(p - 1);
+  $("#tpNext").onclick = $("#tpNext2").onclick = () => goP(p + 1);
+  $("#tpPick").onclick = surahPicker;
+  document.querySelectorAll("[data-ts]").forEach(b => b.onclick = () => { ST.tsrc = b.dataset.ts; save(); tafsirTab(); });
+  fillTafsir(p, src);
+}
+function surahPicker() {
+  openSheet(`<h3>اختر السورة</h3><input class="search" id="sq" type="search" placeholder="ابحث باسم السورة أو رقمها" style="margin:10px 0"><div id="sl2"></div>`);
+  const draw = () => {
+    const q = ($("#sq").value || "").trim(), qd = q.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)), qn = M.norm(q).join(" ");
+    const list = SURAHS.filter(n => !q || (/^\d+$/.test(qd) ? String(n) === qd : qn && M.norm(DATA.surahs[n]).join(" ").includes(qn)));
+    $("#sl2").innerHTML = list.map(n => `<button class="sl" data-sp="${n}"><span class="no">${AR(n)}</span><span class="grow"><div class="nm">${DATA.surahs[n]}</div><div class="tiny muted">${DATA.surahInfo[n].rev}، ${ayat(DATA.surahInfo[n].n)}</div></span></button>`).join("");
+    document.querySelectorAll("[data-sp]").forEach(b => b.onclick = () => { S.tp = DATA.surahInfo[+b.dataset.sp].page; closeSheet(); tafsirTab(); scrollTo(0, 0); });
+  };
+  $("#sq").oninput = draw; draw();
+}
+function fillTafsir(p, src) {
+  const keys = DATA.pages[p];
+  dorarGroups(p).then(gs => {
+    const box = $("#tlist"); if (!box) return;
+    const hasD = gs.some(g => g.sections.ijmali); const db = $("#tsDorar"); if (db && !hasD) db.disabled = true;
+    const use = src === "dorar" && !hasD ? "muyassar" : src;
+    let html = src === "dorar" && !hasD ? `<div class="info" style="margin-bottom:10px">موسوعة التفسير غير متاحة لهذا الوجه بعد؛ يُعرض التفسير الميسر.</div>` : "";
+    const shown = new Set();
+    for (const k of keys) {
+      const v = V(k);
+      if (v.a === 1) html += `<div class="banner" style="margin:14px 8px 12px">سورة ${DATA.surahs[v.s]}</div>`;
+      if (use === "dorar") { const g = gs.find(g => g.n === v.s && g.from <= v.a && g.to >= v.a && g.sections.ijmali);
+        if (g && !shown.has(g)) { shown.add(g); html += `<div class="tgroup"><span class="lbl">المعنى الإجمالي للآيات ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span>${esc(g.sections.ijmali.text)}</div>`; } }
+      const tx = use === "muyassar" ? esc(v.tf)
+        : use === "gharib" ? (v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`) : "";
+      html += `<div class="ta"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
+        ${DATA.mutashabihat[k] ? `<button class="mchip" data-mut="${k}">${ICON.layers.replace("<svg", '<svg width="13" height="13"')}لها متشابه</button>` : ""}</div>`;
+    }
+    html += use === "dorar" ? DSRC : `<div class="src">${use === "muyassar" ? "التفسير الميسر، مجمع الملك فهد." : "السراج في بيان غريب القرآن."}</div>`;
+    box.innerHTML = html;
+    box.querySelectorAll(".q").forEach(q => q.onclick = () => ayahSheet(q.dataset.k));
+    box.querySelectorAll("[data-mut]").forEach(b => b.onclick = () => ayahSheet(b.dataset.mut));
+  });
+}
+
+/* ---------- المراجعة ---------- */
+function review() {
+  const now = Date.now(), entries = Object.entries(ST.pages);
+  const due = entries.filter(([, r]) => r.due <= now).sort((a, b) => b[1].errors - a[1].errors);
+  const later = entries.filter(([, r]) => r.due > now).sort((a, b) => a[1].due - b[1].due);
+  const seen = new Set(); const trans = ST.mistakes.filter(m => m.type === "transition").reverse().filter(m => !seen.has(m.k) && seen.add(m.k)).slice(0, 8);
+  const days = r => Math.max(1, Math.round((r.due - now) / 864e5));
+  $("#view").innerHTML = bar("المراجعة", "تُبنى من أخطائك في التسميع والاختبار", true) + (!entries.length
+    ? `<div class="card empty">${ICON.review}<div style="font-weight:600;color:var(--ink)">لم تسمّع أي وجه بعد</div><div class="small">سمّع وجهاً، وسيبني مثاني جدول مراجعتك.</div><button class="btn primary" style="margin-top:14px" data-tas="${ST.last || 3}">${ICON.mic}سمّع الآن</button></div>`
+    : `<div class="sec" style="margin-top:6px"><h2>مستحق اليوم</h2></div>
+    ${due.length ? due.map(([p, r]) => pageItem(p, r.errors ? `${AR(r.errors)} مواضع ضعف` : "مراجعة تثبيت")).join("") : `<div class="info">أنهيت مراجعة اليوم، بارك الله فيك.</div>`}
+    ${trans.length ? `<div class="sec"><h2>متشابهات تحتاج ضبطاً</h2></div>${trans.map(m => `<button class="item" data-mut="${m.k}">
+      <span class="pg" style="--h:var(--gold-soft);color:var(--gold)">${ICON.layers.replace("<svg", '<svg width="20" height="20"')}</span>
+      <span class="grow"><div style="font-weight:600">${ref(m.k)}</div><div class="tiny muted">قرأتَ مكانها صيغة ${ref(m.to)}</div></span><span class="muted" style="width:18px">${ICON.chev}</span></button>`).join("")}` : ""}
+    ${later.length ? `<div class="sec"><h2>قادم</h2></div>${later.slice(0, 6).map(([p, r]) => pageItem(p, `بعد ${AR(days(r))} ${days(r) <= 2 ? "يوم" : "أيام"}`)).join("")}` : ""}`);
+  if ($("#back")) $("#back").onclick = () => go("home");
+  bindAll();
+}
+
+/* ---------- حسابي ---------- */
+async function profile() {
+  $("#view").innerHTML = bar("حسابي") + `
+    <div class="card"><label class="tiny muted" for="name">اسمك</label><input type="text" id="name" placeholder="يظهر في الرئيسية" value="${esc(ST.name)}" style="margin-top:6px"></div>
+    <div class="sec"><h2>تسجيلاتي</h2></div><div id="recs"><div class="info">جارٍ التحميل…</div></div>
+    <div class="sec"><h2>مراجعة المحتوى</h2><span class="badge draft">للمتخصص الشرعي</span></div>
+    <div class="card"><div class="small muted">موضوع الوجه والفوائد ومقاصد السورة مسوداتٌ تظهر بشارة «بانتظار المراجعة» حتى يعتمدها المتخصص بعد مطابقتها بالمختصر في التفسير.</div>
+      <div class="row" style="margin-top:12px"><div class="grow"><b>${AR(Object.values(ST.approved).filter(Boolean).length)}</b> <span class="small muted">من ${AR(Object.keys(CONTENT.pages).length)} وجهاً معتمد</span></div><button class="btn" id="openReview">افتح المراجعة</button></div></div>
+    <div class="sec"><h2>الميكروفون</h2></div><div class="card row"><div class="grow small muted">إذا لم يعمل التسجيل، افحص السبب.</div><button class="btn" data-diag>افحص الميكروفون</button></div>
+    <div class="sec"><h2>المصادر</h2></div>
+    <div class="card small">${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></div>
+    <div class="sec"><h2>بياناتي</h2></div>
+    <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
+  $("#name").onchange = e => { ST.name = e.target.value.trim(); save(); };
+  $("#openReview").onclick = reviewSheet;
+  document.querySelectorAll("[data-diag]").forEach(b => b.onclick = diagSheet);
+  const recs = (await DB.all()).sort((a, b) => b.at - a.at);
+  $("#reset").onclick = async () => { if (!confirm("سيُحذف سجل أخطائك ومراجعاتك وتسجيلاتك من هذا الجهاز.")) return;
+    for (const r of recs) await DB.del(r.id); ST = { name: ST.name, pages: {}, mistakes: [], sessions: [], approved: ST.approved, last: 3 }; save(); profile(); };
+  const box = $("#recs");
+  box.innerHTML = recs.length ? "" : `<div class="info">لا تسجيلات بعد. من «سمّع» اختر «تسجيل صوتي».</div>`;
+  recs.forEach(r => {
+    const el = document.createElement("div"); el.className = "item"; el.style.flexWrap = "wrap";
+    el.innerHTML = `<span class="pg" style="--h:${heat(r.page)}">${AR(r.page)}</span><span class="grow"><div style="font-weight:600">${ref(r.from)} – ${AR(V(r.to).a)}</div>
+      <div class="tiny muted">${new Date(r.at).toLocaleDateString("ar-SA", { day: "numeric", month: "long" })}، ${fmt(r.dur || 0)}</div></span>${r.acc != null ? accChip(r.acc) : `<span class="chip mid">لم يُقيَّم</span>`}`;
+    const a = document.createElement("audio"); a.controls = true; a.style.width = "100%"; a.style.marginTop = "8px"; a.src = URL.createObjectURL(r.blob);
+    const del = document.createElement("button"); del.className = "link"; del.style.color = "var(--err)"; del.style.marginTop = "6px"; del.textContent = "حذف";
+    del.onclick = async () => { await DB.del(r.id); profile(); };
+    el.append(a, del); box.appendChild(el);
+  });
+}
+function reviewSheet() {
+  openSheet(`<h3>مراجعة محتوى الأوجه</h3><p class="small muted" style="margin-top:0">طابِق كل وجه بالمختصر في التفسير، ثم اعتمده.</p>
+    ${Object.keys(CONTENT.pages).map(Number).map(p => `<div class="card"><div class="row"><b class="grow">الوجه ${AR(p)}: ${pageSurah(p)}</b>
+      <button class="switch" role="switch" aria-checked="${!!ST.approved[p]}" data-ap="${p}" aria-label="اعتماد الوجه ${AR(p)}"></button></div>
+      <div class="small" style="margin-top:6px">${esc(CONTENT.pages[p].topic)}</div>
+      <ul class="fw small muted" style="margin-top:8px">${CONTENT.pages[p].fawaid.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>`).join("")}`);
+  document.querySelectorAll("[data-ap]").forEach(b => b.onclick = () => { const p = b.dataset.ap; ST.approved[p] = !ST.approved[p]; save(); b.setAttribute("aria-checked", !!ST.approved[p]); });
+}
+
+/* ---------- الورقة السفلية ---------- */
+function openSheet(html, noClose) {
+  $("#sheetRoot").innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}
+    ${noClose ? "" : `<button class="btn ghost block" style="margin-top:16px" id="closeSheet">إغلاق</button>`}</div></div>`;
+  $("#scrim").onclick = e => { if (e.target.id === "scrim") closeSheet(); };
+  if (!noClose) $("#closeSheet").onclick = closeSheet;
+  document.addEventListener("keydown", escClose); document.body.style.overflow = "hidden";
+}
+function closeSheet() { $("#sheetRoot").innerHTML = ""; document.removeEventListener("keydown", escClose); document.body.style.overflow = "";
+  if (S.tab === "profile" && !S.reader) profile(); }
+function escClose(e) { if (e.key === "Escape") closeSheet(); }
+
+document.documentElement.style.setProperty("--fs", ST.fs || 1);
+render();
+</script>
+</body>
+</html>

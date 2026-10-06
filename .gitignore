@@ -1,0 +1,14 @@
+node_modules/
+.cache/
+data/layout_raw/
+data/ara-*.json
+data/info.json
+data/editions.json
+scripts/__pycache__/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
