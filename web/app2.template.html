@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0A1E3C">
+<meta name="theme-color" content="#0A3D30">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>مثاني</title>
 <style>
@@ -585,6 +585,97 @@ body.immersive.rui .mp{bottom:calc(var(--bottom) + 84px)}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:.82rem}
 .chips button[aria-pressed="true"]{background:var(--green);color:var(--on);border-color:var(--green)}
+
+/* ================= الهوية الجديدة: زمرّدي ورملي ================= */
+:root{
+  --bg:#F6F4EE; --surface:#FFFFFF; --surface-2:#F1EEE5; --ink:#0F1F1A; --muted:#5E6B65; --line:#E4DFD3;
+  --deep:#062A20; --green:#0B5D47; --green-soft:#E4F1EB; --on:#FFFFFF;
+  --sky:#159A72; --sky-2:#7AD6B5; --sky-soft:#E2F4EC;
+  --gold:#A87412; --gold-2:#D9AE52; --gold-soft:#F8EED8;
+  --paper:#FFFEFA; --rpaper:#FFFEF9;
+  --sh:0 1px 2px rgba(6,42,32,.04),0 8px 24px rgba(6,42,32,.06);
+  --sh2:0 18px 40px rgba(6,42,32,.14);
+  --hero:radial-gradient(120% 90% at 100% 0%,rgba(122,214,181,.35),transparent 55%),linear-gradient(150deg,#062A20 0%,#0A4334 55%,#0E6650 100%);
+  --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'%3E%3Crect x='16' y='16' width='24' height='24'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3Ccircle cx='28' cy='28' r='5'/%3E%3C/g%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#07110E; --surface:#0E1C17; --surface-2:#13261F; --ink:#E6F0EB; --muted:#8FA39A; --line:#1F342C;
+  --deep:#030A08; --green:#7FDDB8; --green-soft:#12302A; --on:#04110C;
+  --sky:#3CC59A; --sky-2:#7FDDB8; --sky-soft:#10332A;
+  --gold:#E3B75E; --gold-2:#E8C77F; --gold-soft:#2E2614;
+  --paper:#0B1814; --rpaper:#0B1814;
+  --sh:0 1px 2px rgba(0,0,0,.4); --sh2:0 18px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#07110E; --surface:#0E1C17; --surface-2:#13261F; --ink:#E6F0EB; --muted:#8FA39A; --line:#1F342C;
+  --deep:#030A08; --green:#7FDDB8; --green-soft:#12302A; --on:#04110C;
+  --sky:#3CC59A; --sky-2:#7FDDB8; --sky-soft:#10332A;
+  --gold:#E3B75E; --gold-2:#E8C77F; --gold-soft:#2E2614;
+  --paper:#0B1814; --rpaper:#0B1814;
+  --sh:0 1px 2px rgba(0,0,0,.4); --sh2:0 18px 40px rgba(0,0,0,.5);}
+body{background:var(--bg);background-image:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:var(--bg)}}
+/* البطاقات: أنعم وأوضح */
+.card,.item,.tile,.qa button,.sl,.dsec,.ta,.tpanel,.res,.stat,.jz,.seg,.mtool,.qc,.votd,.mini,.tfh .pick,.srcs,.opt2,.rcl,.search,.ibtn,.pnav2 button{
+  border-radius:24px;box-shadow:var(--sh);border:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.ibtn,.pnav2 button{border-radius:16px}
+.pv .page{box-shadow:var(--sh2);border:1px solid var(--line)}
+.btn{border-radius:16px;font-weight:700}
+.btn.primary,.srcs button[aria-pressed="true"],.seg button[aria-pressed="true"],.mtool .vs button[aria-pressed="true"],.chips button[aria-pressed="true"],.pick-grid button[aria-pressed="true"]{
+  background:linear-gradient(135deg,#0A4D3B,#159A72);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(21,154,114,.28)}
+.bar h1{font-size:1.6rem;font-weight:800;letter-spacing:-.01em}
+.sec2 h2,.sec h2,.htitle h3{font-weight:800}
+.sec2 button,.votd .lbl{color:var(--sky)}
+/* الرئيسية */
+.hd .av{background:linear-gradient(135deg,#0A4D3B,#22B386);box-shadow:0 6px 16px rgba(21,154,114,.3)}
+.hd .hi b{font-weight:800}
+.heroC{background:var(--star),var(--hero);background-size:56px 56px,auto,auto;border-radius:30px;box-shadow:0 22px 44px rgba(6,42,32,.28);padding:22px}
+.heroC::after{background:radial-gradient(circle,rgba(217,174,82,.35),transparent 70%)}
+.heroC .k{color:#D9AE52;opacity:1;font-weight:600;letter-spacing:.02em}
+.heroC .t{font-size:1.55rem;font-weight:800}
+.heroC .go{border-radius:999px;padding:11px 20px;background:#F6E7C1;color:#062A20;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.ring2{background:radial-gradient(closest-side,#0A4334 79%,transparent 80% 100%),conic-gradient(#D9AE52 calc(var(--p)*1%),rgba(255,255,255,.14) 0)}
+/* شبكة «ابدأ من هنا» */
+.hs{display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:visible;margin:0;padding:0}
+.qc{width:auto;padding:14px;display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:0;align-items:center}
+.qc .ic{grid-row:span 2}
+.qc b{align-self:end;line-height:1.3}
+.qc span.t{margin-top:0;align-self:start}
+.qc:first-child{grid-column:1/-1;padding:18px}
+.qc:first-child .ic{width:54px;height:54px;border-radius:18px}
+.qc:first-child b{font-size:1.15rem}
+.qc .ic{border-radius:16px;box-shadow:0 6px 14px rgba(6,42,32,.18)}
+.qc b{font-weight:800}
+.votd{border-radius:28px}
+.votd::before{height:4px;background:linear-gradient(90deg,#D9AE52,#159A72)}
+.votd .ay{color:var(--ink)}
+.mini .pn{border-radius:16px}
+/* المصحف */
+.pattern{background:var(--star),var(--hero);background-size:56px 56px,auto,auto;color:#fff}
+.juzhead{border-radius:28px;box-shadow:0 18px 40px rgba(6,42,32,.22)}
+.qstrip .here::after{color:#062A20}
+.sl .no{background:var(--gold-soft);color:var(--gold)}
+.sl .nm{font-size:1.3rem}
+.link.sinfo{background:var(--sky-soft);color:var(--green)}
+/* التنقل السفلي */
+.tabs{border-radius:28px;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);box-shadow:0 16px 36px rgba(6,42,32,.16)}
+.tabs button[aria-current="page"]{color:var(--green);font-weight:800}
+.tabs button[aria-current="page"]:not(.fab) svg{background:var(--sky-soft);border-radius:12px;padding:3px 10px;width:44px;height:30px;box-sizing:border-box;filter:none}
+.tabs .fab span.c{background:linear-gradient(140deg,#0A4D3B,#22B386);box-shadow:0 10px 24px rgba(21,154,114,.4)}
+.tabs .fab[aria-current="page"] span.c{background:linear-gradient(140deg,#062A20,#0B5D47)}
+/* التسميع */
+.mic{background:linear-gradient(140deg,#0A4D3B,#22B386);box-shadow:0 12px 28px rgba(21,154,114,.35)}
+.modes button{border-radius:18px}
+.modes button[aria-pressed="true"]{background:var(--green-soft);border-color:var(--sky);color:var(--green)}
+.ctrl{border-radius:26px;box-shadow:var(--sh2);border:1px solid var(--line)}
+/* المشغّل */
+.mp{background:var(--star),linear-gradient(135deg,#062A20,#0A4334 70%,#0E6650);background-size:56px 56px,auto;box-shadow:0 16px 36px rgba(6,42,32,.35)}
+.mp .ctl .pp{color:#062A20}
+.mp .bar2 i{background:#D9AE52}
+.mp .rep{color:#D9AE52}
+/* مظهر القراءة الفاتح */
+.rd[data-rt="light"]{--rline:#CFE5DA;--mk-b:#2FAE85;--mk-bg:#E2F4EC;--mk-c:#0B5D47;--bn-bg:#0B5D47;--bn-b:#0B5D47}
+.rhint{background:#062A20}
 </style>
 </head>
 <body>
@@ -732,7 +823,7 @@ function drawStrip0(id, cur, onPick) {
   if (!drawStrip.dens) drawStrip.dens = PAGES.map(p => { const k = DATA.pages[p]; return k.filter(x => DATA.mutashabihat[x]).length / k.length; });
   for (let p = 1; p <= n; p++) {
     const x = W - p * bw, h = H * (0.18 + 0.82 * drawStrip.dens[p - 1]);
-    g.fillStyle = juzStarts.has(p) ? "rgba(124,203,242,.75)" : "rgba(124,203,242,.32)";
+    g.fillStyle = juzStarts.has(p) ? "rgba(217,174,82,.85)" : "rgba(122,214,181,.38)";
     g.fillRect(x, (H - h) / 2, Math.max(bw - .2, .5), h);
   }
   for (const [pp, r] of Object.entries(ST.pages)) { // الأوجه المسمَّعة فوق كل شيء وبعرض واضح
@@ -755,11 +846,11 @@ function home() {
   const hr = new Date().getHours(), greet = hr < 12 ? "صباح الخير" : "مساء الخير";
   // آية اليوم: من الآيات التي لها متشابه، تتغير يومياً
   const pool = Object.keys(DATA.mutashabihat), vk = pool[Math.floor(now / 864e5) % pool.length], vv = V(vk);
-  const qcs = [["سمّع", "الوجه مخفي", ICON.mic, "linear-gradient(135deg,#14335E,#2F9FDB)", () => openTasmee(last)],
-    ["التفسير", "آية وتفسيرها", ICON.tafsir, "linear-gradient(135deg,#1F5F96,#7CCBF2)", () => { S.tp = last; go("tafsir"); }],
-    ["استمع", "تلاوة وتكرار", ICON.listen, "linear-gradient(135deg,#0E7490,#22D3EE)", () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
+  const qcs = [["سمّع", "الوجه مخفي", ICON.mic, "linear-gradient(135deg,#0A5C46,#1FA37A)", () => openTasmee(last)],
+    ["التفسير", "آية وتفسيرها", ICON.tafsir, "linear-gradient(135deg,#0F766E,#5EC9B4)", () => { S.tp = last; go("tafsir"); }],
+    ["استمع", "تلاوة وتكرار", ICON.listen, "linear-gradient(135deg,#155E75,#3BB3C9)", () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
     ["المتشابهات", "قارن وافهم", ICON.layers, "linear-gradient(135deg,#B07816,#E2B04E)", () => openReader(last, "mushaf")],
-    ["اختبر", "أسئلة الوجه", ICON.quiz, "linear-gradient(135deg,#0A1E3C,#14335E)", () => openReader(last, "quiz")]];
+    ["اختبر", "أسئلة الوجه", ICON.quiz, "linear-gradient(135deg,#3B3F8F,#7276D6)", () => openReader(last, "quiz")]];
   $("#view").innerHTML = `
     <div class="hd"><span class="av">${esc((ST.name || "م").trim()[0])}</span>
       <div class="hi"><small>${greet}</small><b>${ST.name ? esc(ST.name) : "حافظ القرآن"}</b></div><div class="date">${hijri}</div></div>
