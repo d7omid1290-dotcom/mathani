@@ -1,0 +1,35 @@
+name: جلب تراجم المعاني
+on:
+  workflow_dispatch:
+    inputs:
+      en: { description: "مفتاح الترجمة الإنجليزية في QuranEnc", default: "english_saheeh" }
+      ur: { description: "مفتاح الترجمة الأردية في QuranEnc", default: "urdu_junagarhi" }
+permissions: { contents: write }
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: جلب السور
+        run: |
+          set -e; mkdir -p data/tafsir
+          for pair in "en:${{ inputs.en }}" "ur:${{ inputs.ur }}"; do
+            lang=${pair%%:*}; key=${pair#*:}; mkdir -p tmp/$lang
+            for s in $(seq 1 114); do curl -sf --retry 3 "https://quranenc.com/api/v1/translation/sura/$key/$s" -o tmp/$lang/$s.json; done
+            python3 - "$lang" <<'PY'
+          import json, sys, glob
+          lang = sys.argv[1]; out = {}
+          for f in glob.glob(f"tmp/{lang}/*.json"):
+              for r in json.load(open(f))["result"]:
+                  out[f"{int(r['sura'])}:{int(r['aya'])}"] = r["translation"].strip()
+          json.dump(out, open(f"data/tafsir/{lang}.json", "w"), ensure_ascii=False, separators=(",", ":"))
+          print(lang, len(out))
+          PY
+          done
+      - name: البناء والاختبار والنشر
+        run: |
+          npm ci || npm install
+          python3 scripts/bundle.py && npm test
+          git config user.name "github-actions" && git config user.email "actions@github.com"
+          mkdir -p data/tafsir; git add data/tafsir dist && git commit -m "تراجم معاني القرآن من QuranEnc" && git push
+          git subtree split --prefix dist -b gh-pages-tmp && git push -f origin gh-pages-tmp:gh-pages
