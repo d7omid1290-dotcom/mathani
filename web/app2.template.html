@@ -805,20 +805,25 @@ const LG = ST.lang && I18N[ST.lang] ? ST.lang : "ar";
 const TR = (() => {
   const AL = "ء-ي", names = Object.values(DATA.surahs).sort((a, b) => b.length - a.length);
   const sIdx = Object.fromEntries(Object.entries(DATA.surahs).map(([n, v]) => [v, +n]));
-  const re = new RegExp(`[0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?|(?<![${AL}])(و?)(${names.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?![${AL}])`, "g");
-  const dict = I18N[LG] || {}, miss = new Set(), done = new WeakMap();
+  const B = "\u0621-\u064A\u064B-\u0652\u0670\u0640", PERSON = new Set(["محمد", "إبراهيم", "يوسف", "مريم", "هود", "نوح", "لقمان", "يونس"]);
+  const re = new RegExp(`[0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?|(?<![${B}])(و?)(${names.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?![${B}])`, "g");
+  // اسم السورة الذي هو اسم علم أيضاً (محمد، إبراهيم…) أو «الملك فهد» لا يُعامل سورةً إلا ومعه رقم آية أو كلمة «سورة»
+  const isSurah = (nm, off, str) => !(nm === "الملك" && /^ فهد/.test(str.slice(off + nm.length))) &&
+    (!PERSON.has(nm) || /^ [0-9٠-٩]/.test(str.slice(off + nm.length)) || /(سورة |[0-9٠-٩]\. )$/.test(str.slice(0, off)) || str.trim() === nm);
+  const dict = I18N[LG] || {}, miss = new Set(), done = new WeakMap(), outs = new Set();
   const DIG = { en: "0123456789", ur: "۰۱۲۳۴۵۶۷۸۹" }[LG];
   const num = m => DIG ? m.replace(/[٠-٩]/g, d => DIG["٠١٢٣٤٥٦٧٨٩".indexOf(d)]).replace(/[0-9]/g, d => DIG[d]).replace("٫", ".") : m;
   const sur = n => LG === "en" ? I18N.surahEn[n] : DATA.surahs[n];
   function t(str) {
     if (LG === "ar" || !str || !/[ء-ي]/.test(str) || str.length > 220) return str;
     if ((str.match(/[\u064B-\u0652\u0640]/g) || []).length > 3) return str; // نص قرآني مشكول
+    if (outs.has(str)) return str; // نص مترجَم سابقاً
     const m = str.match(/^(\s*)([\s\S]*?)(\s*)$/), core = m[2], args = [];
     let i = 0;
-    const key = core.replace(re, (x, w, nm) => { if (nm) { args.push(sur(sIdx[nm])); return (w || "") + `{${i++}}`; } args.push(num(x)); return `{${i++}}`; });
-    const out = dict[key];
+    const key = core.replace(re, (x, w, nm, off) => { if (nm && !isSurah(nm, off + (w || "").length, core)) return x; if (nm) { args.push(sur(sIdx[nm])); return (w || "") + `{${i++}}`; } args.push(num(x)); return `{${i++}}`; });
+    const out = /[\u0621-\u064A]/.test(key) ? dict[key] : key; // أرقام وأسماء سور فقط
     if (out == null) { if (!/[ً-ْ]{2}/.test(core)) miss.add(key); return str; }
-    return m[1] + out.replace(/\{(\d+)\}/g, (_, j) => args[j] ?? "") + m[3];
+    const res = m[1] + out.replace(/\{(\d+)\}/g, (_, j) => args[j] ?? "") + m[3]; outs.add(res); return res;
   }
   const SKIP = "script,style,textarea,.page-in2,.basmala,.ayah,.a,.fw,.pw,.end,.ww,.qw,.opt:not(.ui),[data-noi18n]";
   const ATTRS = ["placeholder", "aria-label", "title", "data-p"];
@@ -846,8 +851,8 @@ const TR = (() => {
 })();
 const tr = TR.t;
 function langSheet() {
-  openSheet(`<h3>${tr("اللغة")} <small class="muted" style="font-weight:400" data-noi18n>Language</small></h3>
-    <div class="langs">${LANGS.map(([c, n, e]) => `<button class="item" data-lang="${c}" aria-pressed="${LG === c}" data-noi18n><span class="grow"><b>${n}</b>${c !== "ar" ? `<div class="tiny muted">${e}</div>` : ""}</span>${LG === c ? ICON.check : ""}</button>`).join("")}</div>
+  openSheet(`<h3>${tr("اللغة")} ${LG !== "en" ? `<small class="muted" style="font-weight:400" data-noi18n>Language</small>` : ""}</h3>
+    <div class="langs">${LANGS.map(([c, n, e]) => `<button class="item" data-lang="${c}" aria-pressed="${LG === c}" data-noi18n><span class="grow"><b>${n}</b>${c !== "ar" && c !== LG && LG !== "en" ? `<div class="tiny muted">${e}</div>` : ""}</span>${LG === c ? ICON.check : ""}</button>`).join("")}</div>
     <p class="tiny muted" style="margin:12px 0 0">${tr("نص المصحف والتفسير يبقيان بالعربية كما في مصادرهما.")}</p>`);
   document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => { ST.lang = b.dataset.lang; save(); location.reload(); });
 }
@@ -2120,7 +2125,7 @@ function review() {
 /* ---------- حسابي ---------- */
 async function profile() {
   $("#view").innerHTML = bar("حسابي") + `
-    <button class="card row langrow" id="langBtn"><span class="grow"><b>اللغة</b> <span class="tiny muted" data-noi18n>Language</span><div class="small muted" data-noi18n>${LANGS.find(x => x[0] === LG)[1]}</div></span>${ICON.chev}</button>
+    <button class="card row langrow" id="langBtn"><span class="grow"><b>اللغة</b> ${LG !== "en" ? `<span class="tiny muted" data-noi18n>Language</span>` : ""}<div class="small muted" data-noi18n>${LANGS.find(x => x[0] === LG)[1]}</div></span>${ICON.chev}</button>
     <div class="card"><label class="tiny muted" for="name">اسمك</label><input type="text" id="name" placeholder="يظهر في الرئيسية" value="${esc(ST.name)}" style="margin-top:6px"></div>
     <div class="sec"><h2>تسجيلاتي</h2></div><div id="recs"><div class="info">جارٍ التحميل…</div></div>
     <div class="sec"><h2>مراجعة المحتوى</h2><span class="badge draft">للمتخصص الشرعي</span></div>
