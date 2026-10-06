@@ -586,6 +586,10 @@ body.immersive.rui .mp{bottom:calc(var(--bottom) + 84px)}
 .chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:.82rem}
 .chips button[aria-pressed="true"]{background:var(--green);color:var(--on);border-color:var(--green)}
 
+.wsh{text-align:center;margin:2px 0 12px}
+.wsh .ww{font-family:var(--quran);font-size:2.6rem;line-height:1.6;color:var(--green)}
+.lbl2{font-size:.74rem;font-weight:700;color:var(--sky);margin-bottom:6px}
+.qw{font-family:var(--quran);font-weight:400;font-size:1.15rem;color:var(--green)}
 /* ================= الهوية الجديدة: زمرّدي ورملي ================= */
 :root{
   --bg:#F6F4EE; --surface:#FFFFFF; --surface-2:#F1EEE5; --ink:#0F1F1A; --muted:#5E6B65; --line:#E4DFD3;
@@ -1436,7 +1440,7 @@ function layoutHTML(p, hide) {
     for (const [k, i0, i1] of l[1]) {
       const T = mt(k), m = DATA.mutashabihat[k] ? " m" : "";
       for (let i = i0; i <= i1 && i < T.length; i++) { words++;
-        row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}">${esc(T[i])}</span>`;
+        row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(T[i])}</span>`;
         if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">${AR(V(k).a)}</span>`; }
     }
     h += `<div class="ln${words <= 1 ? " one" : ""}">${row}</div>`;
@@ -1537,6 +1541,7 @@ function pageReader(p, dir) {
   rd.onclick = e => {
     if (held) { held = false; return; }
     const w = e.target.closest(".w"); if (w) { w.classList.add("shown"); return; }
+    const a = e.target.closest(".a[data-i]"); if (a && !S.hide) { a.classList.add("hold"); setTimeout(() => a.classList.remove("hold"), 400); wordSheet(a.dataset.k, +a.dataset.i); return; }
     setUI(!S.ui);
   };
   bindSwipePage(rd, p);
@@ -1680,6 +1685,32 @@ function ayahSheet(k) {
         : compareHTML(k, p.k, `${ref(k)} و${ref(p.k)}`)).join("")}` : ""}
     <div class="src">المعنى: التفسير الميسر. الغريب: السراج. المتشابهات: حساب نصي على القرآن كاملاً.</div>`);
   $("#ayPlay").onclick = () => { closeSheet(); playFrom(k); };
+}
+/* ---------- معنى الكلمة: من السراج وغريب الكلمات في موسوعة التفسير، وإلا فتفسير الآية من الميسر ---------- */
+const wkey = t => M.norm(t).join("");
+const wsame = (a, b) => a === b || (b.length >= 3 && a.length - b.length <= 3 && a.endsWith(b)) || (a.length >= 3 && b.length - a.length <= 3 && b.endsWith(a));
+function dorarGharib(text) {
+  const out = []; const re = /([^\n:]+)\n:\s*([\s\S]*?)\n\.(?=\n|$)/g; let m;
+  while ((m = re.exec(text))) out.push({ w: m[1].trim(), m: m[2].trim() });
+  return out;
+}
+async function wordSheet(k, i) {
+  const v = V(k), word = mt(k)[i], wk = wkey(word);
+  const sir = v.gh.filter(g => wsame(wk, wkey(g.w)));
+  openSheet(`<div class="wsh"><div class="ww">${esc(word)}</div><div class="tiny muted">${ref(k)}</div></div>
+    ${sir.length ? `<div class="card"><div class="lbl2">معنى الكلمة</div><div class="gh" style="margin-top:4px">${sir.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>
+      <div class="src" style="margin:8px 0 0">السراج في بيان غريب القرآن.</div></div>` : ""}
+    <div id="wdorar"></div>
+    <div class="card" style="margin-top:12px"><div class="lbl2">معنى الآية</div><div class="ayah" style="font-size:1.3rem;line-height:2">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>
+      <div style="line-height:1.95">${esc(v.tf)}</div>
+      ${v.gh.length && !sir.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}
+      <div class="src" style="margin:8px 0 0">التفسير الميسر، مجمع الملك فهد${v.gh.length && !sir.length ? "، والغريب من السراج" : ""}.</div></div>
+    <button class="btn block" id="wAyah" style="margin-top:12px">${ICON.layers}الآية كاملة ومتشابهاتها</button>`);
+  $("#wAyah").onclick = () => ayahSheet(k);
+  const d = await getDorar(v.s); const box = $("#wdorar"); if (!d || !box) return;
+  const g = d.groups.find(g => g.from != null && g.from <= v.a && g.to >= v.a);
+  const hits = g && g.sections && g.sections.gharib ? dorarGharib(g.sections.gharib.text).filter(e => M.norm(e.w).some(t => wsame(wk, t))) : [];
+  if (hits.length) box.innerHTML = `<div class="card" style="margin-top:12px"><div class="lbl2">المعنى اللغوي</div>${hits.map(e => `<div style="line-height:1.95"><b class="qw">${esc(e.w)}</b>: ${esc(e.m)}</div>`).join("")}${DSRC}</div>`;
 }
 const badgeFor = ok => ok ? `<span class="badge ok">معتمد</span>` : `<span class="badge draft">بانتظار المراجعة</span>`;
 function rMeaning() {
