@@ -353,6 +353,32 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 .dial::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--green)}
 .qtxt b{font-size:1.4rem;color:var(--green)}
 .tfx{display:block}
+
+/* المساعد القرآني */
+.acard{display:flex;gap:14px;align-items:center;width:100%;margin-top:14px;padding:16px;border:0;border-radius:24px;cursor:pointer;text-align:start;font:inherit;color:#fff;background:linear-gradient(135deg,#7A4E0E,#B07816 55%,#E2B04E);box-shadow:0 12px 28px rgba(176,120,22,.3)}
+.acard .grow{display:flex;flex-direction:column;gap:2px}.acard b{font-size:1.15rem}.acard span span,.acard .grow>span{font-size:.82rem;opacity:.92}
+.amicb{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2);flex:none}.amicb svg{width:28px;height:28px}
+.amodes{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.amodes button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font:inherit;font-size:.78rem;font-weight:600;color:inherit;cursor:pointer}
+.amodes button span{font-size:1.2rem}.amodes button[aria-pressed="true"]{border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,var(--surface));color:var(--green)}
+.amsgs{display:flex;flex-direction:column;gap:10px;padding-bottom:150px}
+.am{display:flex}.am.me{justify-content:flex-start}.am.bot{justify-content:flex-end}
+[dir="ltr"] .am.me{justify-content:flex-end}[dir="ltr"] .am.bot{justify-content:flex-start}
+.ab{max-width:88%;padding:12px 14px;border-radius:18px;line-height:1.75;font-size:.95rem}
+.am.me .ab{background:var(--green);color:#fff;border-end-start-radius:6px}.am.bot .ab{background:var(--surface);box-shadow:0 8px 24px rgba(20,51,94,.06);border-end-end-radius:6px}
+.aay{background:var(--bg);border-radius:14px;padding:10px 12px;margin-bottom:8px}.aay .ayah{font-size:1.3rem;line-height:2.1}
+.asrc{font-size:.75rem;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+.aq{margin-top:10px;background:var(--gold-soft);color:var(--gold);border-radius:12px;padding:8px 10px;font-size:.9rem}
+.aacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.aacts .btn{padding:8px 12px;font-size:.82rem}
+.aprof{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.aprof div{background:var(--bg);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column}.aprof span{font-size:.72rem;color:var(--muted)}.aprof b{font-size:.85rem}
+.abar{position:fixed;inset-inline:0;bottom:calc(84px + env(safe-area-inset-bottom));margin:0 auto;max-width:560px;padding:0 16px;display:flex;gap:8px;align-items:center;z-index:5}
+.abar input{flex:1;padding:14px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;box-shadow:0 8px 24px rgba(20,51,94,.08)}
+.amic{width:62px;height:62px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--green),var(--sky));color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,93,71,.35);flex:none}
+.amic svg{width:28px;height:28px}.amic.on{background:var(--err);animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,53,63,.45)}100%{box-shadow:0 0 0 16px rgba(192,53,63,0)}}
+.asend{width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);color:var(--green);display:grid;place-items:center;cursor:pointer;flex:none;box-shadow:0 6px 16px rgba(20,51,94,.08)}.asend svg{width:20px;height:20px;transform:scaleX(-1)}
+[dir="ltr"] .asend svg{transform:none}
+.acap{position:fixed;inset-inline:0;bottom:calc(66px + env(safe-area-inset-bottom));text-align:center;z-index:5;pointer-events:none}
 .langrow{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;align-items:center}
 .langrow svg,.langs svg{width:20px;height:20px;flex:none}
 .langs{display:flex;flex-direction:column;gap:8px}.langs .item{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer}
@@ -943,7 +969,7 @@ function render() {
       ? `<button class="fab" data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}><span class="c">${ICON[ic]}</span>${t}</button>`
       : `<button data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}>${ICON[ic]}${t}</button>`).join("");
   if (S.reader) return reader();
-  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah })[S.tab]();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant })[S.tab]();
 }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.tab); });
 function bar(title, sub, back, action) {
@@ -1008,6 +1034,7 @@ function home() {
         <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
       <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div>${mastered ? `<b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small>` : `<b style="font-size:1.1rem">ابدأ</b><small>${AR(jp.length)} وجهاً في الجزء</small>`}</div></div>
     </div></section>
+    <button class="acard" id="asGo"><span class="amicb">${ICON.mic}</span><span class="grow"><b>المساعد القرآني</b><span>تحدّث معه: اشرح لي، سمّعني، راجعني، تدبّر، خطتي</span></span></button>
     ${salahHome()}
     ${wirdHome()}
     <div class="sec2"><h2>ابدأ من هنا</h2></div>
@@ -1023,7 +1050,7 @@ function home() {
       : `<div class="mini" style="color:var(--muted)">لا مراجعة مستحقة الآن. سمّع وجهاً وسيُبنى وردك من أخطائك.</div>`}`;
   document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][4]());
   if ($("#allRev")) $("#allRev").onclick = () => go("review");
-  bindWirdHome(); $("#salahGo").onclick = () => go("salah");
+  bindWirdHome(); $("#salahGo").onclick = () => go("salah"); $("#asGo").onclick = () => go("assistant");
   bindAll();
 }
 function pageItem(p, sub, tas = true) {
@@ -2792,6 +2819,178 @@ let TFX = null;
 const TF = k => { const t = TFX && TFX[k]; return t ? `<span class="tfx" dir="auto" data-noi18n>${esc(t)}</span>` : esc(V(k).tf); };
 const TFV = v => TF(`${v.s}:${v.a}`);
 if (LG !== "ar") fetch(`tafsir/${LG}.json`).then(r => r.ok ? r.json() : null).then(j => { if (j) { TFX = j; render(); } }).catch(() => {});
+
+
+/* ---------- المساعد القرآني: رفيق صوتي يجيب من المصادر المعتمدة ومن سجل الطالب فقط ---------- */
+const AS = { mode: "learn", msgs: [], k: null, rec: null, speak: true };
+const AMODES = [["learn", "تعلّم", "📘"], ["tasmee", "سمّعني", "🎙️"], ["review", "راجعني", "🔄"], ["tadabbur", "تدبّر", "🌿"], ["plan", "خطتي", "🗓️"]];
+const nz = t => M.norm(t).join(" ");
+// يحدد الآية المقصودة: «سورة الملك آية ٣»، أو «الملك ٣»، أو نص من الآية، أو الآية الحالية
+function askRef(text) {
+  const t = text.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)), n = nz(t);
+  let s = null;
+  const names = Object.entries(DATA.surahs).sort((a, b) => b[1].length - a[1].length);
+  for (const [num, nm] of names) { const q = nz(nm); if ((" " + n + " ").includes(" " + q + " ") || (" " + n + " ").includes(" " + q.replace(/^ال/, "") + " ") && q.length > 4) { s = +num; break; } }
+  const nums = (t.match(/\d+/g) || []).map(Number);
+  if (s) { const a = nums.find(x => DATA.verses[`${s}:${x}`]) || 1; return `${s}:${a}`; }
+  const words = M.norm(t).filter(w => !STOPQ.has(w));
+  if (words.length >= 3) { const r = M.locate(words, locIdx(), DATA, ST.last || 1); if (r) return r.k; }
+  return null;
+}
+const STOPQ = new Set(M.norm("ما معنى اشرح لي هذه الآية الكلمة قوله تعالى في سورة آية المتشابهات متشابه اعطني شرحا مبسطا سؤالا يساعدني على تدبر وش ايش يعني تفسير"));
+const srcTag = s => `<div class="asrc">📚 المصدر: ${s}</div>`;
+const ayahBox = k => `<div class="aay"><div class="ayah">${esc(V(k).t)} <span class="end">${AR(V(k).a)}</span></div><div class="tiny muted">${ref(k)}</div></div>`;
+const REFLECT = ["ما الذي تدعوك إليه هذه الآية في يومك هذا؟", "أيّ كلمة في هذه الآية استوقفتك، ولماذا؟", "كيف تُظهر أثر هذه الآية في عمل واحد اليوم؟"];
+
+// ملف الطالب القرآني: يُبنى من سجله المحفوظ على الجهاز
+function profileData() {
+  const w = ST.wird && ST.wird.setup ? ST.wird : null, s = w ? WD.streaks() : { cur: 0, best: 0, total: 0 };
+  const sess = ST.sessions || [], acc = sess.length ? sess.reduce((a, x) => a + (x.acc || 0), 0) / sess.length : null;
+  const byK = {}; (ST.mistakes || []).forEach(m => { byK[m.k] = (byK[m.k] || 0) + 1; });
+  const rep = Object.entries(byK).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const weakP = Object.entries(ST.pages).filter(([, r]) => r.errors > 0).sort((a, b) => b[1].errors - a[1].errors).map(([p]) => +p);
+  const due = Object.entries(ST.pages).filter(([, r]) => r.due <= Date.now()).map(([p]) => +p);
+  const last = [...sess].sort((a, b) => b.at - a.at)[0];
+  const level = acc == null ? "لم يُحدَّد بعد" : acc >= .9 ? "متقن" : acc >= .75 ? "جيد" : "يحتاج تثبيتاً";
+  return { w, s, acc, level, rep, weakP, due, last, mem: w ? (w.mem || []).length : Object.keys(ST.pages).length, ayat: w ? w.hAyat || 0 : 0, sessions: sess.length };
+}
+function planText() {
+  const P = profileData(), parts = [], acts = [];
+  const lastMis = (ST.mistakes || []).slice(-1)[0];
+  if (lastMis) { const p = V(lastMis.k).p; parts.push(`راجع الموضع الذي أخطأت فيه مؤخراً: ${ref(lastMis.k)} (الوجه ${AR(p)}).`); acts.push([`سمّع الوجه ${AR(p)}`, `tas:${p}`]); }
+  else if (P.weakP.length) { parts.push(`راجع الوجه ${AR(P.weakP[0])}، فهو أكثر أوجهك أخطاءً.`); acts.push([`سمّع الوجه ${AR(P.weakP[0])}`, `tas:${P.weakP[0]}`]); }
+  if (P.w) { const d = WD.day(WD.today());
+    if (d && !WD.complete(d)) { const left = WD.tasks(d).filter(x => !d.done[x]).map(x => TASKN[x][0]); parts.push(`ثم أكمل وردك اليومي: ${left.join("، ")}.`); acts.push(["افتح وردي", "go:wird"]); }
+    else if (d) parts.push("وردك اليوم مكتمل، بارك الله فيك 🌱."); else parts.push("اليوم يوم راحة في وردك؛ يكفيك مراجعة خفيفة."); }
+  else { parts.push((parts.length ? "ثم " : "") + "حدّد وردك اليومي ليُبنى لك جدول حفظ وتلاوة ومراجعة."); acts.push(["حدّد وردي", "go:wirdSetup"]); }
+  if (P.due.length > 1) parts.push(`لديك ${AR(P.due.length)} أوجه حان وقت مراجعتها.`);
+  try { const n = nextPrayer(); parts.push(`صلاة ${n.n} ${leftTxt(n.at - Date.now())}؛ اجعل جزءاً من مراجعتك بعدها.`); } catch (e) {}
+  if (P.s.cur >= 2) parts.push(`استمرارك ${AR(P.s.cur)} أيام متتالية، حافظ عليه.`);
+  return { txt: parts.join(" "), acts };
+}
+function weakestPage() {
+  const P = profileData(), score = {};
+  for (const [p, r] of Object.entries(ST.pages)) score[p] = (r.errors || 0) * 3 + (r.due <= Date.now() ? 2 : 0) + Math.min(5, (Date.now() - (r.last || r.due || 0)) / 864e5 / 3);
+  (ST.mistakes || []).slice(-30).forEach(m => { const p = V(m.k).p; score[p] = (score[p] || 0) + 1; });
+  const mem = P.w ? P.w.mem || [] : []; mem.forEach(p => { score[p] = (score[p] || 0) + 0.5; });
+  const best = Object.entries(score).sort((a, b) => b[1] - a[1])[0];
+  return best ? +best[0] : null;
+}
+function tadabburAyah() {
+  const P = profileData(), d = P.w && WD.day(WD.today());
+  if (d && d.plan.h) return d.plan.h[0];
+  const pool = P.w && P.w.mem && P.w.mem.length ? P.w.mem : [ST.last || 3];
+  const p = pool[Math.floor(Date.now() / 864e5) % pool.length], ks = DATA.pages[p];
+  return ks[Math.floor(Date.now() / 36e5) % ks.length];
+}
+
+// فهم الطلب: قواعد واضحة، والجواب نصاً من المصدر أو من سجل الطالب
+function answer(q, forced) {
+  const n = " " + nz(q) + " ", has = (...w) => w.some(x => n.includes(" " + nz(x)) || n.includes(nz(x) + " "));
+  let mode = forced || AS.mode;
+  if (has("سمعني", "سمّعني", "اختبر حفظي")) mode = "tasmee";
+  else if (has("راجعني", "مراجعة")) mode = "review";
+  else if (has("وش اسوي", "ماذا افعل", "خطتي", "خطة", "ايش اسوي")) mode = "plan";
+  else if (has("ملفي", "مستواي", "تقدمي")) mode = "profile";
+  else if (has("تدبر", "اتدبر")) mode = "tadabbur";
+  else if (has("معنى", "اشرح", "شرح", "تفسير", "متشابه", "المتشابهات", "كلمة", "يعني")) mode = "learn";
+  const k = askRef(q) || AS.k;
+  if (mode === "tasmee") {
+    const s = (askRef(q) || "").split(":")[0]; const key = s ? `${s}:1` : AS.k || DATA.pages[ST.last || 3][0];
+    return { html: `سأستمع إليك من ${ref(key)}. اقرأ من حفظك، وبعد الانتهاء أعطيك تقريراً بالأخطاء ومواضعها، ثم نعيد معاً ما يحتاج مراجعة.`, say: `سأستمع إليك من ${ref(key)}. ابدأ القراءة.`, acts: [["ابدأ التسميع", `tasm:${key}`]] };
+  }
+  if (mode === "review") {
+    const p = weakestPage();
+    if (!p) return { html: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك.", acts: [["سمّعني الآن", `tas:${ST.last || 3}`]] };
+    const r = ST.pages[p] || {};
+    return { html: `اخترت لك الوجه ${AR(p)} (سورة ${pageSurah(p)})، لأنه ${r.errors ? `سُجّل فيه ${AR(r.errors)} مواضع ضعف` : "حان وقت مراجعته"}. سمّعه الآن من حفظك.`, acts: [[`راجعني في الوجه ${AR(p)}`, `tas:${p}`]] };
+  }
+  if (mode === "plan") { const P = planText(); return { html: "خطتك اليوم: " + P.txt, acts: P.acts }; }
+  if (mode === "profile") {
+    const P = profileData();
+    return { html: `<b>ملفك القرآني</b><div class="aprof">
+      <div><span>المحفوظ</span><b>${AR(P.mem)} وجه، ${AR(P.ayat)} آية</b></div><div><span>الورد اليومي</span><b>${P.w ? (P.w.type === "hifz" ? "حفظ" : P.w.type === "tilawa" ? "تلاوة" : "حفظ وتلاوة") : "غير محدد"}</b></div>
+      <div><span>سجل التسميع</span><b>${AR(P.sessions)} جلسة</b></div><div><span>مستوى الإتقان</span><b>${P.level}${P.acc != null ? ` (${AR(Math.round(P.acc * 100))}٪)` : ""}</b></div>
+      <div><span>الاستمرارية</span><b>${AR(P.s.cur)} يوم، وأطولها ${AR(P.s.best)}</b></div><div><span>آخر نشاط</span><b>${P.last ? `الوجه ${AR(P.last.page)}، ${new Date(P.last.at).toLocaleDateString(LG === "ar" ? "ar-SA" : LG)}` : "لا يوجد"}</b></div></div>
+      ${P.rep.length ? `<div class="small" style="margin-top:8px"><b>أخطاء متكررة:</b> ${P.rep.map(([k, c]) => `<span>${ref(k)} (${AR(c)})</span>`).join("، ")}</div>` : ""}
+      ${P.weakP.length ? `<div class="small"><b>تحتاج مراجعة:</b> ${P.weakP.slice(0, 5).map(p => `<span>${FM("الوجه {0}", p)}</span>`).join("، ")}</div>` : ""}`, say: `مستوى إتقانك ${P.level}، واستمرارك ${P.s.cur} يوم.`, acts: [["تقدمي", "go:progress"]] };
+  }
+  if (mode === "tadabbur") {
+    const kk = askRef(q) || tadabburAyah(); AS.k = kk; const qn = REFLECT[Math.floor(Date.now() / 864e5) % REFLECT.length];
+    return { html: `${ayahBox(kk)}<div class="small" style="margin-top:8px"><b>المعنى:</b> ${TF(kk)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}<div class="aq">🤍 <b>سؤال للتدبر:</b> ${qn}</div>`,
+      say: `اخترت لك آية من ${ref(kk)}. اقرأ معناها، ثم تأمل: ${qn}`, acts: [["افتح الوجه", `read:${V(kk).p}`]] };
+  }
+  // تعلّم
+  if (!k) return { html: "اذكر الآية التي تسأل عنها: مثلاً «ما معنى سورة الملك آية ٢»، أو اقرأ جزءاً من الآية وسأتعرف عليها.", say: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها." };
+  AS.k = k; const v = V(k);
+  if (has("متشابه", "المتشابهات")) {
+    const m = DATA.mutashabihat[k] || [];
+    return { html: `${ayahBox(k)}${m.length ? `<div class="small"><b>متشابهاتها:</b> ${m.slice(0, 6).map(x => `<button class="chip" data-mut="${k}">${ref(x.k)}</button>`).join(" ")}</div>` : `<div class="small">لا متشابه مسجّلاً لهذه الآية في فهرس المتشابهات.</div>`}${srcTag("فهرس المتشابهات في مثاني (حساب نصي آلي)")}`,
+      say: m.length ? `لهذه الآية ${m.length} من المتشابهات، أولها ${ref(m[0].k)}.` : "لا متشابه مسجلاً لهذه الآية.", acts: m.length ? [["قارن بينها", `mut:${k}`]] : [] };
+  }
+  if (has("كلمة", "كلمه")) {
+    const qw = M.norm(q).filter(w => !STOPQ.has(w)), g = (v.gh || []).find(x => qw.some(w => M.wordEq(M.norm(x.w).join(""), w) || M.norm(x.w).join("").includes(w))) || (v.gh || [])[0];
+    if (g) return { html: `${ayahBox(k)}<div class="small"><b>${esc(g.w)}:</b> ${esc(g.m)}</div>${srcTag("السراج في بيان غريب القرآن")}`, say: `${M.norm(g.w).join("")}: ${g.m}` };
+    return { html: `${ayahBox(k)}<div class="small">لا توجد كلمة غريبة مشروحة لهذه الآية في السراج. هذا معنى الآية:</div><div class="small">${TF(k)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}`, say: v.tf };
+  }
+  if (has("سؤال")) { const qn = REFLECT[v.a % REFLECT.length]; return { html: `${ayahBox(k)}<div class="aq">🤍 <b>سؤال للتدبر:</b> ${qn}</div>`, say: qn }; }
+  return { html: `${ayahBox(k)}<div class="small" style="line-height:1.9"><b>المعنى:</b> ${TF(k)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}`, say: v.tf, acts: [["افتح الوجه", `read:${v.p}`], ["متشابهاتها", `ask:ما المتشابهات في ${ref(k)}`]] };
+}
+const MODE_HELLO = {
+  learn: "اسألني عن معنى آية أو كلمة أو متشابهاتها. مثال: «ما معنى سورة الملك آية ٢».",
+  tasmee: "قل: «سمّعني سورة الملك»، وسأستمع إلى تلاوتك ثم أعطيك تقريراً بأخطائك.",
+  review: "سأختار لك ما تحتاج مراجعته من أخطائك السابقة ومستوى إتقانك.",
+  tadabbur: "سأختار لك آية من وردك أو محفوظك، مع معناها وسؤال يعينك على التدبر.",
+  plan: "سأبني لك خطة اليوم من وردك وأخطائك ومراجعتك ومواقيت الصلاة." };
+function say(text) {
+  if (!AS.speak || !window.speechSynthesis || !text) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(String(text).replace(/<[^>]+>/g, "").slice(0, 400)); u.lang = "ar-SA"; u.rate = 0.95;
+    const vv = speechSynthesis.getVoices().find(x => /^ar/i.test(x.lang)); if (vv) u.voice = vv; speechSynthesis.speak(u); } catch (e) {}
+}
+function asPush(role, html, acts) { AS.msgs.push({ role, html, acts: acts || [] }); AS.msgs = AS.msgs.slice(-30); drawMsgs(); }
+function ask(q, forced) {
+  if (q) asPush("me", esc(q));
+  const r = answer(q || "", forced);
+  asPush("bot", r.html, r.acts); say(r.say || r.html);
+}
+function drawMsgs() {
+  const box = $("#amsgs"); if (!box) return;
+  box.innerHTML = AS.msgs.map((m, i) => `<div class="am ${m.role}"><div class="ab">${m.html}${m.acts.length ? `<div class="aacts">${m.acts.map(([l, a]) => `<button class="btn" data-act="${esc(a)}">${l}</button>`).join("")}</div>` : ""}</div></div>`).join("");
+  box.querySelectorAll("[data-act]").forEach(b => b.onclick = () => { const [t, ...r] = b.dataset.act.split(":"), v = r.join(":");
+    if (t === "tas") openTasmee(+v);
+    if (t === "tasm") { const p = V(v).p, ks = DATA.pages[p].filter(x => ALLK.indexOf(x) >= ALLK.indexOf(v)); openTasmee(p); S.T.noLoc = true; S.T.from = ks[0]; S.T.mode = "live"; tasmee(); }
+    if (t === "go") go(v); if (t === "read") openReader(+v, "mushaf"); if (t === "mut") ayahSheet(v); if (t === "ask") ask(v); });
+  bindAll(); box.scrollTop = box.scrollHeight; setTimeout(() => { const l = box.lastElementChild; if (l) l.scrollIntoView({ block: "end", behavior: "smooth" }); }, 50);
+}
+function assistant() {
+  if (!AS.msgs.length) asPush("bot", `السلام عليكم${ST.name ? ` يا ${esc(ST.name)}` : ""} 🌿 أنا رفيقك في رحلتك مع القرآن: أشرح لك من التفسير الميسر، وأسمّع لك، وأراجع معك أخطاءك، وأبني خطتك اليومية. اضغط الميكروفون وتحدث، أو اكتب سؤالك.`, [["وش أسوي اليوم؟", "ask:وش اسوي اليوم"], ["ملفي القرآني", "ask:ملفي"]]);
+  $("#view").innerHTML = bar("المساعد القرآني", "رفيقك من الحفظ إلى الإتقان", true, `<button class="ibtn" id="aSpk" aria-label="الرد الصوتي">${AS.speak ? "🔊" : "🔇"}</button>`) + `
+    <div class="amodes">${AMODES.map(([id, t, e]) => `<button data-am="${id}" aria-pressed="${AS.mode === id}"><span>${e}</span>${t}</button>`).join("")}</div>
+    <div class="amsgs" id="amsgs"></div>
+    <div class="abar"><input type="text" id="aIn" placeholder="اكتب سؤالك…"><button class="amic" id="aMic" aria-label="تحدث">${ICON.mic}</button><button class="asend" id="aSend" aria-label="أرسل">${ICON.back}</button></div>
+    <div class="tiny muted acap">يجيب من مصادر معتمدة يذكرها مع كل جواب، ولا يُفتي ولا يفسّر من عنده.</div>`;
+  drawMsgs();
+  $("#back").onclick = () => { stopAsk(); go("home"); };
+  $("#aSpk").onclick = () => { AS.speak = !AS.speak; try { speechSynthesis.cancel(); } catch (e) {} assistant(); };
+  document.querySelectorAll("[data-am]").forEach(b => b.onclick = () => { AS.mode = b.dataset.am; asPush("bot", MODE_HELLO[AS.mode]);
+    if (AS.mode !== "learn" && AS.mode !== "tasmee") ask("", AS.mode); else say(MODE_HELLO[AS.mode]);
+    document.querySelectorAll("[data-am]").forEach(x => x.setAttribute("aria-pressed", x.dataset.am === AS.mode)); });
+  const send = () => { const v = $("#aIn").value.trim(); if (!v) return; $("#aIn").value = ""; ask(v); };
+  $("#aSend").onclick = send; $("#aIn").onkeydown = e => { if (e.key === "Enter") send(); };
+  $("#aMic").onclick = () => AS.rec ? stopAsk() : listenAsk();
+}
+function listenAsk() {
+  if (!SR) { asPush("bot", "التحدث بالصوت يحتاج متصفح Google Chrome أو Safari. يمكنك الكتابة الآن."); return; }
+  try { speechSynthesis.cancel(); } catch (e) {}
+  const r = new SR(); r.lang = "ar-SA"; r.interimResults = true; r.continuous = false; AS.rec = r;
+  $("#aMic").classList.add("on"); $("#aIn").placeholder = tr("أستمع إليك…");
+  let fin = "";
+  r.onresult = e => { let t = ""; for (let i = 0; i < e.results.length; i++) { t += e.results[i][0].transcript; if (e.results[i].isFinal) fin = t; } $("#aIn").value = t; };
+  r.onend = () => { const v = (fin || $("#aIn").value).trim(); stopAsk(); if (v) { $("#aIn").value = ""; ask(v); } };
+  r.onerror = () => stopAsk();
+  try { r.start(); } catch (e) { stopAsk(); }
+}
+function stopAsk() { if (AS.rec) { const r = AS.rec; AS.rec = null; try { r.stop(); } catch (e) {} } const m = $("#aMic"); if (m) m.classList.remove("on"); const i = $("#aIn"); if (i) i.placeholder = tr("اكتب سؤالك…"); }
 
 TR.start(); render(); setTimeout(() => { if (S.tab === "home") wirdMorning(); }, 900);
 LIVE.boot();
