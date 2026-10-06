@@ -590,6 +590,22 @@ body.immersive.rui .mp{bottom:calc(var(--bottom) + 84px)}
 .wsh .ww{font-family:var(--quran);font-size:2.6rem;line-height:1.6;color:var(--green)}
 .lbl2{font-size:.74rem;font-weight:700;color:var(--sky);margin-bottom:6px}
 .qw{font-family:var(--quran);font-weight:400;font-size:1.15rem;color:var(--green)}
+.live{position:fixed;top:calc(var(--top) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:456px;z-index:40;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#062A20,#0B5D47);color:#fff;border-radius:20px;padding:8px 8px 8px 12px;box-shadow:0 14px 32px rgba(6,42,32,.35)}
+.live[hidden]{display:none}
+.live .dot{width:10px;height:10px;border-radius:50%;background:#E3B75E;flex:none;margin-inline-start:4px}
+.live .dot.on{background:#4ADE80;box-shadow:0 0 0 4px rgba(74,222,128,.25)}
+.live b{display:block;font-size:.85rem;line-height:1.2}.live small{font-size:.72rem;opacity:.8}
+.live button{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;display:grid;place-items:center;flex:none}
+.live button svg{width:19px;height:19px}
+.live button[aria-pressed="true"]{background:#F0939A;color:#3A0A0E}
+.live .end2{width:auto;border-radius:999px;padding:0 14px;background:#DC2626;font-weight:700;font-size:.8rem}
+body:has(.live:not([hidden])) .content{padding-top:62px}
+body:has(.live:not([hidden])) .rd{padding-top:calc(var(--top) + 100px)}
+body:has(.live:not([hidden])) .rtop{top:calc(var(--top) + 102px)}
+.live{font-family:var(--ui)}
+a.btn{text-decoration:none}
+.empty h3{color:var(--ink)}
 /* ================= الهوية الجديدة: زمرّدي ورملي ================= */
 :root{
   --bg:#F6F4EE; --surface:#FFFFFF; --surface-2:#F1EEE5; --ink:#0F1F1A; --muted:#5E6B65; --line:#E4DFD3;
@@ -684,7 +700,7 @@ body{background:var(--bg);background-image:none}
 </head>
 <body>
 <div class="app"><main class="content" id="view"></main><nav class="tabs" id="tabs" aria-label="التنقل"></nav></div>
-<div id="sheetRoot"></div>
+<div id="sheetRoot"></div><div id="live" class="live" hidden></div>
 <div id="mp" class="mp" hidden></div>
 
 <script>/* مثاني — المنطق الأساسي (بدون واجهة) — قابل للاختبار في Node */
@@ -1048,6 +1064,9 @@ const ICON = {
   pen: I('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>'),
   layers: I('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>'),
   bulb: I('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'),
+  users: I('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c2 .7 3.2 2.6 3.7 5.5"/>'),
+  share: I('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'),
+  micoff: I('<path d="M3 3l18 18"/><path d="M9 9v2a3 3 0 0 0 5 2.2M15 10V6a3 3 0 0 0-5.7-1.3"/><path d="M5 11a7 7 0 0 0 11.5 5.3M19 11a7 7 0 0 1-.6 2.8M12 18v3"/>'),
   check: I('<path d="M4 12l5 5L20 6"/>'),
   star: I('<path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>'),
   quiz: I('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h0"/>'),
@@ -1082,7 +1101,7 @@ const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
   T: { page: 3, from: null, to: null, mode: "live", phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, progText: "" },
   quiz: null };
 function go(tab) { document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
-function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); }
+function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); if (S.rview === "mushaf") LIVE.page(+p); }
 function openTasmee(p) {
   stopRec(true); resetT(); S.T.page = +p; S.T.surah = null; S.T.from = null; S.T.to = null; S.tab = "tasmee"; S.reader = null; render(); scrollTo(0, 0);
 }
@@ -1151,7 +1170,8 @@ function home() {
     ["التفسير", "آية وتفسيرها", ICON.tafsir, "linear-gradient(135deg,#0F766E,#5EC9B4)", () => { S.tp = last; go("tafsir"); }],
     ["استمع", "تلاوة وتكرار", ICON.listen, "linear-gradient(135deg,#155E75,#3BB3C9)", () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
     ["المتشابهات", "قارن وافهم", ICON.layers, "linear-gradient(135deg,#B07816,#E2B04E)", () => openReader(last, "mushaf")],
-    ["اختبر", "أسئلة الوجه", ICON.quiz, "linear-gradient(135deg,#3B3F8F,#7276D6)", () => openReader(last, "quiz")]];
+    ["اختبر", "أسئلة الوجه", ICON.quiz, "linear-gradient(135deg,#3B3F8F,#7276D6)", () => openReader(last, "quiz")],
+    ["حلقة مباشرة", "سمّع مع معلمك", ICON.users, "linear-gradient(135deg,#9A3412,#EA7A3B)", () => LIVE.start()]];
   $("#view").innerHTML = `
     <div class="hd"><span class="av">${esc((ST.name || "م").trim()[0])}</span>
       <div class="hi"><small>${greet}</small><b>${ST.name ? esc(ST.name) : "حافظ القرآن"}</b></div><div class="date">${hijri}</div></div>
@@ -1547,7 +1567,7 @@ function pageReader(p, dir) {
   bindSwipePage(rd, p);
   fitPage();
 }
-function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); }
+function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); LIVE.page(q); }
 // يتسع الوجه للشاشة: يُحسب ارتفاع الصفحة ثم يُصغَّر الخط حتى يسع الوجه كله بلا تمرير
 function fitPage() {
   const box = $("#rb"), pv = $("#rd"), L = $("#lines"); if (!box || !pv || !L) return;
@@ -2343,7 +2363,110 @@ function closeSheet() { $("#sheetRoot").innerHTML = ""; document.removeEventList
 function escClose(e) { if (e.key === "Escape") closeSheet(); }
 
 document.documentElement.style.setProperty("--fs", ST.fs || 1);
+/* ---------- الحلقة المباشرة: اتصال صوتي مباشر بين الأجهزة (WebRTC عبر PeerJS) مع مصحف مشترك ---------- */
+const LIVE = (() => {
+  const L = { peer: null, host: false, room: null, stream: null, calls: [], conns: [], muted: false, status: "", remote: 0, syncing: false };
+  const PEER_JS = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
+  const link = () => location.origin + location.pathname + "?room=" + encodeURIComponent(L.room);
+  const loadLib = () => window.Peer ? Promise.resolve() : new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = PEER_JS; sc.onload = ok; sc.onerror = () => no(new Error("lib")); document.head.appendChild(sc); });
+  const newPeer = id => { const o = window.MATHANI_PEER || {}; return id ? new Peer(id, o) : new Peer(o); };
+  const rid = () => "mathani-" + Array.from(crypto.getRandomValues(new Uint8Array(5)), b => (b % 36).toString(36)).join("");
+  function bar() {
+    const el = $("#live"); if (!el) return;
+    if (!L.peer) { el.hidden = true; el.innerHTML = ""; return; }
+    el.hidden = false;
+    el.innerHTML = `<span class="dot ${L.remote ? "on" : ""}"></span><div class="grow"><b>حلقة مباشرة</b><small>${esc(L.status)}</small></div>
+      ${L.host ? `<button id="lvShare" aria-label="شارك رابط الحلقة">${ICON.share}</button>` : ""}
+      <button id="lvMute" aria-pressed="${L.muted}" aria-label="${L.muted ? "شغّل الميكروفون" : "اكتم الميكروفون"}">${L.muted ? ICON.micoff : ICON.mic}</button>
+      <button id="lvEnd" class="end2" aria-label="أنهِ الحلقة">إنهاء</button>`;
+    if (L.host) $("#lvShare").onclick = shareSheet;
+    $("#lvMute").onclick = () => { L.muted = !L.muted; L.stream && L.stream.getAudioTracks().forEach(t => t.enabled = !L.muted); bar(); };
+    $("#lvEnd").onclick = () => end(true);
+  }
+  const setStatus = t => { L.status = t; bar(); };
+  const count = () => { L.remote = L.calls.filter(c => c.open !== false && c._live).length; setStatus(L.remote ? (L.host ? `متصل مع ${AR(L.remote)}` : "متصل بالحلقة") : L.host ? "بانتظار من يدخل بالرابط…" : "جارٍ الاتصال…"); };
+  function playRemote(call) {
+    call.on("stream", st => { call._live = true; let a = $("#au-" + call.peer); if (!a) { a = document.createElement("audio"); a.id = "au-" + call.peer; a.autoplay = true; a.setAttribute("playsinline", ""); document.body.appendChild(a); }
+      a.srcObject = st; a.play().catch(() => {}); count(); });
+    const gone = () => { call._live = false; const a = $("#au-" + call.peer); a && a.remove(); L.calls = L.calls.filter(c => c !== call); count(); };
+    call.on("close", gone); call.on("error", gone);
+    L.calls.push(call);
+  }
+  function wire(conn) {
+    L.conns.push(conn);
+    conn.on("open", () => { if (L.host && S.reader && S.rview === "mushaf") conn.send({ t: "page", p: S.reader }); });
+    conn.on("data", m => {
+      if (!m || m.t !== "page") return;
+      if (L.host) L.conns.forEach(c => c !== conn && c.open && c.send(m));
+      if (!(S.reader === m.p && S.rview === "mushaf")) { L.syncing = true; openReader(m.p, "mushaf"); L.syncing = false; }
+    });
+    conn.on("close", () => { L.conns = L.conns.filter(c => c !== conn); });
+  }
+  async function mic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("mic");
+    return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  }
+  function fail(e) {
+    const msg = e && e.message === "mic" ? "لا يمكن الوصول إلى الميكروفون. افتح مثاني في Chrome أو Safari واسمح بالميكروفون."
+      : e && e.name === "NotAllowedError" ? "لم يُسمح بالميكروفون. اسمح به من إعدادات المتصفح ثم حاول مرة أخرى."
+      : e && e.message === "lib" ? "تعذر تحميل أداة الاتصال. تأكد من الإنترنت ثم حاول مرة أخرى."
+      : e && e.type === "peer-unavailable" ? "الحلقة غير موجودة أو انتهت. اطلب من المعلم رابطاً جديداً."
+      : "تعذر الاتصال. تأكد من الإنترنت ثم حاول مرة أخرى.";
+    end(false); openSheet(`<h3>الحلقة المباشرة</h3><div class="alert">${msg}</div>`);
+  }
+  function shareSheet() {
+    const u = link(), txt = `انضم إلى حلقتي في مثاني: ${u}`;
+    openSheet(`<h3>شارك رابط الحلقة</h3><p class="small muted" style="margin-top:0">من يفتح الرابط يدخل الحلقة مباشرة، ويرى الوجه الذي تفتحه.</p>
+      <input type="text" id="lvLink" readonly value="${esc(u)}" dir="ltr">
+      <div class="two"><button class="btn primary" id="lvCopy">نسخ الرابط</button><a class="btn" id="lvWa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">واتساب</a></div>
+      ${navigator.share ? `<button class="btn block" id="lvNative" style="margin-top:10px">${ICON.share}مشاركة</button>` : ""}`);
+    $("#lvCopy").onclick = async () => { try { await navigator.clipboard.writeText(u); } catch (e) { $("#lvLink").select(); document.execCommand("copy"); } $("#lvCopy").textContent = "نُسخ ✓"; };
+    if (navigator.share) $("#lvNative").onclick = () => navigator.share({ title: "حلقة مثاني", text: txt, url: u }).catch(() => {});
+  }
+  async function start() {
+    if (L.peer) return shareSheet();
+    try {
+      setStatus("جارٍ التجهيز…");
+      L.stream = await mic(); await loadLib();
+      L.host = true; L.room = rid(); L.peer = newPeer(L.room); bar();
+      L.peer.on("open", () => { count(); shareSheet(); });
+      L.peer.on("call", call => { call.answer(L.stream); playRemote(call); });
+      L.peer.on("connection", wire);
+      L.peer.on("disconnected", () => { try { L.peer.reconnect(); } catch (e) {} });
+      L.peer.on("error", fail);
+      openReader(ST.last || 1, "mushaf");
+    } catch (e) { fail(e); }
+  }
+  async function join(room) {
+    try {
+      L.stream = await mic(); await loadLib();
+      L.host = false; L.room = room; L.peer = newPeer(); setStatus("جارٍ الاتصال…");
+      L.peer.on("open", () => { playRemote(L.peer.call(room, L.stream)); wire(L.peer.connect(room, { reliable: true })); });
+      L.peer.on("error", fail);
+    } catch (e) { fail(e); }
+  }
+  function end(user) {
+    L.calls.forEach(c => { try { c.close(); } catch (e) {} }); L.conns.forEach(c => { try { c.close(); } catch (e) {} });
+    if (L.peer) { try { L.peer.destroy(); } catch (e) {} }
+    if (L.stream) L.stream.getTracks().forEach(t => t.stop());
+    document.querySelectorAll("audio[id^='au-']").forEach(a => a.remove());
+    Object.assign(L, { peer: null, stream: null, calls: [], conns: [], muted: false, remote: 0, room: null });
+    if (user && location.search.includes("room=")) history.replaceState(null, "", location.pathname);
+    bar();
+  }
+  function page(p) { if (!L.peer || L.syncing) return; L.conns.forEach(c => c.open && c.send({ t: "page", p })); }
+  function boot() {
+    const room = new URLSearchParams(location.search).get("room"); if (!room || !/^mathani-[a-z0-9]{3,20}$/.test(room)) return;
+    openSheet(`<div class="empty" style="padding:10px 0 4px">${ICON.users}<h3 style="margin:6px 0">دعوة إلى حلقة مباشرة</h3>
+      <p class="small muted" style="margin:0">ستسمع معلمك ويسمعك، وتقرآن من الوجه نفسه.</p></div>
+      <button class="btn primary block" id="lvJoin">${ICON.mic}انضم الآن</button>`);
+    $("#lvJoin").onclick = () => { closeSheet(); join(room); };
+  }
+  return { start, join, end, page, boot, state: L };
+})();
+
 render();
+LIVE.boot();
 </script>
 </body>
 </html>
