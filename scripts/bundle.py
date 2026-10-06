@@ -24,5 +24,8 @@ FONTS = "".join([face("Amiri Quran", "amiri-quran-arabic-400-normal.woff2", 400,
 html = html.replace("<style>", "<style>" + FONTS, 1)
 os.makedirs(f"{root}/dist/dorar", exist_ok=True)
 for f in dorar_files: shutil.copy(f, f"{root}/dist/dorar/")
+# التفسير الميسر مترجماً (data/tafsir/{lang}.json) يُحمَّل عند اختيار اللغة
+os.makedirs(f"{root}/dist/tafsir", exist_ok=True)
+for f in glob.glob(f"{root}/data/tafsir/*.json"): shutil.copy(f, f"{root}/dist/tafsir/")
 open(f"{root}/dist/index.html", "w", encoding="utf-8").write(html)
 print("dist/index.html", round(len(html.encode()) / 1024), "KB | dorar:", len(dorar_files), "surahs")

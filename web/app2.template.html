@@ -334,6 +334,25 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 .gland .tiny{font-size:.8rem;background:rgba(255,255,255,.7);padding:6px 10px;border-radius:10px}
 .garden.sm{min-height:0;padding:12px 14px;font-size:1.5rem;letter-spacing:2px;background:linear-gradient(180deg,var(--g1),var(--g2));text-align:center}
 .glist{display:flex;gap:10px;align-items:center;padding:6px 0}.glist span{font-size:1.3rem;width:28px;text-align:center}
+
+/* مواقيت الصلاة والقبلة */
+.ptile{display:flex;gap:12px;align-items:center;width:100%;margin-top:14px;background:var(--surface);border-radius:20px;padding:12px 14px;box-shadow:0 10px 30px rgba(20,51,94,.06);border:0;text-align:start;font:inherit;color:inherit;cursor:pointer}
+.ptile .grow{display:flex;flex-direction:column}.ptile b{font-size:1.05rem}.pic{font-size:1.8rem;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--green-soft);flex:none}
+.pnext{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#0A3D30,#0F6B52);color:#fff;border-radius:24px;padding:18px 20px;margin-bottom:14px}
+.pn2{font-size:1.8rem;font-weight:700;margin:2px 0}.pbig{font-size:3rem}
+.plist{padding:6px 14px}.prow{display:flex;align-items:center;gap:10px;padding:11px 0}.prow+.prow{border-top:1px solid var(--line)}
+.prow.cur b,.prow.cur .pt{color:var(--green)}.prow.cur{font-weight:700}.pt{font-variant-numeric:tabular-nums}
+.pbell{width:40px;height:36px;border-radius:10px;border:0;background:var(--bg);font-size:1.1rem;cursor:pointer}.pbell[aria-pressed="false"]{opacity:.55}
+.qcard{text-align:center}.dial{position:relative;width:230px;height:230px;margin:6px auto 14px}
+.rose{position:absolute;inset:0;border-radius:50%;border:2px solid var(--line);background:radial-gradient(circle,var(--surface) 55%,var(--bg));transition:transform .25s ease-out}
+.rose .nn{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-weight:700;color:var(--err);font-family:system-ui}
+.kaaba{position:absolute;inset:0}.kaaba i{position:absolute;left:50%;top:22%;bottom:50%;width:4px;margin-left:-2px;border-radius:4px;background:var(--gold)}
+.kaaba b{position:absolute;left:50%;top:6%;transform:translateX(-50%);font-size:1.7rem}
+.phone{position:absolute;top:-10px;left:50%;margin-left:-9px;border:9px solid transparent;border-top:0;border-bottom:14px solid var(--green)}
+.dial.on .rose{border-color:var(--ok);box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 20%,transparent)}
+.dial::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--green)}
+.qtxt b{font-size:1.4rem;color:var(--green)}
+.tfx{display:block}
 .langrow{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;align-items:center}
 .langrow svg,.langs svg{width:20px;height:20px;flex:none}
 .langs{display:flex;flex-direction:column;gap:8px}.langs .item{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer}
@@ -834,18 +853,19 @@ const LG = ST.lang && I18N[ST.lang] ? ST.lang : "ar";
 const TR = (() => {
   const AL = "ء-ي", names = Object.values(DATA.surahs).sort((a, b) => b.length - a.length);
   const sIdx = Object.fromEntries(Object.entries(DATA.surahs).map(([n, v]) => [v, +n]));
-  const B = "\u0621-\u064A\u064B-\u0652\u0670\u0640", PERSON = new Set(["محمد", "إبراهيم", "يوسف", "مريم", "هود", "نوح", "لقمان", "يونس"]);
+  const B = "\u0621-\u064A\u064B-\u0652\u0670\u0640", PRAYN = new Set(["الفجر", "العصر"]), PERSON = new Set(["الفجر", "العصر", "محمد", "إبراهيم", "يوسف", "مريم", "هود", "نوح", "لقمان", "يونس"]);
   const re = new RegExp(`[0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?|(?<![${B}])(و?)(${names.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?![${B}])`, "g");
   // اسم السورة الذي هو اسم علم أيضاً (محمد، إبراهيم…) أو «الملك فهد» لا يُعامل سورةً إلا ومعه رقم آية أو كلمة «سورة»
   const isSurah = (nm, off, str) => !(nm === "الملك" && /^ فهد/.test(str.slice(off + nm.length))) &&
-    (!PERSON.has(nm) || /^ [0-9٠-٩]/.test(str.slice(off + nm.length)) || /(سورة |[0-9٠-٩]\. )$/.test(str.slice(0, off)) || str.trim() === nm);
+    (!PERSON.has(nm) || /^ [0-9٠-٩]/.test(str.slice(off + nm.length)) || /(سورة |[0-9٠-٩]\. )$/.test(str.slice(0, off)) || (str.trim() === nm && !PRAYN.has(nm)));
   const dict = I18N[LG] || {}, miss = new Set(), done = new WeakMap(), outs = new Set();
   const DIG = { en: "0123456789", ur: "۰۱۲۳۴۵۶۷۸۹" }[LG];
   const num = m => DIG ? m.replace(/[٠-٩]/g, d => DIG["٠١٢٣٤٥٦٧٨٩".indexOf(d)]).replace(/[0-9]/g, d => DIG[d]).replace("٫", ".") : m;
   const sur = n => LG === "en" ? I18N.surahEn[n] : DATA.surahs[n];
   function t(str) {
     if (LG === "ar" || !str || !/[ء-ي]/.test(str) || str.length > 220) return str;
-    if ((str.match(/[\u064B-\u0652\u0640]/g) || []).length > 3) return str; // نص قرآني مشكول
+    const dn = (str.match(/[\u064B-\u0652\u0640]/g) || []).length;
+    if (dn > 3 && dn > (str.match(/[\u0621-\u064A]/g) || []).length * 0.25) return str; // نص قرآني مشكول
     if (outs.has(str)) return str; // نص مترجَم سابقاً
     const m = str.match(/^(\s*)([\s\S]*?)(\s*)$/), core = m[2], args = [];
     let i = 0;
@@ -923,7 +943,7 @@ function render() {
       ? `<button class="fab" data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}><span class="c">${ICON[ic]}</span>${t}</button>`
       : `<button data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}>${ICON[ic]}${t}</button>`).join("");
   if (S.reader) return reader();
-  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden })[S.tab]();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah })[S.tab]();
 }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.tab); });
 function bar(title, sub, back, action) {
@@ -988,13 +1008,14 @@ function home() {
         <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
       <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div>${mastered ? `<b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small>` : `<b style="font-size:1.1rem">ابدأ</b><small>${AR(jp.length)} وجهاً في الجزء</small>`}</div></div>
     </div></section>
+    ${salahHome()}
     ${wirdHome()}
     <div class="sec2"><h2>ابدأ من هنا</h2></div>
     <div class="hs">${qcs.map(([t, sub, ic, bg], i) => `<button class="qc" data-q="${i}"><span class="ic" style="background:${bg}">${ic}</span><b>${t}</b><span class="t">${sub}</span></button>`).join("")}</div>
     <div class="sec2"><h2>آية اليوم</h2><button data-read="${vv.p}">افتح الوجه</button></div>
     <div class="votd"><div class="lbl">سورة ${sName(vk)}، الآية ${AR(vv.a)}</div><div class="ay">﴿${esc(vv.t)}﴾</div>
       <div class="rf">لهذه الآية متشابه؛ هل تعرف أين؟</div>
-      <details><summary>اعرض التفسير والمتشابه</summary><div class="tx">${esc(vv.tf)}</div>
+      <details><summary>اعرض التفسير والمتشابه</summary><div class="tx">${TF(vk)}</div>
         <button class="btn block" style="margin-top:10px;background:var(--gold-soft);color:var(--gold)" data-mut="${vk}">${ICON.layers}قارن بمتشابهها</button></details></div>
     <div class="sec2"><h2>ورد المراجعة</h2>${due.length ? `<button id="allRev">عرض الكل</button>` : ""}</div>
     ${due.length ? due.slice(0, 3).map(([p, r]) => `<button class="mini" data-tas="${p}"><span class="pn">${AR(p)}</span><span class="grow"><div style="font-weight:600">سورة ${pageSurah(+p)}</div>
@@ -1002,7 +1023,7 @@ function home() {
       : `<div class="mini" style="color:var(--muted)">لا مراجعة مستحقة الآن. سمّع وجهاً وسيُبنى وردك من أخطائك.</div>`}`;
   document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][4]());
   if ($("#allRev")) $("#allRev").onclick = () => go("review");
-  bindWirdHome();
+  bindWirdHome(); $("#salahGo").onclick = () => go("salah");
   bindAll();
 }
 function pageItem(p, sub, tas = true) {
@@ -1447,7 +1468,7 @@ function drawPanel(p) {
   box.querySelectorAll("[data-ps]").forEach(b => b.onclick = () => { ST.psrc = b.dataset.ps; save(); drawPanel(p); });
   const m = box.querySelector("[data-mut]"); if (m) m.onclick = () => ayahSheet(k);
   const body = $("#pBody"), ay = `<div class="ay">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>`;
-  if (src === "muyassar") body.innerHTML = ay + esc(v.tf) + `<div class="src">التفسير الميسر، مجمع الملك فهد.</div>`;
+  if (src === "muyassar") body.innerHTML = ay + TFV(v) + `<div class="src">التفسير الميسر، مجمع الملك فهد.</div>`;
   else if (src === "gharib") body.innerHTML = ay + (v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<div class="muted small">لا كلمات غريبة في هذه الآية.</div>`) + `<div class="src">السراج في بيان غريب القرآن.</div>`;
   else dorarGroups(p).then(gs => { if (S.sel !== k || !$("#pBody")) return;
     const g = gs.find(g => g.n === v.s && g.from <= v.a && g.to >= v.a && g.sections.ijmali);
@@ -1475,7 +1496,7 @@ function rMushafTafsir(p, keys) {
         if (g && !shown.has(g)) { shown.add(g);
           html += `<div class="tgroup"><span class="lbl">المعنى الإجمالي للآيات ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span>${esc(g.sections.ijmali.text)}</div>`; }
       }
-      const tx = useSrc === "muyassar" ? `<span class="lbl">التفسير الميسر</span>${esc(v.tf)}`
+      const tx = useSrc === "muyassar" ? `<span class="lbl">التفسير الميسر</span>${TFV(v)}`
         : useSrc === "gharib" ? (v.gh.length ? `<span class="lbl">غريب الكلمات</span><div class="gh" style="margin-top:4px">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`)
         : "";
       html += `<div class="ta"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
@@ -1501,14 +1522,14 @@ function bindSwipe(el, p) {
 function compareHTML(k, other, title) {
   const d = M.diffWords(V(k).t, V(other).t);
   const side = (key, arr) => `<div class="side"><h4>${ref(key)}</h4><div class="ayah">${arr.map(x => x.same ? esc(x.w) : `<span class="diff">${esc(x.w)}</span>`).join(" ")}</div>
-    <div class="ctx"><b>السياق:</b> ${esc(V(key).tf)}</div></div>`;
+    <div class="ctx"><b>السياق:</b> ${TF(key)}</div></div>`;
   return `<section class="compare"><header>${title}</header>${side(k, d.a)}${side(other, d.b)}</section>`;
 }
 function ayahSheet(k) {
   const v = V(k), ps = DATA.mutashabihat[k] || [];
   openSheet(`<div class="row"><h3 class="grow" style="margin:0">${ref(k)}</h3><button class="btn" id="ayPlay" style="padding:8px 14px">${ICON.listen}استمع من هنا</button></div>
     <div class="ayah" style="margin:6px 0">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>
-    <div class="card"><div class="tiny muted" style="margin-bottom:4px">المعنى</div>${esc(v.tf)}
+    <div class="card"><div class="tiny muted" style="margin-bottom:4px">المعنى</div>${TFV(v)}
       ${v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}</div>
     ${ps.length ? `<div class="htitle"><h3>${ICON.layers}متشابهاتها</h3></div><div class="small muted">مواضع الاختلاف ملوّنة. سياق كل موضع هو مفتاح التفريق.</div>
       ${ps.map(p => p.r >= 1 ? `<section class="compare"><header>تتكرر بلفظها في ${ref(p.k)}</header><div class="side ctx">اللفظ واحد؛ ما قبلها في كل موضع هو ما يفرّق بينهما عند التسميع.</div></section>`
@@ -1532,7 +1553,7 @@ async function wordSheet(k, i) {
       <div class="src" style="margin:8px 0 0">السراج في بيان غريب القرآن.</div></div>` : ""}
     <div id="wdorar"></div>
     <div class="card" style="margin-top:12px"><div class="lbl2">معنى الآية</div><div class="ayah" style="font-size:1.3rem;line-height:2">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>
-      <div style="line-height:1.95">${esc(v.tf)}</div>
+      <div style="line-height:1.95">${TFV(v)}</div>
       ${v.gh.length && !sir.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}
       <div class="src" style="margin:8px 0 0">التفسير الميسر، مجمع الملك فهد${v.gh.length && !sir.length ? "، والغريب من السراج" : ""}.</div></div>
     <button class="btn block" id="wAyah" style="margin-top:12px">${ICON.layers}الآية كاملة ومتشابهاتها</button>`);
@@ -1548,7 +1569,7 @@ function rMeaning() {
   $("#rv").innerHTML = `<div id="dmean"></div>
     <div class="htitle"><h3>${ICON.book}معاني الآيات</h3><span class="badge ok">مصدر معتمد</span></div>
     <div class="card">${keys.map(k => `<div class="verse"><div class="ayah">${esc(V(k).t)} <span class="end">${AR(V(k).a)}</span></div>
-      <p>${esc(V(k).tf)}</p>${V(k).gh.length ? `<div class="gh">${V(k).gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}</div>`).join("")}</div>
+      <p>${TF(k)}</p>${V(k).gh.length ? `<div class="gh">${V(k).gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : ""}</div>`).join("")}</div>
     <div class="src">المعنى: التفسير الميسر، مجمع الملك فهد. الغريب: السراج في بيان غريب القرآن.</div>
     <div class="htitle"><h3>${ICON.star}أسباب النزول</h3></div><div id="dasbab"><div class="info">لا يُعرض إلا ما ورد في موسوعة التفسير من أسباب النزول.</div></div>`;
   dorarGroups(p0).then(gs => { if (S.reader !== p0 || S.rview !== "meaning") return;
@@ -2123,7 +2144,7 @@ function fillTafsir(p, src) {
       if (v.a === 1) html += `<div class="banner" style="margin:14px 8px 12px">سورة ${DATA.surahs[v.s]}</div>`;
       if (use === "dorar") { const g = gs.find(g => g.n === v.s && g.from <= v.a && g.to >= v.a && g.sections.ijmali);
         if (g && !shown.has(g)) { shown.add(g); html += `<div class="tgroup"><span class="lbl">المعنى الإجمالي للآيات ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span>${esc(g.sections.ijmali.text)}</div>`; } }
-      const tx = use === "muyassar" ? esc(v.tf)
+      const tx = use === "muyassar" ? TFV(v)
         : use === "gharib" ? (v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`) : "";
       html += `<div class="ta"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
         ${DATA.mutashabihat[k] ? `<button class="mchip" data-mut="${k}">${ICON.layers.replace("<svg", '<svg width="13" height="13"')}لها متشابه</button>` : ""}</div>`;
@@ -2612,6 +2633,165 @@ function wirdMorning() {
     <button class="btn primary block" style="margin-top:14px" id="mStart">${"ابدأ"}</button>`);
   $("#mStart").onclick = () => { closeSheet(); go("wird"); };
 }
+
+
+/* ---------- مواقيت الصلاة والأذان والقبلة: حساب فلكي على الجهاز، بلا خادم ---------- */
+const ADHAN_URL = ""; // رابط تسجيل أذان مأذون باستخدامه؛ إن بقي فارغاً يُستخدم تنبيه صوتي هادئ
+const PT = (() => {
+  const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+  const sin = d => Math.sin(rad(d)), cos = d => Math.cos(rad(d)), tan = d => Math.tan(rad(d));
+  const asin = x => deg(Math.asin(x)), acos = x => deg(Math.acos(Math.max(-1, Math.min(1, x)))), atan2 = (y, x) => deg(Math.atan2(y, x)), acot = x => deg(Math.atan(1 / x));
+  const fix = (a, b) => { a -= b * Math.floor(a / b); return a < 0 ? a + b : a; };
+  const METHODS = {
+    umm: { n: "أم القرى (مكة المكرمة)", fajr: 18.5, ishaMin: 90 },
+    mwl: { n: "رابطة العالم الإسلامي", fajr: 18, isha: 17 },
+    karachi: { n: "جامعة العلوم الإسلامية بكراتشي", fajr: 18, isha: 18 },
+    egypt: { n: "الهيئة المصرية العامة للمساحة", fajr: 19.5, isha: 17.5 },
+    isna: { n: "الجمعية الإسلامية لأمريكا الشمالية", fajr: 15, isha: 15 },
+  };
+  function julian(y, m, d) { if (m <= 2) { y--; m += 12; } const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4); return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5; }
+  function sun(jd) {
+    const D = jd - 2451545, g = fix(357.529 + 0.98560028 * D, 360), q = fix(280.459 + 0.98564736 * D, 360);
+    const L = fix(q + 1.915 * sin(g) + 0.020 * sin(2 * g), 360), e = 23.439 - 0.00000036 * D;
+    const RA = atan2(cos(e) * sin(L), cos(L)) / 15;
+    return { decl: asin(sin(e) * sin(L)), eqt: q / 15 - fix(RA, 24) };
+  }
+  // أوقات اليوم بالساعات المحلية للجهاز
+  function times(date, lat, lng, method, asrF) {
+    const M = METHODS[method] || METHODS.umm, tz = -date.getTimezoneOffset() / 60;
+    const jd = julian(date.getFullYear(), date.getMonth() + 1, date.getDate()) - lng / (15 * 24);
+    const mid = t => fix(12 - sun(jd + t).eqt, 24);
+    const angleT = (a, t, ccw) => { const d = sun(jd + t).decl, n = mid(t); const T = acos((-sin(a) - sin(d) * sin(lat)) / (cos(d) * cos(lat))) / 15; return n + (ccw ? -T : T); };
+    const asrT = (f, t) => { const d = sun(jd + t).decl; return angleT(-acot(f + tan(Math.abs(lat - d))), t); };
+    const p = { fajr: 5, sunrise: 6, dhuhr: 12, asr: 13, maghrib: 18, isha: 18 };
+    for (let it = 0; it < 2; it++) {
+      const t = k => p[k] / 24;
+      p.fajr = angleT(M.fajr, t("fajr"), true); p.sunrise = angleT(0.833, t("sunrise"), true); p.dhuhr = mid(t("dhuhr"));
+      p.asr = asrT(asrF || 1, t("asr")); p.maghrib = angleT(0.833, t("maghrib")); p.isha = M.ishaMin ? p.maghrib + M.ishaMin / 60 : angleT(M.isha, t("isha"));
+    }
+    const out = {};
+    for (const k in p) { const h = p[k] + tz - lng / 15 + (k === "dhuhr" ? 1 / 60 : 0); const d = new Date(date); d.setHours(0, 0, 0, 0); out[k] = new Date(d.getTime() + Math.round(h * 60) * 60000); }
+    return out;
+  }
+  const KAABA = [21.4225, 39.8262];
+  function qibla(lat, lng) {
+    const [kl, kg] = KAABA, dl = kg - lng;
+    const b = atan2(sin(dl), cos(lat) * tan(kl) - sin(lat) * cos(dl));
+    const R = 6371, a = sin((kl - lat) / 2) ** 2 + cos(lat) * cos(kl) * sin(dl / 2) ** 2;
+    return { bearing: fix(b, 360), km: Math.round(2 * R * Math.asin(Math.sqrt(a))) };
+  }
+  return { times, qibla, METHODS };
+})();
+const PRAY = [["fajr", "الفجر"], ["sunrise", "الشروق"], ["dhuhr", "الظهر"], ["asr", "العصر"], ["maghrib", "المغرب"], ["isha", "العشاء"]];
+const CITIES = [["مكة المكرمة", 21.4225, 39.8262], ["المدينة المنورة", 24.4672, 39.6111], ["الرياض", 24.7136, 46.6753], ["جدة", 21.5433, 39.1728], ["الدمام", 26.4207, 50.0888],
+  ["الكويت", 29.3759, 47.9774], ["الدوحة", 25.2854, 51.531], ["دبي", 25.2048, 55.2708], ["مسقط", 23.588, 58.3829], ["المنامة", 26.2285, 50.586], ["عمّان", 31.9454, 35.9284],
+  ["القاهرة", 30.0444, 31.2357], ["إسطنبول", 41.0082, 28.9784], ["كراتشي", 24.8607, 67.0011], ["لاهور", 31.5204, 74.3587], ["إسلام آباد", 33.6844, 73.0479],
+  ["جاكرتا", -6.2088, 106.8456], ["كوالالمبور", 3.139, 101.6869], ["لندن", 51.5072, -0.1276], ["نيويورك", 40.7128, -74.006]];
+function salahCfg() {
+  ST.salah = ST.salah || { method: LG === "ur" ? "karachi" : LG === "en" ? "mwl" : "umm", asr: LG === "ur" ? 2 : 1, alerts: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true } };
+  if (!ST.salah.loc) ST.salah.loc = { name: CITIES[0][0], lat: CITIES[0][1], lng: CITIES[0][2], auto: false };
+  return ST.salah;
+}
+const fmtT = d => { try { return new Intl.DateTimeFormat(LG === "ar" ? "ar-SA-u-nu-arab" : LG === "ur" ? "ur-PK-u-nu-arabext" : "en", { hour: "numeric", minute: "2-digit" }).format(d); } catch (e) { return d.toTimeString().slice(0, 5); } };
+function todayTimes(d) { const c = salahCfg(); return PT.times(d || new Date(), c.loc.lat, c.loc.lng, c.method, c.asr); }
+function nextPrayer() {
+  const now = new Date(), t = todayTimes(now);
+  for (const [k, n] of PRAY) if (k !== "sunrise" && t[k] > now) return { k, n, at: t[k] };
+  const tm = new Date(now); tm.setDate(tm.getDate() + 1); return { k: "fajr", n: "الفجر", at: todayTimes(tm).fajr };
+}
+const leftTxt = ms => { const m = Math.max(0, Math.round(ms / 60000)), h = Math.floor(m / 60); return h ? `بعد ${AR(h)} س و${AR(m % 60)} د` : `بعد ${AR(m)} دقيقة`; };
+function geoLocate(cb) {
+  if (!navigator.geolocation) return cb(false);
+  navigator.geolocation.getCurrentPosition(p => { const c = salahCfg(); c.loc = { name: "موقعي الحالي", lat: +p.coords.latitude.toFixed(4), lng: +p.coords.longitude.toFixed(4), auto: true }; save(); cb(true); },
+    () => cb(false), { timeout: 12000, maximumAge: 6 * 3600e3 });
+}
+function salahHome() {
+  const c = ST.salah; const n = nextPrayer();
+  return `<button class="ptile" id="salahGo"><span class="pic">🕌</span><span class="grow"><span class="tiny muted">الصلاة القادمة</span><b>${n.n}</b><span class="small muted"><span>${fmtT(n.at)}</span>، <span>${leftTxt(n.at - Date.now())}</span></span></span>
+    <span class="tiny muted" style="text-align:end">${c && c.loc ? esc(c.loc.name) : "مكة المكرمة"}<br><span style="color:var(--green);font-weight:600">القبلة والمواقيت</span></span></button>`;
+}
+function salah() {
+  const c = salahCfg(), t = todayTimes(), n = nextPrayer(), q = PT.qibla(c.loc.lat, c.loc.lng);
+  const hij = (() => { try { return new Intl.DateTimeFormat({ ar: "ar-SA", en: "en", ur: "ur" }[LG] + "-u-ca-islamic", { day: "numeric", month: "long", year: "numeric" }).format(new Date()); } catch (e) { return ""; } })();
+  $("#view").innerHTML = bar("مواقيت الصلاة", hij, true) + `
+    <div class="pnext"><div><div class="tiny" style="opacity:.8">الصلاة القادمة</div><div class="pn2">${n.n}</div><div><span>${fmtT(n.at)}</span>، <span id="pleft">${leftTxt(n.at - Date.now())}</span></div></div><div class="pbig">🕌</div></div>
+    <div class="card"><div class="row"><span class="grow"><b>${esc(c.loc.name)}</b><div class="tiny muted">${c.loc.lat.toFixed(2)}°، ${c.loc.lng.toFixed(2)}°</div></span><button class="btn" id="pLoc">📍 حدّد موقعي</button></div>
+      <button class="link" id="pCity" style="margin-top:6px">أو اختر مدينة</button></div>
+    <div class="card plist">${PRAY.map(([k, nm]) => `<div class="prow ${n.k === k ? "cur" : ""}"><b class="grow">${nm}</b><span class="pt">${fmtT(t[k])}</span>
+      ${k === "sunrise" ? `<span style="width:40px"></span>` : `<button class="pbell" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? "🔔" : "🔕"}</button>`}</div>`).join("")}</div>
+    <div class="card"><div class="row"><span class="grow"><b>تنبيه الأذان</b><div class="tiny muted" id="pNote">${adhanState()}</div></span><button class="btn primary" id="pTest">🔊 جرّب</button></div></div>
+    <div class="sec2"><h2>القبلة</h2></div>
+    <div class="card qcard"><div class="dial" id="dial"><div class="rose" id="rose"><span class="nn">N</span><div class="kaaba" style="transform:rotate(${q.bearing}deg)"><i></i><b>🕋</b></div></div><div class="phone"></div></div>
+      <div class="qtxt"><b>${AR(Math.round(q.bearing))}°</b> <span class="small muted">من الشمال باتجاه عقارب الساعة</span><div class="tiny muted"><span>${FM("المسافة إلى مكة المكرمة: {0} كم", q.km)}</span></div><div class="tiny" id="qhint" style="margin-top:6px;color:var(--muted)">ضع الجوال مسطحاً، ثم اضغط «شغّل البوصلة» ولفّ حتى يشير السهم إلى الكعبة.</div></div>
+      <button class="btn block" id="qStart" style="margin-top:12px">🧭 شغّل البوصلة</button></div>
+    <div class="sec2"><h2>طريقة الحساب</h2></div>
+    <div class="card"><select id="pMethod" class="wsel" style="margin-top:0">${Object.entries(PT.METHODS).map(([k, m]) => `<option value="${k}" ${c.method === k ? "selected" : ""}>${m.n}</option>`).join("")}</select>
+      <div class="chips" style="margin-top:10px"><button class="wopt" style="flex:1" data-asr="1" aria-pressed="${c.asr === 1}"><b>العصر: الجمهور</b></button><button class="wopt" style="flex:1" data-asr="2" aria-pressed="${c.asr === 2}"><b>العصر: الحنفي</b></button></div>
+      <div class="tiny muted" style="margin-top:8px">المواقيت محسوبة فلكياً على جهازك بحسب موقعك وطريقة الحساب، وقد تختلف دقائق عن تقويم بلدك الرسمي.</div></div>`;
+  $("#back").onclick = () => go("home");
+  $("#pLoc").onclick = () => { $("#pLoc").textContent = "…"; geoLocate(ok => { if (!ok) alert(tr("تعذّر تحديد موقعك. اسمح للمتصفح بالوصول إلى الموقع، أو اختر مدينة.")); salah(); }); };
+  $("#pCity").onclick = () => { openSheet(`<h3>اختر مدينة</h3><div class="langs">${CITIES.map(([nm], i) => `<button class="item" data-city="${i}">${nm}</button>`).join("")}</div>`);
+    document.querySelectorAll("[data-city]").forEach(b => b.onclick = () => { const [nm, la, lo] = CITIES[+b.dataset.city]; c.loc = { name: nm, lat: la, lng: lo, auto: false }; save(); closeSheet(); salah(); }); };
+  document.querySelectorAll("[data-bell]").forEach(b => b.onclick = () => { c.alerts[b.dataset.bell] = !c.alerts[b.dataset.bell]; save(); askNotify(); salah(); });
+  $("#pTest").onclick = () => { askNotify(); playAdhan(); };
+  $("#pMethod").onchange = e => { c.method = e.target.value; save(); salah(); };
+  document.querySelectorAll("[data-asr]").forEach(b => b.onclick = () => { c.asr = +b.dataset.asr; save(); salah(); });
+  $("#qStart").onclick = () => compass(q.bearing);
+}
+/* البوصلة: اتجاه الجهاز من مستشعر الاتجاه، فيدور قرص الاتجاهات والسهم يشير إلى الكعبة */
+let COMPASS = null;
+function compass(bearing) {
+  const set = h => { const r = $("#rose"); if (!r) return stopCompass(); r.style.transform = `rotate(${-h}deg)`;
+    const diff = Math.abs(((bearing - h + 540) % 360) - 180); const hint = $("#qhint");
+    if (hint) { hint.textContent = diff < 6 ? tr("أنت متجه إلى القبلة ✓") : tr("لفّ ببطء حتى يشير السهم إلى الأعلى."); hint.style.color = diff < 6 ? "var(--ok)" : "var(--muted)"; }
+    $("#dial").classList.toggle("on", diff < 6); };
+  const handler = e => { let h = e.webkitCompassHeading != null ? e.webkitCompassHeading : e.absolute || e.type === "deviceorientationabsolute" ? 360 - (e.alpha || 0) : null; if (h != null) set(h); };
+  const start = () => { stopCompass(); COMPASS = handler; addEventListener("deviceorientationabsolute", handler); addEventListener("deviceorientation", handler);
+    setTimeout(() => { const r = $("#rose"); if (r && !r.style.transform) { const h = $("#qhint"); if (h) h.textContent = tr("لا يتوفر مستشعر بوصلة في هذا الجهاز. استخدم الدرجة المكتوبة مع بوصلة أخرى."); } }, 2500); };
+  if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") DeviceOrientationEvent.requestPermission().then(s => s === "granted" ? start() : null).catch(() => {});
+  else start();
+}
+function stopCompass() { if (COMPASS) { removeEventListener("deviceorientationabsolute", COMPASS); removeEventListener("deviceorientation", COMPASS); COMPASS = null; } }
+/* الأذان: يُنبَّه عند دخول الوقت ما دام التطبيق مفتوحاً */
+function adhanState() {
+  const N = window.Notification;
+  return N && N.permission === "granted" ? "يعمل التنبيه ما دام التطبيق مفتوحاً، مع إشعار على الجهاز." : "ينبّهك صوتياً عند دخول الوقت ما دام التطبيق مفتوحاً. اضغط «جرّب» للسماح بالإشعارات.";
+}
+function askNotify() { try { if (window.Notification && Notification.permission === "default") Notification.requestPermission(); } catch (e) {} }
+let ADHAN_AUDIO = null;
+function playAdhan() {
+  if (ADHAN_URL) { try { ADHAN_AUDIO = ADHAN_AUDIO || new Audio(ADHAN_URL); ADHAN_AUDIO.currentTime = 0; ADHAN_AUDIO.play().catch(() => chime()); return; } catch (e) {} }
+  chime();
+}
+function chime() { // نغمة هادئة من ثلاث درجات
+  try { const C = window.AudioContext || window.webkitAudioContext, ctx = new C();
+    [523.25, 659.25, 783.99, 659.25].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f;
+      const t0 = ctx.currentTime + i * 0.55; g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.25, t0 + 0.05); g.gain.exponentialRampToValueAtTime(0.001, t0 + 1.2);
+      o.connect(g).connect(ctx.destination); o.start(t0); o.stop(t0 + 1.3); });
+    setTimeout(() => ctx.close(), 4000); } catch (e) {}
+}
+function adhanTick() {
+  const c = ST.salah; if (!c) return;
+  const now = new Date(), t = todayTimes(now), dk = WD.today();
+  for (const [k, nm] of PRAY) {
+    if (k === "sunrise" || !c.alerts[k]) continue;
+    const diff = now - t[k];
+    if (diff >= 0 && diff < 120000 && c.fired !== dk + k) {
+      c.fired = dk + k; save(); playAdhan();
+      const msg = tr(`حان الآن وقت صلاة ${nm}`);
+      try { if (window.Notification && Notification.permission === "granted") new Notification(tr("مثاني"), { body: msg }); } catch (e) {}
+      openSheet(`<div class="empty" style="padding:8px 0"><div style="font-size:3rem">🕌</div><h3 style="margin:8px 0 4px">${msg}</h3><p class="small muted" style="margin:0"><span>${esc(c.loc.name)}</span>، <span>${fmtT(t[k])}</span></p></div>`);
+    }
+  }
+  const pl = $("#pleft"); if (pl) { const n = nextPrayer(); pl.textContent = leftTxt(n.at - Date.now()); }
+}
+if (!/jsdom/.test(navigator.userAgent)) setInterval(adhanTick, 20000); // لا يُبقي اختبارات Node قيد التشغيل
+
+/* التفسير الميسر مترجماً بحسب لغة الواجهة (يُحمَّل عند الحاجة إن توفّر ملفه) */
+let TFX = null;
+const TF = k => { const t = TFX && TFX[k]; return t ? `<span class="tfx" dir="auto" data-noi18n>${esc(t)}</span>` : esc(V(k).tf); };
+const TFV = v => TF(`${v.s}:${v.a}`);
+if (LG !== "ar") fetch(`tafsir/${LG}.json`).then(r => r.ok ? r.json() : null).then(j => { if (j) { TFX = j; render(); } }).catch(() => {});
 
 TR.start(); render(); setTimeout(() => { if (S.tab === "home") wirdMorning(); }, 900);
 LIVE.boot();
