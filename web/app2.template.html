@@ -73,6 +73,7 @@ button{cursor:pointer}
 .sec{display:flex;justify-content:space-between;align-items:baseline;margin:24px 2px 10px}
 .sec h2{margin:0;font-size:1rem;font-weight:600}
 .sec a,.link{color:var(--green);font-size:.85rem;font-weight:500;background:none;border:0;padding:0}
+.link.sinfo{flex:none;padding:7px 12px;border-radius:999px;font-weight:600;font-size:.8rem;background:color-mix(in srgb,var(--sky) 14%,transparent);white-space:nowrap}
 .muted{color:var(--muted)} .small{font-size:.82rem} .tiny{font-size:.72rem}
 .btn{border:0;border-radius:14px;padding:12px 18px;font-weight:600;background:var(--green-soft);color:var(--green);display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn svg{width:18px;height:18px}
@@ -385,7 +386,7 @@ body{background:#F3F7FC;background-image:linear-gradient(180deg,#E6EFFA 0,#F3F7F
 .card,.item,.tile,.qa button,.sl,.dsec,.ta,.tpanel,.res,.stat,.jz,.seg,.mtool{border-radius:22px;box-shadow:0 10px 30px rgba(20,51,94,.07);border:1px solid rgba(20,51,94,.05)}
 .btn{border-radius:16px}
 .btn.primary{background:linear-gradient(135deg,var(--green),var(--sky));box-shadow:0 8px 18px rgba(47,159,219,.28)}
-.bar{background:transparent;backdrop-filter:none}
+.bar{background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .bar h1{font-size:1.45rem;font-weight:700}
 .bar h1 small{margin-top:4px}
 /* شريط التنقل العائم */
@@ -765,7 +766,7 @@ function home() {
     <section class="heroC"><div class="in">
       <div><div class="k">تابع حفظك</div><div class="t">سورة ${pageSurah(last)}</div><div class="s">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div>
         <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
-      <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div><b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small></div></div>
+      <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div>${mastered ? `<b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small>` : `<b style="font-size:1.1rem">ابدأ</b><small>${AR(jp.length)} وجهاً في الجزء</small>`}</div></div>
     </div></section>
     <div class="sec2"><h2>ابدأ من هنا</h2></div>
     <div class="hs">${qcs.map(([t, sub, ic, bg], i) => `<button class="qc" data-q="${i}"><span class="ic" style="background:${bg}">${ic}</span><b>${t}</b><span class="t">${sub}</span></button>`).join("")}</div>
@@ -812,7 +813,7 @@ function mushaf() {
       const list = SURAHS.filter(n => !q || (/^\d+$/.test(qd) ? String(n) === qd : qn && M.norm(DATA.surahs[n]).join(" ").includes(qn)));
       $("#slist").innerHTML = list.length ? list.map(n => { const I2 = DATA.surahInfo[n];
         return `<button class="sl" data-read="${I2.page}"><span class="no">${AR(n)}</span><span class="grow"><div class="nm">${DATA.surahs[n]}</div>
-          <div class="tiny muted">${I2.rev}، ${ayat(I2.n)}، الوجه ${AR(I2.page)}</div></span><span class="link" data-sinfo="${n}" role="button" tabindex="0" style="padding:8px 4px">عن السورة</span></button>`; }).join("")
+          <div class="tiny muted">${I2.rev}، ${ayat(I2.n)}، الوجه ${AR(I2.page)}</div></span><span class="link sinfo" data-sinfo="${n}" role="button" tabindex="0">عن السورة</span></button>`; }).join("")
         : `<div class="info">لا توجد سورة بهذا الاسم.</div>`;
       bindAll();
       document.querySelectorAll("[data-sinfo]").forEach(b => b.onclick = e => { e.stopPropagation(); surahSheet(+b.dataset.sinfo); });
