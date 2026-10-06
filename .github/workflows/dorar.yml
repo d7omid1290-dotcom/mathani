@@ -1,0 +1,72 @@
+# يجلب موسوعة التفسير (الدرر السنية) على خوادم GitHub، ثم يبني ويختبر وينشر.
+# التشغيل: من تبويب Actions اختر «جلب موسوعة التفسير» ثم Run workflow.
+name: جلب موسوعة التفسير
+
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: "من سورة"
+        default: "78"
+      to:
+        description: "إلى سورة"
+        default: "114"
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: تثبيت الأدوات
+        run: |
+          python -m pip install requests beautifulsoup4
+          npm ci
+
+      - name: جلب السور
+        run: python scripts/fetch_dorar.py "${{ inputs.from }}" "${{ inputs.to }}"
+
+      - name: فحص الأقسام
+        run: |
+          python - "${{ inputs.from }}" "${{ inputs.to }}" <<'PY'
+          import json, sys
+          a, b = int(sys.argv[1]), int(sys.argv[2])
+          for s in range(a, b + 1):
+              d = json.load(open(f"data/dorar/{s}.json", encoding="utf-8"))
+              g = d["groups"]
+              no_tafsir = [x["from"] for x in g if "tafsir" not in x["sections"]]
+              no_range = sum(1 for x in g if x["from"] is None)
+              keys = sorted({k for x in g for k in x["sections"]})
+              flag = "" if g and d["intro"] and not no_tafsir and not no_range else "  <-- تحقق"
+              print(f"{s}: intro={sorted(d['intro'])} groups={len(g)} keys={keys} no_tafsir={no_tafsir} no_range={no_range}{flag}")
+          PY
+
+      - name: البناء والاختبار
+        run: |
+          python scripts/bundle.py
+          npm test 2>&1 | tee test.log
+          if grep "JS errors:" test.log | grep -v "JS errors: none"; then exit 1; fi
+
+      - name: الحفظ والنشر
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/dorar dist
+          git commit -m "موسوعة التفسير: السور ${{ inputs.from }} إلى ${{ inputs.to }} من الدرر السنية" || exit 0
+          git push origin HEAD:main
+          git subtree split --prefix dist -b pages
+          git push -f origin pages:gh-pages
