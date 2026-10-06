@@ -99,4 +99,14 @@ t("الانتقال إلى المتشابه يُكتشف لحظياً عند ن�
   assert.strictEqual(M.slipTo("2:48", ctx, W, data), "2:123");
   assert.strictEqual(M.slipTo("2:48", ctx, M.norm("كلام اخر"), data), null);
 });
+t("التعرف على موضع القراءة من أي مكان في المصحف", () => {
+  const idx = M.locIndex(data), N = k => M.norm(V(k));
+  assert.deepStrictEqual(M.locate(N("2:255").slice(5, 10), idx, data, 1).k, "2:255");
+  assert.strictEqual(M.locate(N("2:255").slice(5, 10), idx, data, 1).wi, 5);
+  const r = M.locate(M.norm("أعوذ بالله من الشيطان الرجيم بسم الله الرحمن الرحيم").concat(N("36:1"), N("36:2"), N("36:3")), idx, data, 1);
+  assert.strictEqual(r.k, "36:1"); assert.strictEqual(r.hOff, 9);
+  assert.strictEqual(M.locate(N("2:48").slice(0, 6), idx, data, 8), null); // متشابه: ينتظر كلمات أكثر
+  assert.strictEqual(M.locate(N("2:123").concat(N("2:124")).slice(0, 14), idx, data, 8).k, "2:123");
+  assert.strictEqual(M.locate(M.norm("مرحبا كيف حالك اليوم يا صديقي"), idx, data, 1), null);
+});
 console.log(`${pass} اختبار ناجح`);

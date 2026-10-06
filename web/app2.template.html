@@ -301,6 +301,14 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 .heard b{font-family:var(--quran);font-weight:400;font-size:1.05rem;color:var(--ink)}
 .toast{border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:.86rem;display:flex;align-items:center;gap:10px}
 .toast.gold{background:var(--gold-soft);color:var(--gold)} .toast.red{background:var(--err-soft);color:var(--err)}
+.toast.green{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.fpage[hidden]{display:none}
+.pw{color:var(--muted);opacity:.55}
+.autoloc{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin-bottom:10px;border-radius:16px;background:var(--card);border:1px solid var(--line);cursor:pointer}
+.autoloc input{width:20px;height:20px;margin-top:3px;accent-color:var(--green);flex:none}
+.autoloc span{display:flex;flex-direction:column;gap:2px}.autoloc small{color:var(--muted);font-size:.8rem;line-height:1.5}
+.locwait{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:34px 18px}
+.locwait svg{width:38px;height:38px;color:var(--green)}
 .toast button{margin-inline-start:auto;border:0;background:var(--surface);color:inherit;border-radius:10px;padding:5px 10px;font-weight:600;font-size:.8rem}
 .typein{display:flex;gap:8px;margin-top:10px}
 .typein input{flex:1}
@@ -1676,35 +1684,59 @@ function stopRec(silent) {
 
 /* ---------- التسميع المباشر: الوجه مخفي وينكشف مع القراءة الصحيحة ---------- */
 let F = null;
-function buildFollow() {
+function buildFollow(startWi) {
   const keys = tKeys(); const E = [], disp = [], owner = [];
-  let html = "", open = false, n = 0;
+  let html = "", open = false, n = 0, preText = "";
   for (const k of keys) {
     const v = V(k);
     if (v.a === 1) { if (open) html += "</div>"; html += `<div class="banner">سورة ${DATA.surahs[v.s]}</div>${v.s !== 1 && v.s !== 9 ? `<div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>` : ""}<div class="text">`; open = true; }
     else if (!open) { html += `<div class="text">`; open = true; }
     const toks = M.tokens(v.t), nn = M.norm(v.t);
-    toks.forEach((w, wi) => { E.push(nn[wi]); disp.push(w); owner.push(k); html += `<span class="fw h" data-i="${n++}">${esc(w)}</span> `; });
+    toks.forEach((w, wi) => {
+      if (k === keys[0] && wi < (startWi || 0)) { preText += w + " "; html += `<span class="pw">${esc(w)}</span> `; return; } // ما قبل موضع البدء: ظاهر ولا يُسمَّع
+      E.push(nn[wi]); disp.push(w); owner.push(k); html += `<span class="fw h" data-i="${n++}">${esc(w)}</span> `; });
     html += `<span class="end">${AR(v.a)}</span> `;
   }
   html += open ? "</div>" : "";
-  return { keys, E, disp, owner, html, forced: new Set(), prev: [], finals: [], session: [], interim: "", typed: "", done: false, last: null };
+  return { keys, E, disp, owner, html, forced: new Set(), prev: [], finals: [], session: [], interim: "", typed: "", done: false, last: null,
+    hOff: 0, locating: ST.autoLoc !== false, preText };
+}
+/* التسميع من أي موضع: يُعرف موضع القراءة في المصحف كله ثم يُنتقل إليه */
+let LOCIDX = null;
+const locIdx = () => LOCIDX || (LOCIDX = M.locIndex(DATA));
+function tryLocate(H, nFinal) {
+  if (!H.length) return false;
+  const r = M.locate(H, locIdx(), DATA, S.T.page);
+  if (!r) {
+    if (H.length >= 18) { F.locating = false; F.locMiss = true; } // لم يُعرف الموضع: نتابع الوجه المحدد
+    return false;
+  }
+  const keep = { finals: F.finals, session: F.session, interim: F.interim, typed: F.typed };
+  const T = S.T; T.page = V(r.k).p; T.surah = null; T.from = r.k; T.to = null;
+  F = Object.assign(buildFollow(r.wi), keep, { hOff: r.hOff, locating: false, found: r.k, foundAt: Date.now() });
+  F.page = T.page; F.from = F.keys[0]; F.to = F.keys.at(-1);
+  tasmee();
+  return true;
 }
 function followHeard() {
   const finalText = F.finals.concat(F.session).join(" ") + " " + F.typed.replace(/\S+$/, m => F.typed.endsWith(" ") ? m : "");
   const pendingTyped = F.typed.endsWith(" ") ? "" : (F.typed.match(/\S+$/) || [""])[0];
-  const fin = M.norm(finalText), tail = M.norm(F.interim + " " + pendingTyped);
-  return { H: fin.concat(tail), nFinal: fin.length, text: finalText };
+  const fin = M.norm(finalText), tail = M.norm(F.interim + " " + pendingTyped), o = F.hOff || 0;
+  return { H: fin.concat(tail).slice(o), nFinal: Math.max(0, fin.length - o), text: finalText.split(/\s+/).filter(Boolean).slice(o).join(" ") };
 }
 function drawFollow(box) {
   const T = S.T;
   if (!F || F.page !== T.page || F.from !== tKeys()[0] || F.to !== tKeys().at(-1)) { F = buildFollow(); F.page = T.page; F.from = F.keys[0]; F.to = F.keys.at(-1); }
-  const on = !!REC && T.phase === "recording";
+  const on = !!REC && T.phase === "recording", loc = F.locating, heardAny = followHeard().H.length > 0;
+  if (loc) setTimeout(locIdx, on ? 0 : 300); // يُبنى فهرس المصحف مسبقاً
   box.innerHTML = `
+    ${!on && !heardAny && !F.found ? `<label class="autoloc"><input type="checkbox" id="autoloc" ${loc ? "checked" : ""}><span><b>ابدأ من أي موضع</b><small>اقرأ من أي مكان في القرآن، ويتعرّف مثاني على الآية وينتقل إليها</small></span></label>` : ""}
+    <div id="floc">${F.found && Date.now() - F.foundAt < 6000 ? `<div class="toast green">${ICON.check.replace("<svg", '<svg width="20" height="20"')}<span>تعرّفتُ على موضعك: ${ref(F.found)}</span></div>` : F.locMiss && !F.found ? `<div class="toast gold"><span>لم أتعرّف على موضع القراءة، فأتابعك في الوجه المحدد.</span></div>` : ""}</div>
     <div class="fstat"><div class="prog"><i id="fprog" style="width:0"></i></div><span class="tiny muted" id="fcount"></span></div>
     <div id="ftoast"></div>
-    <div class="page fpage"><div class="page-in"><div class="page-in2" id="fpage">${F.html}</div></div></div>
-    <div class="heard" id="fheard">${on ? "" : "اضغط الميكروفون واقرأ من حفظك؛ كل كلمة صحيحة تنكشف في مكانها."}</div>
+    ${loc ? `<div class="card locwait" id="flocw">${ICON.wave}<b>${on ? "أستمع إليك…" : "اقرأ من أي موضع"}</b><span class="tiny muted">${on ? "ابدأ القراءة من أي آية، وسأتعرّف على موضعك وأنتقل إليه." : "اضغط الميكروفون وابدأ من أي آية في القرآن."}</span></div>` : ""}
+    <div class="page fpage" ${loc ? "hidden" : ""}><div class="page-in"><div class="page-in2" id="fpage">${F.html}</div></div></div>
+    <div class="heard" id="fheard">${on ? "" : loc ? "" : "اضغط الميكروفون واقرأ من حفظك؛ كل كلمة صحيحة تنكشف في مكانها."}</div>
     ${T.err ? `<div class="alert">${T.err}<div style="margin-top:8px"><button class="link" style="color:var(--err);text-decoration:underline" data-diag>افحص سبب المشكلة</button></div></div>` : ""}
     <details style="margin-top:10px"><summary class="tiny muted" style="cursor:pointer">لا يعمل الميكروفون؟ جرّب بالكتابة</summary>
       <div class="typein"><input type="text" id="ftype" placeholder="اكتب من حفظك، كلمة بعد كلمة" value="${esc(F.typed)}"></div></details>
@@ -1715,13 +1747,21 @@ function drawFollow(box) {
       <button class="side" id="fend">${ICON.check}${F.done ? "النتيجة" : "أنهِ وقيّم"}</button>
     </div>`;
   $("#fmic").onclick = () => on ? stopFollow(false) : startFollow();
-  $("#fhint").onclick = () => { const f = M.follow(F.E, followHeard().H, followHeard().nFinal, F.forced); if (f.pos < F.E.length) { F.forced.add(f.pos); updateFollow(); } };
+  $("#fhint").onclick = () => { if (F.locating) return; const f = M.follow(F.E, followHeard().H, followHeard().nFinal, F.forced); if (f.pos < F.E.length) { F.forced.add(f.pos); updateFollow(); } };
   $("#fend").onclick = () => stopFollow(true);
+  const al = $("#autoloc"); if (al) al.onchange = () => { ST.autoLoc = al.checked; save(); F.locating = al.checked; drawStudio(); };
+  if (F.found) setTimeout(() => { const e = $("#floc"); if (e && F && Date.now() - F.foundAt >= 5900) e.innerHTML = ""; }, 6000);
   $("#ftype").oninput = e => { F.typed = e.target.value; updateFollow(); };
   updateFollow(true);
 }
 function updateFollow(initial) {
   if (!F || !$("#fpage")) return;
+  if (F.locating) {
+    const h = followHeard();
+    if (tryLocate(h.H, h.nFinal)) return;
+    if (F.locating) { if (h.H.length) $("#fheard").innerHTML = `سمعتُ: <b>${esc(h.H.slice(-6).join(" "))}</b>`; return; }
+    drawStudio(); return; // لم يُعرف الموضع: نعود إلى الوجه المحدد
+  }
   const { H, nFinal } = followHeard();
   const f = M.follow(F.E, H, nFinal, F.forced);
   const spans = document.querySelectorAll("#fpage .fw");
@@ -1781,7 +1821,8 @@ function stopFollow(evaluateNow) {
   if (R && R.sr) { REC = null; try { R.sr.stop(); } catch (e) {} F.finals.push(...F.session); F.session = []; F.interim = ""; }
   T.phase = "ready";
   if (!evaluateNow) return drawStudio();
-  const { text } = followHeard();
+  if (F.locating && followHeard().H.length) { T.err = "لم أتعرّف على موضع القراءة بعد. اقرأ آية كاملة أو أكثر، أو ألغِ «ابدأ من أي موضع»."; return drawStudio(); }
+  const text = (F.preText || "") + followHeard().text;
   const hinted = [...F.forced].map(i => F.disp[i]);
   if (!text.trim() && !hinted.length) { T.err = "لم يصل شيء من التسميع بعد. اضغط الميكروفون واقرأ، أو اكتب من حفظك."; return drawStudio(); }
   const slips = F.slips || {}; F = null; evaluate(text, slips);

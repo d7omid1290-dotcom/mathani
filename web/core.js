@@ -292,6 +292,47 @@
     return null;
   }
 
-  const api = { mtokens, slipTo, follow, tokens, norm, align, evaluate, diffWords, schedule, makeQuiz, sim, wordEq };
+
+  /*
+   * التعرف على موضع القراءة في المصحف كله: يقرأ الحافظ من أي موضع فيُعرف أين هو
+   * locIndex يبني فهرساً لكل كلمات المصحف (مرة واحدة)، وlocate تبحث عن أفضل بداية لما سُمع
+   */
+  const skel = w => w.replace(/[اويء]/g, "") || w; // هيكل الكلمة: يتسامح مع اختلاف الألف والواو والياء في التعرف الصوتي
+  function locIndex(data) {
+    const keys = Object.keys(data.verses).sort((a, b) => { const [s1, a1] = a.split(":"), [s2, a2] = b.split(":"); return s1 - s2 || a1 - a2; });
+    const G = [], K = [], W = [], map = new Map();
+    for (const k of keys) norm(data.verses[k].t).forEach((w, i) => { G.push(w); K.push(k); W.push(i); });
+    for (let i = 0; i + 1 < G.length; i++) { const b = skel(G[i]) + " " + skel(G[i + 1]); let a = map.get(b); if (!a) map.set(b, a = []); a.push(i); }
+    return { G, K, W, map };
+  }
+  const OPEN = [["اعوذ", "بالله", "من", "الشيطان", "الرجيم"], ["بسم", "الله", "الرحمن", "الرحيم"]];
+  // H: الكلمات المسموعة (مطبّعة). near: رقم الوجه الحالي لترجيح المتشابهات. تُرجع null إن لم يتأكد بعد
+  function locate(H, idx, data, near) {
+    let off = 0;
+    for (let again = true; again;) { again = false;
+      for (const o of OPEN) { const n = Math.min(o.length, H.length - off);
+        if (n > 0 && o.slice(0, n).every((w, x) => wordEq(H[off + x], w))) { if (n < o.length) return null; off += o.length; again = true; } } }
+    const Hs = H.slice(off);
+    if (Hs.length < 3) return null;
+    const cands = new Set();
+    for (let j = 0; j + 1 < Math.min(Hs.length, 7); j++) for (const p of idx.map.get(skel(Hs[j]) + " " + skel(Hs[j + 1])) || []) { if (p - j >= 0) cands.add(p - j); if (j && p - j + 1 >= 0) cands.add(p - j + 1); }
+    let best = [], top = 0;
+    for (const c of cands) {
+      const f = follow(idx.G.slice(c, c + Hs.length + 3), Hs, Hs.length);
+      const first = f.st.indexOf(1); if (first < 0) continue;
+      const score = f.st.filter(x => x === 1).length;
+      if (score > top) { top = score; best = [c + first]; } else if (score === top && !best.includes(c + first)) best.push(c + first);
+    }
+    if (top < Math.min(4, Hs.length) || top < Hs.length * 0.6) return null;
+    if (best.length > 1) {
+      if (Hs.length < 10) return null; // متشابه: ننتظر كلمات أكثر تميّز الموضع
+      const pg = i => data.verses[idx.K[i]].p;
+      best.sort((a, b) => Math.abs(pg(a) - near) - Math.abs(pg(b) - near));
+    }
+    const i = best[0];
+    return { k: idx.K[i], wi: idx.W[i], hOff: off, score: top, ties: best.length };
+  }
+
+  const api = { locIndex, locate, mtokens, slipTo, follow, tokens, norm, align, evaluate, diffWords, schedule, makeQuiz, sim, wordEq };
   if (typeof module !== "undefined") module.exports = api; else root.Mathani = api;
 })(this);
