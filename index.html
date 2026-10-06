@@ -373,6 +373,13 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 .aprof{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.aprof div{background:var(--bg);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column}.aprof span{font-size:.72rem;color:var(--muted)}.aprof b{font-size:.85rem}
 .abar{position:fixed;inset-inline:0;bottom:calc(84px + env(safe-area-inset-bottom));margin:0 auto;max-width:560px;padding:0 16px;display:flex;gap:8px;align-items:center;z-index:5}
 .abar input{flex:1;padding:14px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;box-shadow:0 8px 24px rgba(20,51,94,.08)}
+.acallbtn{display:flex;align-items:center;gap:10px;width:100%;margin:6px 0 10px;padding:12px 14px;border:0;border-radius:16px;background:linear-gradient(135deg,#0b5d47,#127a5e);color:#fff;font:inherit;cursor:pointer;font-size:20px}.acallbtn b{font-size:15px}.acallbtn span{font-size:12px;opacity:.85;margin-inline-start:auto}
+.acall{position:fixed;inset:0;z-index:90;background:linear-gradient(180deg,#073d2f,#0b5d47 55%,#0e6b53);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
+.acav{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);box-shadow:0 0 0 0 rgba(255,255,255,.35);transition:.3s}.acav span svg{width:56px;height:56px}
+.acav.listen{animation:ring 1.4s infinite;background:rgba(255,255,255,.2)}.acav.speak{animation:talk .6s infinite alternate}.acav.think{opacity:.7}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,255,255,.4)}100%{box-shadow:0 0 0 36px rgba(255,255,255,0)}}@keyframes talk{from{transform:scale(1)}to{transform:scale(1.08)}}
+.acn{font-size:20px}.acst{opacity:.85;font-size:14px}.acq{font-size:15px;opacity:.9;max-width:520px}.aca{font-size:15px;line-height:1.9;background:rgba(255,255,255,.1);border-radius:16px;padding:12px 14px;max-width:520px;max-height:30vh;overflow:auto}
+.acbtns{display:flex;gap:10px;margin-top:14px}.acend{border:0;border-radius:999px;background:#d64545;color:#fff;font:inherit;font-weight:700;padding:14px 26px;cursor:pointer}.acbtns .btn.ghost{color:#fff;border-color:rgba(255,255,255,.5)}
 .amic{width:62px;height:62px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--green),var(--sky));color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,93,71,.35);flex:none}
 .amic svg{width:28px;height:28px}.amic.on{background:var(--err);animation:pulse 1.2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,53,63,.45)}100%{box-shadow:0 0 0 16px rgba(192,53,63,0)}}
@@ -3280,10 +3287,61 @@ const MODE_HELLO = {
   review: "سأختار لك ما تحتاج مراجعته من أخطائك السابقة ومستوى إتقانك.",
   tadabbur: "سأختار لك آية من وردك أو محفوظك، مع معناها وسؤال يعينك على التدبر.",
   plan: "سأبني لك خطة اليوم من وردك وأخطائك ومراجعتك ومواقيت الصلاة." };
-function say(text) {
-  if (!AS.speak || !window.speechSynthesis || !text) return;
-  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(String(text).replace(/<[^>]+>/g, "").slice(0, 400)); u.lang = "ar-SA"; u.rate = 0.95;
-    const vv = speechSynthesis.getVoices().find(x => /^ar/i.test(x.lang)); if (vv) u.voice = vv; speechSynthesis.speak(u); } catch (e) {}
+let VOICE = null;
+function pickVoice() { try { const vs = speechSynthesis.getVoices().filter(x => /^ar/i.test(x.lang)); const sc = x => (/natural|neural|online|google|premium|enhanced/i.test(x.name) ? 4 : 0) + (/hamed|zariyah|maged|laila|majed|tarik|mariam/i.test(x.name) ? 2 : 0) + (/SA/i.test(x.lang) ? 1 : 0);
+  VOICE = vs.sort((a, b) => sc(b) - sc(a))[0] || null; } catch (e) {} }
+if (window.speechSynthesis) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {} }
+function sayText(text) { const d = document.createElement("div"); d.innerHTML = String(text); d.querySelectorAll(".aay,.asrc,.aacts").forEach(x => x.remove()); return d.textContent.replace(/[\u064B-\u0652\u0670]/g, "").replace(/[🌿🤍📞🔊]/gu, "").replace(/([٠-٩0-9]+) س و([٠-٩0-9]+) د/g, "$1 ساعة و$2 دقيقة").replace(/([٠-٩0-9]+) د(?=[؛.،\s]|$)/g, "$1 دقيقة").replace(/\s+/g, " ").trim(); }
+function say(text, done, force) {
+  if ((!AS.speak && !force) || !window.speechSynthesis || !text) { if (done) done(); return; }
+  try { speechSynthesis.cancel(); if (!VOICE) pickVoice();
+    const parts = sayText(text).slice(0, 600).split(/(?<=[.،؛:!؟?])\s+/).reduce((a, x) => { if (a.length && (a[a.length - 1] + " " + x).length < 160) a[a.length - 1] += " " + x; else a.push(x); return a; }, []).filter(Boolean);
+    if (!parts.length) { if (done) done(); return; }
+    let i = 0; const next = () => { if (i >= parts.length) { if (done) done(); return; } const u = new SpeechSynthesisUtterance(parts[i++]); u.lang = VOICE ? VOICE.lang : "ar-SA"; if (VOICE) u.voice = VOICE; u.rate = 1.02; u.pitch = 1;
+      u.onend = next; u.onerror = () => { if (done) done(); }; speechSynthesis.speak(u); };
+    next();
+  } catch (e) { if (done) done(); }
+}
+// المكالمة الصوتية: استماع ← فهم ← رد صوتي ← استماع مجدداً
+const CALL = { on: false, st: "", q: "", a: "", rec: null };
+function smallTalk(q) {
+  const n = M.norm(q).join(" ");
+  if (/^(السلام|سلام|مرحبا|هلا|اهلا)/.test(n)) return { html: `وعليكم السلام ورحمة الله${ST.name ? ` يا ${esc(ST.name)}` : ""}، حياك الله. بماذا نبدأ: نراجع، أو أسمّع لك، أو أبني خطة يومك؟` };
+  if (/(مع السلامه|باي|انهي المكالمه|اقفل|سكر)/.test(n)) return { html: "في حفظ الله، وأعانك على وردك.", end: true };
+  if (/(شكرا|جزاك|يعطيك العافيه|ما قصرت)/.test(n)) return { html: "وإياك، بارك الله فيك. هل تريد شيئاً آخر؟" };
+  if (/(كيف حالك|كيفك|شلونك|وش اخبارك)/.test(n)) return { html: "الحمد لله بخير، وأسعد بصحبتك مع القرآن. كيف أعينك اليوم؟" };
+  return null;
+}
+function callUI() {
+  let o = $("#acall"); if (!CALL.on) { if (o) o.remove(); return; }
+  if (!o) { o = document.createElement("div"); o.id = "acall"; o.className = "acall"; document.body.appendChild(o); }
+  const lab = { listen: "أستمع إليك…", think: "لحظة…", speak: "أتحدث…", idle: "اضغط الميكروفون وتحدث" }[CALL.st] || "";
+  o.innerHTML = `<div class="acav ${CALL.st}"><span>${ICON.mic}</span></div><b class="acn">المساعد القرآني</b><div class="acst">${tr(lab)}</div>
+    ${CALL.q ? `<div class="acq" dir="auto">«${esc(CALL.q)}»</div>` : ""}${CALL.a ? `<div class="aca" dir="auto">${esc(CALL.a.slice(0, 260))}</div>` : ""}
+    <div class="acbtns">${CALL.st === "speak" ? `<button class="btn ghost" id="acSkip">قاطعه وتحدث</button>` : ""}<button class="acend" id="acEnd" aria-label="إنهاء المكالمة">✕ إنهاء</button></div>`;
+  $("#acEnd").onclick = endCall; const sk = $("#acSkip"); if (sk) sk.onclick = () => { try { speechSynthesis.cancel(); } catch (e) {} callListen(); };
+}
+function startCall() {
+  if (!SR) { asPush("bot", "المكالمة الصوتية تحتاج متصفح Google Chrome أو Safari."); return; }
+  stopAsk(); CALL.on = true; CALL.q = ""; CALL.a = ""; const hi = `السلام عليكم${ST.name ? ` يا ${ST.name}` : ""}. أنا معك، تفضل بسؤالك.`;
+  CALL.st = "speak"; CALL.a = hi; callUI(); say(hi, callListen, true);
+}
+function endCall() { CALL.on = false; try { speechSynthesis.cancel(); } catch (e) {} if (CALL.rec) { const r = CALL.rec; CALL.rec = null; try { r.abort(); } catch (e) {} } callUI(); }
+function callListen() {
+  if (!CALL.on) return; if (CALL.rec) { try { CALL.rec.abort(); } catch (e) {} }
+  const r = new SR(); r.lang = "ar-SA"; r.interimResults = true; r.continuous = false; CALL.rec = r; CALL.st = "listen"; CALL.q = ""; callUI();
+  let fin = "", got = false;
+  r.onresult = e => { let t = ""; for (let i = 0; i < e.results.length; i++) { t += e.results[i][0].transcript; if (e.results[i].isFinal) fin = t; } CALL.q = t; const q = $(".acq"); if (q) q.textContent = `«${t}»`; else callUI(); };
+  r.onend = () => { if (CALL.rec !== r) return; CALL.rec = null; const v = (fin || CALL.q).trim(); if (!CALL.on) return; if (!v) { setTimeout(callListen, 250); return; } got = true; callReply(v); };
+  r.onerror = e => { if (CALL.rec !== r) return; CALL.rec = null; if (e.error === "not-allowed" || e.error === "service-not-allowed") { CALL.st = "idle"; CALL.a = tr("اسمح للتطبيق باستخدام الميكروفون ثم أعد الاتصال."); callUI(); return; } if (CALL.on) setTimeout(callListen, 400); };
+  try { r.start(); } catch (e) { setTimeout(callListen, 500); }
+}
+function callReply(q) {
+  CALL.st = "think"; CALL.q = q; callUI();
+  const st = smallTalk(q), res = st || answer(q);
+  asPush("me", esc(q)); asPush("bot", res.html, res.acts);
+  const spoken = sayText(res.say || res.html); CALL.a = spoken; CALL.st = "speak"; callUI();
+  say(spoken, () => { if (st && st.end) endCall(); else callListen(); }, true);
 }
 function asPush(role, html, acts) { AS.msgs.push({ role, html, acts: acts || [] }); AS.msgs = AS.msgs.slice(-30); drawMsgs(); }
 function ask(q, forced) {
@@ -3303,12 +3361,13 @@ function drawMsgs() {
 function assistant() {
   if (!AS.msgs.length) asPush("bot", `السلام عليكم${ST.name ? ` يا ${esc(ST.name)}` : ""} 🌿 أنا رفيقك في رحلتك مع القرآن: أشرح لك من التفسير الميسر، وأسمّع لك، وأراجع معك أخطاءك، وأبني خطتك اليومية. اضغط الميكروفون وتحدث، أو اكتب سؤالك.`, [["وش أسوي اليوم؟", "ask:وش اسوي اليوم"], ["ملفي القرآني", "ask:ملفي"]]);
   $("#view").innerHTML = bar("المساعد القرآني", "رفيقك من الحفظ إلى الإتقان", true, `<button class="ibtn" id="aSpk" aria-label="الرد الصوتي">${AS.speak ? "🔊" : "🔇"}</button>`) + `
+    <button class="acallbtn" id="aCall">📞 <b>مكالمة صوتية</b><span>تحدّث معه كأنك في مكالمة</span></button>
     <div class="amodes">${AMODES.map(([id, t, e]) => `<button data-am="${id}" aria-pressed="${AS.mode === id}"><span>${e}</span>${t}</button>`).join("")}</div>
     <div class="amsgs" id="amsgs"></div>
     <div class="abar"><input type="text" id="aIn" placeholder="اكتب سؤالك…"><button class="amic" id="aMic" aria-label="تحدث">${ICON.mic}</button><button class="asend" id="aSend" aria-label="أرسل">${ICON.back}</button></div>
     <div class="tiny muted acap">يجيب من مصادر معتمدة يذكرها مع كل جواب، ولا يُفتي ولا يفسّر من عنده.</div>`;
   drawMsgs();
-  $("#back").onclick = () => { stopAsk(); go("home"); };
+  $("#back").onclick = () => { stopAsk(); endCall(); go("home"); };
   $("#aSpk").onclick = () => { AS.speak = !AS.speak; try { speechSynthesis.cancel(); } catch (e) {} assistant(); };
   document.querySelectorAll("[data-am]").forEach(b => b.onclick = () => { AS.mode = b.dataset.am; asPush("bot", MODE_HELLO[AS.mode]);
     if (AS.mode !== "learn" && AS.mode !== "tasmee") ask("", AS.mode); else say(MODE_HELLO[AS.mode]);
@@ -3316,6 +3375,7 @@ function assistant() {
   const send = () => { const v = $("#aIn").value.trim(); if (!v) return; $("#aIn").value = ""; ask(v); };
   $("#aSend").onclick = send; $("#aIn").onkeydown = e => { if (e.key === "Enter") send(); };
   $("#aMic").onclick = () => AS.rec ? stopAsk() : listenAsk();
+  $("#aCall").onclick = startCall;
 }
 function listenAsk() {
   if (!SR) { asPush("bot", "التحدث بالصوت يحتاج متصفح Google Chrome أو Safari. يمكنك الكتابة الآن."); return; }
