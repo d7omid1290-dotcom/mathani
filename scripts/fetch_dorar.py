@@ -20,8 +20,8 @@ def key_of(title):
     t = re.sub("[أإآ]", "ا", t).replace("ة", "ه").replace("ى", "ي")
     table = {"اسماء السوره": "names", "فضائل السوره وخصائصها": "fadael", "بيان المكي والمدني": "makki",
              "مقاصد السوره": "maqasid", "موضوعات السوره": "mawdoat", "المعني الاجمالي": "ijmali",
-             "غريب الكلمات": "gharib", "مشكل الاعراب": "irab", "تفسير الايات": "tafsir", "تفسير الايه": "tafsir",
-             "الفوائد التربويه": "tarbawi", "الفوائد العلميه واللطائف": "ilmi", "بلاغه الايات": "balagha", "بلاغه الايه": "balagha"}
+             "غريب الكلمات": "gharib", "مشكل الاعراب": "irab", "تفسير الايات": "tafsir", "تفسير الايه": "tafsir", "تفسير الايتين": "tafsir",
+             "الفوائد التربويه": "tarbawi", "الفوائد العلميه واللطائف": "ilmi", "بلاغه الايات": "balagha", "بلاغه الايه": "balagha", "بلاغه الايتين": "balagha"}
     for k, v in table.items():
         if t.startswith(k): return v
     return "other:" + t
@@ -79,7 +79,7 @@ def sections(html):
     og = soup.find("meta", property="og:title")
     rng = None
     if og:
-        m = re.search(r"الآي[ةات]+\s*\((\d+)\s*(?:-\s*(\d+))?\)", og.get("content", ""))
+        m = re.search(r"الآي(?:ة|ات|تان|تين)\s*\((\d+)\s*(?:-\s*(\d+))?\)", DIAC.sub("", og.get("content", "")))
         if m: rng = [int(m.group(1)), int(m.group(2) or m.group(1))]
     nxt = None
     for a in soup.find_all("a"):

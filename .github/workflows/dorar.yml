@@ -52,6 +52,12 @@ jobs:
               no_range = sum(1 for x in g if x["from"] is None)
               keys = sorted({k for x in g for k in x["sections"]})
               flag = "" if g and d["intro"] and not no_tafsir and not no_range else "  <-- تحقق"
+              for x in g:
+                  if x["from"] is None or "tafsir" not in x["sections"]:
+                      import re
+                      f = ".cache/dorar/" + re.sub(r"[^0-9a-z]+", "_", x["url"]) + ".html"
+                      h = open(f, encoding="utf-8").read()
+                      print("   og:", re.findall(r'og:title" content="([^"]*)', h)[:1], "h5:", re.findall(r"<h5[^>]*>(.*?)</h5>", h, re.S)[:12])
               print(f"{s}: intro={sorted(d['intro'])} groups={len(g)} keys={keys} no_tafsir={no_tafsir} no_range={no_range}{flag}")
           PY
 
