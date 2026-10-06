@@ -301,6 +301,15 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 .heard b{font-family:var(--quran);font-weight:400;font-size:1.05rem;color:var(--ink)}
 .toast{border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:.86rem;display:flex;align-items:center;gap:10px}
 .toast.gold{background:var(--gold-soft);color:var(--gold)} .toast.red{background:var(--err-soft);color:var(--err)}
+/* واجهة إنجليزية: نص المصحف يبقى من اليمين، وكل فقرة تأخذ اتجاه لغتها */
+[dir="ltr"] :is(.rd,.page,.fpage,.ayah,.basmala,.banner,.opts:not(:has(.ui)),.compare .side,.ww,.qw,.today .ayah){direction:rtl}
+[dir="ltr"] :is(p,div,h1,h2,h3,h4,li,summary,label,small,b){unicode-bidi:plaintext}
+[dir="ltr"] .rd *{unicode-bidi:normal}
+.langrow{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;align-items:center}
+.langrow svg,.langs svg{width:20px;height:20px;flex:none}
+.langs{display:flex;flex-direction:column;gap:8px}.langs .item{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer}
+.langs .item[aria-pressed="true"]{border-color:var(--green);background:color-mix(in srgb,var(--green) 8%,var(--card))}
+[dir="ltr"] svg.flip{transform:scaleX(-1)}
 .toast.green{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
 .fpage[hidden]{display:none}
 .pw{color:var(--muted);opacity:.55}
@@ -1105,7 +1114,7 @@ const ICON = {
   review: I('<path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/>'),
   user: I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
   tafsir: I('<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M9 9h6M9 13h4"/>'),
-  back: I('<path d="M5 12h14M13 6l6 6-6 6"/>'), next: I('<path d="M15 6l-6 6 6 6"/>'), prev: I('<path d="M9 6l6 6-6 6"/>'), chev: I('<path d="M15 6l-6 6 6 6"/>'),
+  back: I('<path d="M5 12h14M13 6l6 6-6 6"/>', 'class="flip"'), next: I('<path d="M15 6l-6 6 6 6"/>'), prev: I('<path d="M9 6l6 6-6 6"/>'), chev: I('<path d="M15 6l-6 6 6 6"/>', 'class="flip"'),
   stop: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="3"/></svg>',
   play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
   pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
@@ -1126,6 +1135,60 @@ const KEY = "mathani:app:v2";
 let ST = { name: "", pages: {}, mistakes: [], sessions: [], approved: {}, last: 3 };
 try { const r = localStorage.getItem(KEY); if (r) ST = Object.assign(ST, JSON.parse(r)); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} };
+
+/* ---------- اللغات: ترجمة الواجهة فقط؛ نص المصحف والتفسير والمعاني تبقى بالعربية كما هي في مصادرها ---------- */
+const I18N = {"surahEn":{"1":"Al-Fatihah","2":"Al-Baqarah","3":"Al-Imran","4":"An-Nisa","5":"Al-Ma'idah","6":"Al-An'am","7":"Al-A'raf","8":"Al-Anfal","9":"At-Tawbah","10":"Yunus","11":"Hud","12":"Yusuf","13":"Ar-Ra'd","14":"Ibrahim","15":"Al-Hijr","16":"An-Nahl","17":"Al-Isra","18":"Al-Kahf","19":"Maryam","20":"Ta-Ha","21":"Al-Anbiya","22":"Al-Hajj","23":"Al-Mu'minun","24":"An-Nur","25":"Al-Furqan","26":"Ash-Shu'ara","27":"An-Naml","28":"Al-Qasas","29":"Al-Ankabut","30":"Ar-Rum","31":"Luqman","32":"As-Sajdah","33":"Al-Ahzab","34":"Saba","35":"Fatir","36":"Ya-Sin","37":"As-Saffat","38":"Sad","39":"Az-Zumar","40":"Ghafir","41":"Fussilat","42":"Ash-Shura","43":"Az-Zukhruf","44":"Ad-Dukhan","45":"Al-Jathiyah","46":"Al-Ahqaf","47":"Muhammad","48":"Al-Fath","49":"Al-Hujurat","50":"Qaf","51":"Adh-Dhariyat","52":"At-Tur","53":"An-Najm","54":"Al-Qamar","55":"Ar-Rahman","56":"Al-Waqi'ah","57":"Al-Hadid","58":"Al-Mujadilah","59":"Al-Hashr","60":"Al-Mumtahanah","61":"As-Saff","62":"Al-Jumu'ah","63":"Al-Munafiqun","64":"At-Taghabun","65":"At-Talaq","66":"At-Tahrim","67":"Al-Mulk","68":"Al-Qalam","69":"Al-Haqqah","70":"Al-Ma'arij","71":"Nuh","72":"Al-Jinn","73":"Al-Muzzammil","74":"Al-Muddaththir","75":"Al-Qiyamah","76":"Al-Insan","77":"Al-Mursalat","78":"An-Naba","79":"An-Nazi'at","80":"Abasa","81":"At-Takwir","82":"Al-Infitar","83":"Al-Mutaffifin","84":"Al-Inshiqaq","85":"Al-Buruj","86":"At-Tariq","87":"Al-A'la","88":"Al-Ghashiyah","89":"Al-Fajr","90":"Al-Balad","91":"Ash-Shams","92":"Al-Layl","93":"Ad-Duha","94":"Ash-Sharh","95":"At-Tin","96":"Al-Alaq","97":"Al-Qadr","98":"Al-Bayyinah","99":"Az-Zalzalah","100":"Al-Adiyat","101":"Al-Qari'ah","102":"At-Takathur","103":"Al-Asr","104":"Al-Humazah","105":"Al-Fil","106":"Quraysh","107":"Al-Ma'un","108":"Al-Kawthar","109":"Al-Kafirun","110":"An-Nasr","111":"Al-Masad","112":"Al-Ikhlas","113":"Al-Falaq","114":"An-Nas"},"en":{},"ur":{}};
+const LANGS = [["ar", "العربية", "Arabic"], ["en", "English", "English"], ["ur", "اردو", "Urdu"]];
+const LG = ST.lang && I18N[ST.lang] ? ST.lang : "ar";
+const TR = (() => {
+  const AL = "ء-ي", names = Object.values(DATA.surahs).sort((a, b) => b.length - a.length);
+  const sIdx = Object.fromEntries(Object.entries(DATA.surahs).map(([n, v]) => [v, +n]));
+  const re = new RegExp(`[0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?|(?<![${AL}])(و?)(${names.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?![${AL}])`, "g");
+  const dict = I18N[LG] || {}, miss = new Set(), done = new WeakMap();
+  const DIG = { en: "0123456789", ur: "۰۱۲۳۴۵۶۷۸۹" }[LG];
+  const num = m => DIG ? m.replace(/[٠-٩]/g, d => DIG["٠١٢٣٤٥٦٧٨٩".indexOf(d)]).replace(/[0-9]/g, d => DIG[d]).replace("٫", ".") : m;
+  const sur = n => LG === "en" ? I18N.surahEn[n] : DATA.surahs[n];
+  function t(str) {
+    if (LG === "ar" || !str || !/[ء-ي]/.test(str) || str.length > 220) return str;
+    if ((str.match(/[\u064B-\u0652\u0640]/g) || []).length > 3) return str; // نص قرآني مشكول
+    const m = str.match(/^(\s*)([\s\S]*?)(\s*)$/), core = m[2], args = [];
+    let i = 0;
+    const key = core.replace(re, (x, w, nm) => { if (nm) { args.push(sur(sIdx[nm])); return (w || "") + `{${i++}}`; } args.push(num(x)); return `{${i++}}`; });
+    const out = dict[key];
+    if (out == null) { if (!/[ً-ْ]{2}/.test(core)) miss.add(key); return str; }
+    return m[1] + out.replace(/\{(\d+)\}/g, (_, j) => args[j] ?? "") + m[3];
+  }
+  const SKIP = "script,style,textarea,.page-in2,.basmala,.ayah,.a,.fw,.pw,.end,.ww,.qw,.opt:not(.ui),[data-noi18n]";
+  const ATTRS = ["placeholder", "aria-label", "title", "data-p"];
+  function attrs(el) { for (const a of ATTRS) if (el.hasAttribute(a)) { const v = el.getAttribute(a), o = t(v); if (o !== v) el.setAttribute(a, o); } }
+  function walk(root) {
+    if (root.nodeType === 3) { if (!(root.parentElement && root.parentElement.closest(SKIP))) node(root); return; }
+    if (root.nodeType !== 1 || root.closest(SKIP)) return;
+    attrs(root); root.querySelectorAll("[placeholder],[aria-label],[title],[data-p]").forEach(attrs);
+    const it = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement && n.parentElement.closest(SKIP) ? 2 : 1 });
+    const list = []; while (it.nextNode()) list.push(it.currentNode); list.forEach(node);
+  }
+  function node(n) { if (done.get(n) === n.data) return; const o = t(n.data); if (o !== n.data) n.data = o; done.set(n, n.data); }
+  function start() {
+    document.documentElement.lang = LG; document.documentElement.dir = LG === "en" ? "ltr" : "rtl";
+    if (LG === "ar") return;
+    document.title = t(document.title);
+    walk(document.body);
+    new MutationObserver(ms => { for (const m of ms) {
+      if (m.type === "characterData") { if (!(m.target.parentElement && m.target.parentElement.closest(SKIP))) node(m.target); }
+      else if (m.type === "attributes") attrs(m.target);
+      else m.addedNodes.forEach(walk);
+    } }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  }
+  return { t, start, miss };
+})();
+const tr = TR.t;
+function langSheet() {
+  openSheet(`<h3>${tr("اللغة")} <small class="muted" style="font-weight:400" data-noi18n>Language</small></h3>
+    <div class="langs">${LANGS.map(([c, n, e]) => `<button class="item" data-lang="${c}" aria-pressed="${LG === c}" data-noi18n><span class="grow"><b>${n}</b>${c !== "ar" ? `<div class="tiny muted">${e}</div>` : ""}</span>${LG === c ? ICON.check : ""}</button>`).join("")}</div>
+    <p class="tiny muted" style="margin:12px 0 0">${tr("نص المصحف والتفسير يبقيان بالعربية كما في مصادرهما.")}</p>`);
+  document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => { ST.lang = b.dataset.lang; save(); location.reload(); });
+}
 function record(page, errors, detail, acc, kind) {
   ST.pages[page] = M.schedule(ST.pages[page], errors, Date.now());
   (detail || []).forEach(d => ST.mistakes.push({ ...d, page, at: Date.now() }));
@@ -1211,7 +1274,7 @@ function home() {
   const due = Object.entries(ST.pages).filter(([, r]) => r.due <= now).sort((a, b) => b[1].errors - a[1].errors);
   const last = ST.last || 3, jz = juzOf(last), jp = juzPages(jz);
   const mastered = jp.filter(p => ST.pages[p] && ST.pages[p].errors === 0).length;
-  let hijri = ""; try { hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", { day: "numeric", month: "long" }).format(new Date()); } catch (e) {}
+  let hijri = ""; try { hijri = new Intl.DateTimeFormat({ ar: "ar-SA", en: "en", ur: "ur" }[LG] + "-u-ca-islamic", { day: "numeric", month: "long" }).format(new Date()); } catch (e) {}
   const hr = new Date().getHours(), greet = hr < 12 ? "صباح الخير" : "مساء الخير";
   // آية اليوم: من الآيات التي لها متشابه، تتغير يومياً
   const pool = Object.keys(DATA.mutashabihat), vk = pool[Math.floor(now / 864e5) % pool.length], vv = V(vk);
@@ -2395,6 +2458,7 @@ function review() {
 /* ---------- حسابي ---------- */
 async function profile() {
   $("#view").innerHTML = bar("حسابي") + `
+    <button class="card row langrow" id="langBtn"><span class="grow"><b>اللغة</b> <span class="tiny muted" data-noi18n>Language</span><div class="small muted" data-noi18n>${LANGS.find(x => x[0] === LG)[1]}</div></span>${ICON.chev}</button>
     <div class="card"><label class="tiny muted" for="name">اسمك</label><input type="text" id="name" placeholder="يظهر في الرئيسية" value="${esc(ST.name)}" style="margin-top:6px"></div>
     <div class="sec"><h2>تسجيلاتي</h2></div><div id="recs"><div class="info">جارٍ التحميل…</div></div>
     <div class="sec"><h2>مراجعة المحتوى</h2><span class="badge draft">للمتخصص الشرعي</span></div>
@@ -2405,11 +2469,12 @@ async function profile() {
     <div class="card small">${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></div>
     <div class="sec"><h2>بياناتي</h2></div>
     <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
+  $("#langBtn").onclick = langSheet;
   $("#name").onchange = e => { ST.name = e.target.value.trim(); save(); };
   $("#openReview").onclick = reviewSheet;
   document.querySelectorAll("[data-diag]").forEach(b => b.onclick = diagSheet);
   const recs = (await DB.all()).sort((a, b) => b.at - a.at);
-  $("#reset").onclick = async () => { if (!confirm("سيُحذف سجل أخطائك ومراجعاتك وتسجيلاتك من هذا الجهاز.")) return;
+  $("#reset").onclick = async () => { if (!confirm(tr("سيُحذف سجل أخطائك ومراجعاتك وتسجيلاتك من هذا الجهاز."))) return;
     for (const r of recs) await DB.del(r.id); ST = { name: ST.name, pages: {}, mistakes: [], sessions: [], approved: ST.approved, last: 3 }; save(); profile(); };
   const box = $("#recs");
   box.innerHTML = recs.length ? "" : `<div class="info">لا تسجيلات بعد. من «سمّع» اختر «تسجيل صوتي».</div>`;
@@ -2497,13 +2562,13 @@ const LIVE = (() => {
     end(false); openSheet(`<h3>الحلقة المباشرة</h3><div class="alert">${msg}</div>`);
   }
   function shareSheet() {
-    const u = link(), txt = `انضم إلى حلقتي في مثاني: ${u}`;
+    const u = link(), txt = `${tr("انضم إلى حلقتي في مثاني:")} ${u}`;
     openSheet(`<h3>شارك رابط الحلقة</h3><p class="small muted" style="margin-top:0">من يفتح الرابط يدخل الحلقة مباشرة، ويرى الوجه الذي تفتحه.</p>
       <input type="text" id="lvLink" readonly value="${esc(u)}" dir="ltr">
       <div class="two"><button class="btn primary" id="lvCopy">نسخ الرابط</button><a class="btn" id="lvWa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">واتساب</a></div>
       ${navigator.share ? `<button class="btn block" id="lvNative" style="margin-top:10px">${ICON.share}مشاركة</button>` : ""}`);
     $("#lvCopy").onclick = async () => { try { await navigator.clipboard.writeText(u); } catch (e) { $("#lvLink").select(); document.execCommand("copy"); } $("#lvCopy").textContent = "نُسخ ✓"; };
-    if (navigator.share) $("#lvNative").onclick = () => navigator.share({ title: "حلقة مثاني", text: txt, url: u }).catch(() => {});
+    if (navigator.share) $("#lvNative").onclick = () => navigator.share({ title: tr("حلقة مثاني"), text: txt, url: u }).catch(() => {});
   }
   async function start() {
     if (L.peer) return shareSheet();
@@ -2547,7 +2612,7 @@ const LIVE = (() => {
   return { start, join, end, page, boot, state: L };
 })();
 
-render();
+TR.start(); render();
 LIVE.boot();
 </script>
 </body>
