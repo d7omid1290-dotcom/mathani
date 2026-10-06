@@ -305,6 +305,35 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 [dir="ltr"] :is(.rd,.page,.fpage,.ayah,.basmala,.banner,.opts:not(:has(.ui)),.compare .side,.ww,.qw,.today .ayah){direction:rtl}
 [dir="ltr"] :is(p,div,h1,h2,h3,h4,li,summary,label,small,b){unicode-bidi:plaintext}
 [dir="ltr"] .rd *{unicode-bidi:normal}
+
+/* الورد اليومي والبستان */
+.wcard{display:flex;gap:12px;align-items:center;width:100%;background:var(--surface);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(20,51,94,.06);border:0;text-align:start;font:inherit;color:inherit}
+.wcard.col{flex-direction:column;align-items:stretch}.wcard.setup{cursor:pointer;background:linear-gradient(135deg,color-mix(in srgb,var(--green) 10%,var(--surface)),var(--surface))}
+.wbtn{background:var(--green);color:#fff;border-radius:999px;padding:8px 16px;font-weight:700;font-size:.9rem;flex:none}
+.wrow{display:flex;gap:10px;align-items:center;padding:6px 0}.wrow+.wrow{border-top:1px dashed var(--line)}
+.we{font-size:1.4rem;width:34px;text-align:center;flex:none}
+.wz h3{margin:0 0 6px}.wopts{display:grid;gap:8px;margin-top:10px}.wopts.g3{grid-template-columns:1fr 1fr 1fr}.wopts.g5{grid-template-columns:repeat(5,1fr)}
+.wopt{display:flex;flex-direction:column;gap:2px;align-items:flex-start;text-align:start;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font:inherit;color:inherit;cursor:pointer}
+.wopts.g3 .wopt,.wopts.g5 .wopt{align-items:center;text-align:center;padding:12px 4px}
+.wopt small{color:var(--muted);font-size:.78rem}.wopt[aria-pressed="true"]{border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,var(--surface))}
+.wopt.cust{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}.wopt.cust input{width:70px;padding:6px;border-radius:10px;border:1px solid var(--line);text-align:center;font:inherit}
+.wdays{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.wdays button{flex:1 0 22%;padding:8px 4px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font:inherit;font-size:.82rem;color:inherit;cursor:pointer}
+.wdays button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.wsel{width:100%;margin-top:12px;padding:12px;border-radius:12px;border:1px solid var(--line);font:inherit;background:var(--surface);color:inherit}
+.wday{padding:10px 0;border-top:1px dashed var(--line)}.wday:first-of-type{border-top:0}.wday .small{margin-top:3px}
+.wtask{margin-bottom:12px}.wtask.done{opacity:.85;background:color-mix(in srgb,var(--ok) 8%,var(--surface))}
+.wbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.wbtns .btn{flex:1 1 auto;padding:10px 12px;font-size:.85rem;white-space:nowrap}.wbtns .btn svg{width:18px;height:18px}
+.wdone{display:flex;gap:6px;align-items:center;margin-top:10px;color:var(--ok);font-weight:700}.wdone svg{width:20px;height:20px}
+.wmiss{border:1.5px solid var(--gold-2);background:var(--gold-soft)}.wtip{display:flex;gap:10px;align-items:flex-start}.wtip>span{font-size:1.2rem}
+.wfin{text-align:center;margin-top:14px;font-weight:700;font-size:1.05rem}.wfin .link{margin-top:8px}
+.pstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 12px}
+.pst{background:var(--surface);border-radius:18px;padding:14px 6px;text-align:center;box-shadow:0 10px 30px rgba(20,51,94,.06)}.pst b{display:block;font-size:1.4rem;color:var(--green)}.pst span{font-size:.75rem;color:var(--muted)}
+.garden{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#CFEAF7 0,#EAF6FB 38%,var(--g1) 38%,var(--g2) 100%);min-height:220px}
+.gsky{position:absolute;top:10px;inset-inline-end:16px;font-size:1.8rem}
+.gland{position:absolute;inset:40% 0 0 0;padding:14px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:4px;font-size:1.7rem;line-height:1.2}
+.gland .tiny{font-size:.8rem;background:rgba(255,255,255,.7);padding:6px 10px;border-radius:10px}
+.garden.sm{min-height:0;padding:12px 14px;font-size:1.5rem;letter-spacing:2px;background:linear-gradient(180deg,var(--g1),var(--g2));text-align:center}
+.glist{display:flex;gap:10px;align-items:center;padding:6px 0}.glist span{font-size:1.3rem;width:28px;text-align:center}
 .langrow{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;align-items:center}
 .langrow svg,.langs svg{width:20px;height:20px;flex:none}
 .langs{display:flex;flex-direction:column;gap:8px}.langs .item{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer}
@@ -882,7 +911,7 @@ const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
 function go(tab) { document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
 function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); if (S.rview === "mushaf") LIVE.page(+p); }
 function openTasmee(p) {
-  stopRec(true); resetT(); S.T.page = +p; S.T.surah = null; S.T.from = null; S.T.to = null; S.tab = "tasmee"; S.reader = null; render(); scrollTo(0, 0);
+  stopRec(true); resetT(); S.T.noLoc = false; S.T.page = +p; S.T.surah = null; S.T.from = null; S.T.to = null; S.tab = "tasmee"; S.reader = null; render(); scrollTo(0, 0);
 }
 function resetT() { F = null; if (S.T.url) { /* يبقى الرابط صالحاً للتسجيلات المحفوظة */ } Object.assign(S.T, { phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, recId: null }); }
 
@@ -894,7 +923,7 @@ function render() {
       ? `<button class="fab" data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}><span class="c">${ICON[ic]}</span>${t}</button>`
       : `<button data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}>${ICON[ic]}${t}</button>`).join("");
   if (S.reader) return reader();
-  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab })[S.tab]();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden })[S.tab]();
 }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.tab); });
 function bar(title, sub, back, action) {
@@ -959,6 +988,7 @@ function home() {
         <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
       <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div>${mastered ? `<b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small>` : `<b style="font-size:1.1rem">ابدأ</b><small>${AR(jp.length)} وجهاً في الجزء</small>`}</div></div>
     </div></section>
+    ${wirdHome()}
     <div class="sec2"><h2>ابدأ من هنا</h2></div>
     <div class="hs">${qcs.map(([t, sub, ic, bg], i) => `<button class="qc" data-q="${i}"><span class="ic" style="background:${bg}">${ic}</span><b>${t}</b><span class="t">${sub}</span></button>`).join("")}</div>
     <div class="sec2"><h2>آية اليوم</h2><button data-read="${vv.p}">افتح الوجه</button></div>
@@ -972,6 +1002,7 @@ function home() {
       : `<div class="mini" style="color:var(--muted)">لا مراجعة مستحقة الآن. سمّع وجهاً وسيُبنى وردك من أخطائك.</div>`}`;
   document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][4]());
   if ($("#allRev")) $("#allRev").onclick = () => go("review");
+  bindWirdHome();
   bindAll();
 }
 function pageItem(p, sub, tas = true) {
@@ -1767,7 +1798,7 @@ function buildFollow(startWi) {
   }
   html += open ? "</div>" : "";
   return { keys, E, disp, owner, html, forced: new Set(), prev: [], finals: [], session: [], interim: "", typed: "", done: false, last: null,
-    hOff: 0, locating: ST.autoLoc !== false, preText };
+    hOff: 0, locating: ST.autoLoc !== false && !S.T.noLoc, preText };
 }
 /* التسميع من أي موضع: يُعرف موضع القراءة في المصحف كله ثم يُنتقل إليه */
 let LOCIDX = null;
@@ -1957,6 +1988,7 @@ async function evaluate(text, slips) {
     r.status = "transition"; r.transition = { k: slips[r.k] }; r.errors = Math.max(1, r.errors); }
   const done = res.results.filter(r => r.status !== "notReached");
   record(T.page, done.reduce((s, r) => s + r.errors, 0), done.filter(r => r.status !== "ok").map(r => ({ k: r.k, type: r.status, to: r.transition && r.transition.k })), res.accuracy);
+  WD.fromTasmee(T.page, res.results, res.accuracy);
   if (T.recId && T.blob) await DB.put({ id: T.recId, page: T.page, from: keys[0], to: keys.at(-1), at: +T.recId, acc: res.accuracy, blob: T.blob, dur: T.dur, text });
   T.result = { keys, res, text }; T.phase = "result"; tasmee(); scrollTo(0, 0);
 }
@@ -2279,7 +2311,309 @@ const LIVE = (() => {
   return { start, join, end, page, boot, state: L };
 })();
 
-TR.start(); render();
+
+const FM = (s, ...a) => s.replace(/\{(\d+)\}/g, (_, i) => AR(a[i]));
+/* ---------- الورد اليومي: خطة حفظ وتلاوة ومراجعة تُبنى تلقائياً، وبستان ينمو مع الإنجاز ---------- */
+const WD = (() => {
+  const DAYN = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  const dk = d => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`; };
+  const today = () => dk(Date.now());
+  const addDays = (k, n) => { const d = new Date(k + "T12:00:00"); d.setDate(d.getDate() + n); return dk(d); };
+  const wday = k => new Date(k + "T12:00:00").getDay();
+  const W = () => ST.wird;
+  const isDay = k => W().days.includes(wday(k));
+  const hasH = () => W().type !== "tilawa", hasT = () => W().type !== "hifz";
+  // أسطر المصحف (أسطر النص فقط) بالترتيب: كل سطر = [وجه، رقم السطر، مقاطع الآيات]
+  let LINES = null, LINE_OF = null;
+  function lines() {
+    if (LINES) return LINES;
+    LINES = []; LINE_OF = {};
+    for (const p of PAGES) LAYOUT.pages[p].forEach(l => { if (l[0] !== "t") return; const i = LINES.length; LINES.push({ p, segs: l[1] });
+      for (const sg of l[1]) if (sg[1] === 0 && LINE_OF[sg[0]] == null) LINE_OF[sg[0]] = i; });
+    return LINES;
+  }
+  const nextKey = k => { const i = ALLK.indexOf(k); return ALLK[(i + 1) % ALLK.length]; };
+  // مقدار الحفظ: n سطراً من الآية k، ويُكمَل إلى نهاية آخر آية
+  function hifzRange(k, n) {
+    const L = lines(); let i = LINE_OF[k] ?? 0, keys = [];
+    const end = Math.min(L.length, i + Math.max(1, Math.round(n)));
+    for (; i < end; i++) for (const sg of L[i].segs) if (!keys.includes(sg[0]) && ALLK.indexOf(sg[0]) >= ALLK.indexOf(k)) keys.push(sg[0]);
+    if (!keys.length) keys = [k];
+    return keys;
+  }
+  const rangeTxt = keys => { const a = V(keys[0]), b = V(keys.at(-1));
+    return a.s === b.s ? `سورة ${DATA.surahs[a.s]}، ${a.a === b.a ? `الآية ${AR(a.a)}` : `الآيات ${AR(a.a)}–${AR(b.a)}`}` : `${ref(keys[0])} إلى ${ref(keys.at(-1))}`; };
+  const pagesTxt = (p, n) => n === 1 ? `الوجه ${AR(p)}` : `الأوجه ${AR(p)}–${AR(Math.min(604, p + n - 1))}`;
+  const factor = k => { const c = W().catchup; return c && c.left > 0 && isDay(k) ? 1.5 : 1; };
+  // المراجعة: الأوجه المحفوظة، وما يكثر فيه الخطأ أولاً
+  function reviewPages(n, exclude) {
+    const mem = (W().mem || []).filter(p => !exclude.includes(p));
+    const pool = mem.length ? mem : Object.keys(ST.pages).map(Number).filter(p => !exclude.includes(p));
+    if (!pool.length || n <= 0) return { pages: [], weak: [] };
+    const weak = pool.filter(p => ST.pages[p] && ST.pages[p].errors >= 2).sort((a, b) => ST.pages[b].errors - ST.pages[a].errors);
+    const out = weak.slice(0, Math.max(1, Math.ceil(n / 2)));
+    const rest = pool.filter(p => !out.includes(p)).sort((a, b) => a - b);
+    let r = (W().rPos || 0) % Math.max(1, rest.length);
+    while (out.length < Math.min(n, pool.length) && rest.length) { out.push(rest[r % rest.length]); r++; }
+    return { pages: out, weak: out.filter(p => weak.includes(p)) };
+  }
+  function makePlan(k, from) {
+    const w = W(), f = factor(k), plan = {};
+    const hk = from ? from.hKey : w.hKey, tp = from ? from.tPos : w.tPos;
+    if (hasH()) {
+      plan.h = hifzRange(hk, w.hLines * f);
+      const hp = [...new Set(plan.h.map(x => V(x).p))];
+      if (w.rPages) { const r = reviewPages(w.rPages, hp); if (r.pages.length) { plan.r = r.pages; plan.weak = r.weak; } }
+    }
+    if (hasT()) { const n = Math.max(1, Math.round(w.tPages * f)); plan.t = [tp, n]; }
+    return plan;
+  }
+  // سجل اليوم: الخطة ثابتة طوال اليوم، والإنجاز يُسجَّل عليها
+  function day(k) {
+    const w = W(); w.log = w.log || {};
+    if (!w.log[k] && k === today() && isDay(k)) { w.log[k] = { plan: makePlan(k), done: {}, ok: [] }; save(); }
+    return w.log[k];
+  }
+  const tasks = d => ["h", "r", "t"].filter(x => d && d.plan[x]);
+  const pct = d => { const t = tasks(d); return t.length ? t.filter(x => d.done[x]).length / t.length : 0; };
+  const complete = d => d && tasks(d).length && tasks(d).every(x => d.done[x]);
+  function markDone(x, silent) {
+    const k = today(), d = day(k), w = W(); if (!d || !d.plan[x] || d.done[x]) return;
+    d.done[x] = Date.now();
+    if (x === "h") { const ks = d.plan.h; w.hKey = nextKey(ks.at(-1)); w.mem = [...new Set([...(w.mem || []), ...ks.map(q => V(q).p)])]; w.hAyat = (w.hAyat || 0) + ks.length; }
+    if (x === "t") { const [p, n] = d.plan.t; w.tPos = p + n > 604 ? 1 : p + n; w.tTotal = (w.tTotal || 0) + n; if (p + n > 604) w.khatmat = (w.khatmat || 0) + 1; }
+    if (x === "r") w.rPos = (w.rPos || 0) + d.plan.r.length;
+    if (complete(d) && !d.counted) { d.counted = true; if (w.catchup && w.catchup.left > 0) w.catchup.left--; }
+    save();
+    if (!silent && complete(d)) setTimeout(() => openSheet(`<div class="empty" style="padding:8px 0">${garden1(true)}<h3 style="margin:10px 0 4px">${"أحسنت! أتممت وردك اليومي بنجاح 🌱"}</h3><p class="small muted" style="margin:0">${"أضفت نبتة جديدة إلى بستانك."}</p></div>
+      <button class="btn primary block" style="margin-top:14px" id="toGarden">${"افتح البستان"}</button>`), 300);
+    setTimeout(() => { const b = $("#toGarden"); if (b) b.onclick = () => { closeSheet(); go("garden"); }; }, 400);
+  }
+  // من التسميع: آيات الحفظ التي سُمّعت صحيحة، ووجه المراجعة إذا كانت الدقة عالية
+  function fromTasmee(page, results, acc) {
+    if (!W() || !W().setup) return;
+    const d = day(today()); if (!d) return;
+    results.filter(r => r.status === "ok").forEach(r => { if (!d.ok.includes(r.k)) d.ok.push(r.k); });
+    if (d.plan.h && !d.done.h && d.plan.h.every(k => d.ok.includes(k))) markDone("h", true);
+    if (d.plan.r && !d.done.r && acc >= 0.85) { d.rOk = [...new Set([...(d.rOk || []), page])]; if (d.plan.r.every(p => d.rOk.includes(p))) markDone("r", true); }
+    save();
+  }
+  // الأيام الفائتة منذ آخر يوم مكتمل
+  function missed() {
+    const w = W(), t = today(); let n = 0;
+    for (let k = addDays(t, -1), i = 0; i < 60; k = addDays(k, -1), i++) {
+      if (k < (w.start || t)) break;
+      if (!isDay(k)) continue;
+      if (complete(w.log[k])) break; n++;
+    }
+    return n;
+  }
+  function streaks() {
+    const w = W(), t = today(); let cur = 0, best = 0, run = 0, total = 0;
+    const ks = []; for (let k = w.start || t, i = 0; k <= t && i < 4000; k = addDays(k, 1), i++) ks.push(k);
+    for (const k of ks) { if (!isDay(k)) continue; if (complete(w.log[k])) { run++; total++; best = Math.max(best, run); } else if (k !== t) run = 0; }
+    cur = run; return { cur, best, total };
+  }
+  // اقتراحات تتكيّف مع أداء الحافظ (قواعد على سجله، بلا توليد محتوى)
+  function tips() {
+    const w = W(), out = [], d = day(today()), t = today();
+    if (d && d.plan.weak && d.plan.weak.length) out.push({ id: "weak", txt: `<span>لاحظنا أنك تتعثر في</span> <span>${FM("الوجه {0}", d.plan.weak[0])}</span> <span>أكثر من مرة، لذلك أضفناه إلى مراجعة اليوم.</span>` });
+    const past = []; for (let k = addDays(t, -1), i = 0; past.length < 7 && i < 21; k = addDays(k, -1), i++) if (k >= (w.start || t) && isDay(k)) past.push(k);
+    if (hasH() && past.length >= 4 && w.hLines > 3) { const hd = past.filter(k => w.log[k] && w.log[k].done.h).length;
+      if (hd / past.length < 0.5 && w.tipLess !== t) out.push({ id: "less", txt: "يبدو أن مقدار الحفظ الحالي أعلى من معدل إنجازك، هل تريد تخفيضه مؤقتًا؟", act: "خفّض المقدار" }); }
+    const s = streaks();
+    if (hasH() && s.cur >= 7 && s.cur % 7 === 0 && w.tipMore !== t) out.push({ id: "more", txt: FM("ممتاز، حافظت على وردك لمدة {0} أيام. هل ترغب في زيادة مقدار الحفظ؟", s.cur), act: "زِد المقدار" });
+    return out;
+  }
+  // البستان: كل يوم مكتمل نبتة، وتكبر مع الاستمرار
+  function plants() {
+    const w = W(), out = []; let run = 0;
+    if (!w || !w.log) return out;
+    for (const k of Object.keys(w.log).sort()) { const d = w.log[k]; if (!complete(d)) { run = 0; continue; } run++;
+      const both = d.plan.t && (d.plan.h || d.plan.r);
+      out.push({ k, e: run >= 7 ? "🌳" : run >= 5 ? "🌷" : run >= 3 || both ? "🌿" : "🌱", week: run % 7 === 0 }); }
+    return out;
+  }
+  const STAGES = [["أرض جديدة", "#E9E1C9", "#D8CBA3"], ["روضة صغيرة", "#DCEBC4", "#BBD79A"], ["بستان مزهر", "#CFE8C0", "#9FD08A"], ["جنة خضراء", "#BFE3B5", "#7CC27A"]];
+  function garden1(small) {
+    const ps = plants(), stage = Math.min(3, Math.floor(ps.length / 30)), st = STAGES[stage];
+    const items = ps.map(x => x.e + (x.week ? "🦋" : "")).join("");
+    if (small) return `<div class="garden sm" style="--g1:${st[1]};--g2:${st[2]}">${(items || "🌱").slice(-24)}</div>`;
+    return `<div class="garden" style="--g1:${st[1]};--g2:${st[2]}"><div class="gsky">☀️</div><div class="gland">${items || `<span class="tiny muted">${"أتمّ وردك الأول لتنبت أول نبتة."}</span>`}</div></div>
+      <div class="row" style="margin-top:10px"><span class="chip">${st[0]}</span><span class="tiny muted grow"><span>${FM("{0} نبتة", ps.length)}</span>${stage < 3 ? `، <span>${FM("المرحلة التالية بعد {0} يوماً من الإنجاز", 30 * (stage + 1) - ps.length)}</span>` : ""}</span></div>`;
+  }
+  return { DAYN, dk, today, addDays, wday, isDay, hasH, hasT, day, tasks, pct, complete, markDone, fromTasmee, missed, streaks, tips, plants, garden1, makePlan, hifzRange, rangeTxt, pagesTxt, nextKey, STAGES };
+})();
+
+const TASKN = { h: ["حفظ اليوم", "📖"], r: ["مراجعة المحفوظ", "🔄"], t: ["تلاوة اليوم", "📚"] };
+function taskTxt(d, x) {
+  const p = d.plan;
+  if (x === "h") return WD.rangeTxt(p.h);
+  if (x === "r") return p.r.map(q => `<span>${FM("الوجه {0}", q)}</span>`).join("، ");
+  if (x === "t") return WD.pagesTxt(p.t[0], p.t[1]);
+}
+const bar2 = v => `<div class="prog"><i style="width:${Math.round(v * 100)}%"></i></div>`;
+
+/* بطاقة الورد في الرئيسية */
+function wirdHome() {
+  const w = ST.wird;
+  if (!w || !w.setup) return `<div class="sec2"><h2>وردك اليومي 🌱</h2></div>
+    <button class="wcard setup" id="wirdGo"><span class="grow"><b>حدّد وردك اليومي</b><div class="small muted">اختر مقدار الحفظ أو التلاوة، ويبني مثاني جدولك ويتابع تقدّمك.</div></span><span class="wbtn">ابدأ</span></button>`;
+  const k = WD.today(), d = WD.day(k);
+  if (!d) return `<div class="sec2"><h2>وردك اليومي 🌱</h2><button id="wirdGo">الورد</button></div>
+    <div class="wcard"><div class="grow"><b>اليوم يوم راحة</b><div class="small muted">ليس من أيام وردك. يمكنك المراجعة أو التلاوة متى شئت.</div></div></div>`;
+  return `<div class="sec2"><h2>وردك اليومي 🌱</h2><button id="wirdGo2">التفاصيل</button></div>
+    <div class="wcard col">${WD.tasks(d).map(x => `<div class="wrow"><span class="we">${TASKN[x][1]}</span><span class="grow"><b>${TASKN[x][0]}</b><div class="tiny muted">${taskTxt(d, x)}</div></span>${d.done[x] ? `<span class="chip">${ICON.check.replace("<svg", '<svg width="14" height="14"')}تم</span>` : ""}</div>`).join("")}
+      <div class="row" style="margin-top:6px"><span class="tiny muted">إنجاز اليوم</span><span class="grow">${bar2(WD.pct(d))}</span><b class="small">${AR(Math.round(WD.pct(d) * 100))}٪</b></div>
+      <button class="btn primary block" id="wirdGo" style="margin-top:12px">${WD.complete(d) ? "اكتمل وردك اليوم 🌱" : "ابدأ الورد"}</button></div>`;
+}
+function bindWirdHome() { ["#wirdGo", "#wirdGo2"].forEach(s => { const b = $(s); if (b) b.onclick = () => go(ST.wird && ST.wird.setup ? "wird" : "wirdSetup"); }); }
+
+/* الإعداد خطوة خطوة */
+const WZ = { step: 0, d: null };
+function wirdSetup() {
+  if (!WZ.d) WZ.d = Object.assign({ type: "both", days: [0, 1, 2, 3, 4, 6], nd: 6, hLines: 8, rPages: 2, tPages: 2, from: "start", fs: 1, fj: 1, fp: 1 }, ST.wird && ST.wird.setup ? JSON.parse(JSON.stringify(ST.wird)) : {});
+  const z = WZ.d, steps = ["type", "days", ...(z.type !== "tilawa" ? ["hifz"] : []), ...(z.type !== "hifz" ? ["tilawa"] : []), "from", "preview"];
+  WZ.step = Math.min(WZ.step, steps.length - 1);
+  const s = steps[WZ.step];
+  const opt = (name, val, label, sub) => `<button class="wopt" data-k="${name}" data-v="${val}" aria-pressed="${String(z[name]) === String(val)}"><b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</button>`;
+  let body = "";
+  if (s === "type") body = `<h3>نوع الورد</h3><p class="small muted">يمكنك الجمع بين الحفظ والتلاوة.</p><div class="wopts">${opt("type", "hifz", "حفظ", "حفظ جديد مع مراجعة المحفوظ")}${opt("type", "tilawa", "تلاوة", "قراءة يومية من المصحف")}${opt("type", "both", "حفظ + تلاوة", "الاثنان معاً")}</div>`;
+  if (s === "days") body = `<h3>أيام الورد</h3><p class="small muted">كم يوماً في الأسبوع تلتزم فيه؟ ويمكنك اختيار الأيام بنفسك.</p>
+    <div class="wopts g5">${[7, 6, 5, 4, 3].map(n => opt("nd", n, `${AR(n)} أيام`)).join("")}</div>
+    <div class="wdays">${WD.DAYN.map((n, i) => `<button data-day="${i}" aria-pressed="${z.days.includes(i)}">${n}</button>`).join("")}</div>`;
+  if (s === "hifz") body = `<h3>مقدار الحفظ اليومي</h3><div class="wopts g3">${[[3, "٣ أسطر"], [5, "٥ أسطر"], [7, "٧ أسطر"], [8, "نصف صفحة"], [15, "صفحة"]].map(([v, l]) => opt("hLines", v, l)).join("")}
+    <label class="wopt cust"><b>مقدار مخصص</b><span><input type="number" min="1" max="60" id="hCust" value="${[3, 5, 7, 8, 15].includes(+z.hLines) ? "" : z.hLines}"> سطراً</span></label></div>
+    <h3 style="margin-top:18px">المراجعة اليومية</h3><p class="small muted">مراجعة تراكمية للمحفوظ، ويُقدَّم فيها ما يكثر فيه خطؤك.</p>
+    <div class="wopts g5">${[[0, "بلا"], [1, "وجه"], [2, "وجهان"], [3, "٣ أوجه"], [5, "٥ أوجه"]].map(([v, l]) => opt("rPages", v, l)).join("")}</div>`;
+  if (s === "tilawa") body = `<h3>مقدار التلاوة اليومية</h3><div class="wopts g3">${[[1, "صفحة"], [2, "صفحتان"], [3, "٣ صفحات"], [5, "٥ صفحات"], [20, "جزء"]].map(([v, l]) => opt("tPages", v, l)).join("")}
+    <label class="wopt cust"><b>مقدار مخصص</b><span><input type="number" min="1" max="100" id="tCust" value="${[1, 2, 3, 5, 20].includes(+z.tPages) ? "" : z.tPages}"> صفحة</span></label></div>`;
+  if (s === "from") body = `<h3>من أين تبدأ؟</h3><div class="wopts">${opt("from", "start", "من أول المصحف")}${opt("from", "surah", "من سورة معينة")}${opt("from", "juz", "من جزء معين")}${opt("from", "page", "من صفحة معينة")}${opt("from", "last", "من آخر موضع وصلت إليه", `الوجه ${AR(ST.last || 1)}`)}</div>
+    ${z.from === "surah" ? `<select id="fs" class="wsel">${SURAHS.map(n => `<option value="${n}" ${+z.fs === n ? "selected" : ""}>${AR(n)}. ${DATA.surahs[n]}</option>`).join("")}</select>` : ""}
+    ${z.from === "juz" ? `<select id="fj" class="wsel">${Object.keys(DATA.juz).map(n => `<option value="${n}" ${+z.fj === +n ? "selected" : ""}>الجزء ${JUZ_NAMES[n]}</option>`).join("")}</select>` : ""}
+    ${z.from === "page" ? `<input type="number" id="fp" class="wsel" min="1" max="604" value="${z.fp}">` : ""}`;
+  if (s === "preview") {
+    const st = startPoint(z), sim = { hKey: st.k, tPos: st.p };
+    const saved = ST.wird; ST.wird = Object.assign({ log: {}, mem: saved && saved.mem || [] }, z, sim);
+    const rows = []; let n = 0;
+    for (let k = WD.today(), i = 0; n < 4 && i < 14; k = WD.addDays(k, 1), i++) { if (!z.days.includes(WD.wday(k))) continue; n++;
+      const p = WD.makePlan(k, sim);
+      rows.push(`<div class="wday"><b>${FM("اليوم {0}", n)}</b> <span class="tiny muted">${WD.DAYN[WD.wday(k)]}</span>
+        ${p.h ? `<div class="small">📖 <span>حفظ:</span> <span>${WD.rangeTxt(p.h)}</span></div>` : ""}${p.r ? `<div class="small">🔄 <span>مراجعة:</span> ${p.r.map(q => `<span>${FM("الوجه {0}", q)}</span>`).join("، ")}</div>` : z.type !== "tilawa" && z.rPages ? `<div class="small muted">🔄 <span>المراجعة تبدأ بعد أول حفظ</span></div>` : ""}${p.t ? `<div class="small">📚 <span>تلاوة:</span> <span>${WD.pagesTxt(p.t[0], p.t[1])}</span></div>` : ""}</div>`);
+      if (p.h) sim.hKey = WD.nextKey(p.h.at(-1)); if (p.t) sim.tPos = p.t[0] + p.t[1] > 604 ? 1 : p.t[0] + p.t[1];
+    }
+    ST.wird = saved;
+    body = `<h3>جدولك جاهز</h3><p class="small muted">هذه أيامك الأولى، ويتحرك الورد تلقائياً مع إنجازك.</p>${rows.join("")}`;
+  }
+  $("#view").innerHTML = bar("الورد اليومي", `الخطوة ${AR(WZ.step + 1)} من ${AR(steps.length)}`, true) + `<div class="card wz">${body}</div>
+    <div class="two"><button class="btn" id="wzBack">${WZ.step ? "السابق" : "إلغاء"}</button><button class="btn primary" id="wzNext">${s === "preview" ? "ابدأ وردي" : "التالي"}</button></div>`;
+  $("#back").onclick = () => { WZ.d = null; WZ.step = 0; go("home"); };
+  document.querySelectorAll(".wopt[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v; z[k] = isNaN(+v) ? v : +v;
+    if (k === "nd") z.days = { 7: [0, 1, 2, 3, 4, 5, 6], 6: [0, 1, 2, 3, 4, 6], 5: [0, 1, 2, 3, 4], 4: [0, 1, 2, 3], 3: [0, 2, 4] }[v];
+    wirdSetup(); });
+  document.querySelectorAll("[data-day]").forEach(b => b.onclick = () => { const i = +b.dataset.day; z.days = z.days.includes(i) ? z.days.filter(x => x !== i) : [...z.days, i].sort(); if (!z.days.length) z.days = [i]; z.nd = z.days.length; wirdSetup(); });
+  const num = (id, key, max) => { const e = $(id); if (e) e.oninput = () => { const v = Math.max(1, Math.min(max, +e.value || 0)); if (e.value) { z[key] = v; document.querySelectorAll(`.wopt[data-k="${key}"]`).forEach(b => b.setAttribute("aria-pressed", "false")); } }; };
+  num("#hCust", "hLines", 60); num("#tCust", "tPages", 100);
+  ["fs", "fj", "fp"].forEach(id => { const e = $("#" + id); if (e) e.onchange = () => { z[id] = Math.max(1, Math.min(id === "fp" ? 604 : 999, +e.value || 1)); }; });
+  $("#wzBack").onclick = () => { if (WZ.step) { WZ.step--; wirdSetup(); } else { WZ.d = null; go("home"); } };
+  $("#wzNext").onclick = () => {
+    if (s !== "preview") { WZ.step++; wirdSetup(); scrollTo(0, 0); return; }
+    const st = startPoint(z), old = ST.wird || {};
+    ST.wird = Object.assign({}, old, z, { setup: true, hKey: st.k, tPos: st.p, rPos: old.rPos || 0, start: old.start || WD.today(), log: old.log || {}, mem: old.mem || [] });
+    if (ST.wird.log[WD.today()] && !Object.keys(ST.wird.log[WD.today()].done).length) delete ST.wird.log[WD.today()];
+    save(); WZ.d = null; WZ.step = 0; go("wird");
+  };
+}
+function startPoint(z) {
+  if (z.from === "surah") { const k = `${z.fs}:1`; return { k, p: V(k).p }; }
+  if (z.from === "juz") { const p = DATA.juz[z.fj][0]; return { k: DATA.pages[p][0], p }; }
+  if (z.from === "page") return { k: DATA.pages[z.fp][0], p: +z.fp };
+  if (z.from === "last") { const p = ST.last || 1; return { k: DATA.pages[p][0], p }; }
+  return { k: "1:1", p: 1 };
+}
+
+/* شاشة «وردك اليوم» */
+function wird() {
+  const w = ST.wird; if (!w || !w.setup) return wirdSetup();
+  const k = WD.today(), d = WD.day(k), miss = WD.missed(), tips = WD.tips();
+  const card = x => { const done = d.done[x], p = d.plan;
+    const btns = x === "h" ? `<button class="btn" data-wa="hread">${ICON.book}${"ابدأ الحفظ"}</button><button class="btn" data-wa="htas">${ICON.mic}${"سمّع المقدار"}</button>`
+      : x === "r" ? `<button class="btn" data-wa="rtas">${ICON.mic}${"ابدأ المراجعة"}</button>` : `<button class="btn" data-wa="tread">${ICON.book}${"ابدأ التلاوة"}</button>`;
+    return `<div class="card wtask ${done ? "done" : ""}"><div class="row"><span class="we">${TASKN[x][1]}</span><div class="grow"><b>${TASKN[x][0]}</b><div class="small muted">${taskTxt(d, x)}</div>
+      ${x === "r" && p.weak && p.weak.length ? `<div class="tiny" style="color:var(--gold)">${"مقدّم لكثرة الخطأ فيه"}</div>` : ""}</div></div>
+      ${done ? `<div class="wdone">${ICON.check}${x === "h" ? "تم الحفظ" : x === "r" ? "تمت المراجعة" : "تمت التلاوة"}</div>` : `<div class="wbtns">${btns}<button class="btn primary" data-wd="${x}">${ICON.check}${x === "h" ? "تم الحفظ" : x === "r" ? "تمت المراجعة" : "تمت التلاوة"}</button></div>`}
+      ${x === "h" && !done ? `<div class="tiny muted" style="margin-top:8px">${d.ok.filter(q => p.h.includes(q)).length ? `<span>${FM("سمّعت {0} من {1} آيات بنجاح.", d.ok.filter(q => p.h.includes(q)).length, p.h.length)}</span> ` : ""}<span>إذا سمّعت المقدار ونجحت فيه، يسجَّل تلقائياً.</span></div>` : ""}</div>`; };
+  $("#view").innerHTML = bar("وردك اليوم 🌿", d ? WD.DAYN[WD.wday(k)] : "", true, `<button class="ibtn" id="wEdit" aria-label="عدّل الورد">${ICON.pen}</button>`) + `
+    ${miss && d && !d.choice ? `<div class="card wmiss"><b>${FM(miss === 1 ? "فاتك ورد يوم؟" : miss === 2 ? "فاتك ورد يومين؟" : miss <= 10 ? "فاتك ورد {0} أيام؟" : "فاتك ورد {0} يوماً؟", miss)}</b><div class="small muted" style="margin:4px 0 10px">${"لا بأس، الخطة لم تفشل. هل تريد العودة للخطة الأصلية أم خطة تعويضية تدريجية؟"}</div>
+      <div class="two" style="margin-top:0"><button class="btn" data-mc="orig">${"الخطة الأصلية"}</button><button class="btn primary" data-mc="cu">${"خطة تعويضية"}</button></div></div>` : ""}
+    ${tips.map(t => `<div class="card wtip"><span>💡</span><div class="grow small">${t.txt}${t.act ? `<div style="margin-top:8px"><button class="link" data-tip="${t.id}">${t.act}</button></div>` : ""}</div></div>`).join("")}
+    ${d ? WD.tasks(d).map(card).join("") + `<div class="card"><div class="row"><b class="grow">${"إنجاز اليوم"}</b><b>${AR(Math.round(WD.pct(d) * 100))}٪</b></div>${bar2(WD.pct(d))}
+      ${WD.complete(d) ? `<div class="wfin">🌱 ${"اكتمل وردك اليومي"}<div class="small muted">${"أضفت نبتة جديدة إلى بستانك."}</div><button class="link" id="wMore">${"أنجزت أكثر؟ خذ الورد التالي"}</button></div>` : ""}</div>`
+      : `<div class="card"><b>${"اليوم يوم راحة"}</b><div class="small muted">${"ليس من أيام وردك. يمكنك المراجعة أو التلاوة متى شئت."}</div></div>`}
+    <div class="two"><button class="btn" id="wProg">📈 ${"تقدمي"}</button><button class="btn" id="wGarden">🌱 ${"البستان"}</button></div>`;
+  $("#back").onclick = () => go("home");
+  $("#wEdit").onclick = () => { WZ.d = null; WZ.step = 0; go("wirdSetup"); };
+  $("#wProg").onclick = () => go("progress"); $("#wGarden").onclick = () => go("garden");
+  document.querySelectorAll("[data-wd]").forEach(b => b.onclick = () => { WD.markDone(b.dataset.wd); wird(); });
+  document.querySelectorAll("[data-wa]").forEach(b => b.onclick = () => { const a = b.dataset.wa, p = d.plan;
+    if (a === "hread") openReader(V(p.h[0]).p, "mushaf");
+    if (a === "htas") { const left = p.h.filter(q => !d.ok.includes(q)), pg = V((left[0] || p.h[0])).p, on = p.h.filter(q => V(q).p === pg); openTasmee(pg); S.T.noLoc = true; S.T.from = on[0]; S.T.to = on.at(-1); tasmee(); }
+    if (a === "rtas") { const left = p.r.filter(q => !(d.rOk || []).includes(q)); openTasmee(left[0] || p.r[0]); S.T.noLoc = true; tasmee(); }
+    if (a === "tread") openReader(p.t[0], "mushaf"); });
+  document.querySelectorAll("[data-mc]").forEach(b => b.onclick = () => { d.choice = b.dataset.mc; if (b.dataset.mc === "cu") w.catchup = { left: miss * 2 }; save(); wird(); });
+  document.querySelectorAll("[data-tip]").forEach(b => b.onclick = () => { const id = b.dataset.tip;
+    if (id === "less") { w.hLines = Math.max(3, Math.round(w.hLines * 0.6)); w.tipLess = k; }
+    if (id === "more") { w.hLines = Math.min(30, Math.round(w.hLines * 1.4)); w.tipMore = k; }
+    if (d && !Object.keys(d.done).length) d.plan = WD.makePlan(k); save(); wird(); });
+  const more = $("#wMore"); if (more) more.onclick = () => { d.bonus = (d.bonus || 0) + 1; const old = d; w.log[k] = { plan: WD.makePlan(k), done: {}, ok: [], bonus: old.bonus, prev: (old.prev || []).concat([{ plan: old.plan, done: old.done }]) }; save(); wird(); };
+}
+
+/* صفحة «تقدمي» */
+function progress() {
+  const w = ST.wird || {}, s = w.setup ? WD.streaks() : { cur: 0, best: 0, total: 0 };
+  const mem = (w.mem || []).slice().sort((a, b) => a - b);
+  const weak = Object.entries(ST.pages).filter(([, r]) => r.errors > 0).sort((a, b) => b[1].errors - a[1].errors).map(([p]) => +p);
+  const stat = (v, l) => `<div class="pst"><b>${v}</b><span>${l}</span></div>`;
+  $("#view").innerHTML = bar("تقدمي", "رحلتك مع القرآن", true) + `
+    <div class="pstats">${stat(AR(w.hAyat || 0), "آية محفوظة")}${stat(AR(mem.length), "وجه محفوظ")}${stat(AR(w.tTotal || 0), "صفحة تلاوة")}
+      ${stat(AR(s.total), "يوم التزام")}${stat(AR(s.cur), "السلسلة الحالية")}${stat(AR(s.best), "أطول سلسلة")}</div>
+    ${w.khatmat ? `<div class="card" style="text-align:center">🎉 ${FM("ختمات التلاوة: {0}", w.khatmat)}</div>` : ""}
+    <div class="sec2"><h2>${"بستانك"}</h2><button id="pGarden">${"افتح البستان"}</button></div>${WD.garden1(true)}
+    <div class="sec2"><h2>${"المواضع التي أتممتها"}</h2></div>
+    <div class="card">${mem.length ? `<div class="chips">${mem.map(p => `<button class="chip" data-read="${p}">${AR(p)}</button>`).join("")}</div>` : `<div class="small muted">${"لم تُتمّ حفظ موضع بعد."}</div>`}</div>
+    <div class="sec2"><h2>${"تحتاج مراجعة"}</h2></div>
+    <div class="card">${weak.length ? weak.slice(0, 12).map(p => `<button class="mini" data-tas="${p}"><span class="pn">${AR(p)}</span><span class="grow"><div style="font-weight:600">سورة ${pageSurah(p)}</div><div class="tiny muted">${AR(ST.pages[p].errors)} مواضع ضعف</div></span></button>`).join("") : `<div class="small muted">${"لا مواضع ضعف مسجلة. سمّع ليظهر هنا ما يحتاج مراجعة."}</div>`}</div>`;
+  $("#back").onclick = () => go(ST.wird && ST.wird.setup ? "wird" : "home");
+  $("#pGarden").onclick = () => go("garden");
+  bindAll();
+}
+
+/* «البستان» */
+function garden() {
+  const ps = WD.plants(), s = ST.wird && ST.wird.setup ? WD.streaks() : { cur: 0 };
+  const weeks = ps.filter(p => p.week).length;
+  $("#view").innerHTML = bar("البستان", "ينمو بإتمام وردك، لا بمجرد فتح التطبيق", true) + `<div class="card">${WD.garden1()}</div>
+    <div class="card small"><b>${"كيف ينمو بستانك؟"}</b>
+      <div class="glist"><span>🌱</span>${"إتمام الورد = نبتة جديدة"}</div><div class="glist"><span>🌿</span>${"إتمام الحفظ والتلاوة معاً = نمو أكبر"}</div>
+      <div class="glist"><span>🌷</span>${"الاستمرار ٥ أيام = زهرة"}</div><div class="glist"><span>🌳</span>${"الاستمرار أسبوعاً = شجرة"}</div>
+      <div class="glist"><span>🦋</span>${"كل أسبوع كامل = عنصر جديد في البستان"}</div><div class="glist"><span>🏞️</span>${"كل شهر من الالتزام = مرحلة جديدة للبستان"}</div></div>
+    <div class="pstats">${`<div class="pst"><b>${AR(ps.length)}</b><span>${"نبتة"}</span></div><div class="pst"><b>${AR(s.cur)}</b><span>${"السلسلة الحالية"}</span></div><div class="pst"><b>${AR(weeks)}</b><span>${"أسابيع كاملة"}</span></div>`}</div>`;
+  $("#back").onclick = () => go(ST.wird && ST.wird.setup ? "wird" : "home");
+}
+
+/* بطاقة أول فتح في اليوم */
+function wirdMorning() {
+  const w = ST.wird; if (!w || !w.setup || S.reader || new URLSearchParams(location.search).get("room")) return;
+  const k = WD.today(); if (w.seen === k) return;
+  const d = WD.day(k); if (!d || WD.complete(d)) return;
+  w.seen = k; save();
+  openSheet(`<h3>${"وردك اليوم جاهز 🌱"}</h3><p class="small muted" style="margin-top:0">${"لديك اليوم:"}</p>
+    ${WD.tasks(d).map(x => `<div class="wrow"><span class="we">${TASKN[x][1]}</span><span class="grow"><b>${TASKN[x][0]}</b><div class="tiny muted">${taskTxt(d, x)}</div></span></div>`).join("")}
+    <button class="btn primary block" style="margin-top:14px" id="mStart">${"ابدأ"}</button>`);
+  $("#mStart").onclick = () => { closeSheet(); go("wird"); };
+}
+
+TR.start(); render(); setTimeout(() => { if (S.tab === "home") wirdMorning(); }, 900);
 LIVE.boot();
 </script>
 </body>
