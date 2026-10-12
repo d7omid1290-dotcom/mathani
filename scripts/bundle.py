@@ -24,13 +24,7 @@ FONTS = "".join([face("Amiri Quran", "amiri-quran-arabic-400-normal.woff2", 400,
     [face("DigitalKhatt Madina", "digitalkhatt-madina.woff2", 400, AR_RANGE)] +
     [face("Reem Kufi", "reem-kufi-arabic-700-normal.woff2", 700, AR_RANGE), face("Reem Kufi", "reem-kufi-latin-700-normal.woff2", 700, LAT_RANGE)])
 html = html.replace("<style>", "<style>" + FONTS, 1)
-# إطار السورة بألوان شعار مثاني (الأخضر #0E3B2E ودرجاته)
-SFRAME_COLORS = {"#126183": "#0E3B2E", "#1c7897": "#0E3B2E", "#43b4e5": "#3D5A4E", "#6ec5eb": "#BFD3C3",
-                 "#f9fcfe": "#FBF5EA", "#000000": "#0E3B2E"}
-sframe = open(f"{root}/web/img/surah-frame.svg", encoding="utf-8").read()
-for a, b in SFRAME_COLORS.items():
-    sframe = sframe.replace(a, b)
-html = html.replace("/*SFRAME*/", base64.b64encode(sframe.encode()).decode())
+html = html.replace("/*SFRAME*/", base64.b64encode(open(f"{root}/web/img/surah-frame.svg", "rb").read()).decode())
 os.makedirs(f"{root}/dist/dorar", exist_ok=True)
 for f in dorar_files: shutil.copy(f, f"{root}/dist/dorar/")
 # التفسير الميسر مترجماً (data/tafsir/{lang}.json) يُحمَّل عند اختيار اللغة
