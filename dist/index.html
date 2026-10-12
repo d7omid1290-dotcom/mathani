@@ -823,6 +823,23 @@ b,strong,.qc b{font-weight:700}
 .qt small{font-size:.66rem;color:var(--muted);margin-top:-4px}
 .qt .bd{position:absolute;top:-4px;inset-inline-end:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--err);color:#fff;font-style:normal;font-size:.66rem;font-weight:700;display:grid;place-items:center}
 .qt:focus-visible .ic{outline:2px solid var(--green);outline-offset:2px}
+
+/* شاشة التسميع: أعلى أهدأ وأوضح */
+.card.target{padding:12px 14px;border-radius:18px;box-shadow:none;border:1px solid var(--line)}
+.card.target .pg{width:42px;height:42px;border-radius:12px;font-size:.95rem}
+.modes{display:flex;gap:4px;margin-top:12px;padding:4px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line)}
+.modes button,.modes button[aria-pressed="true"]{flex:1;flex-direction:row;justify-content:center;gap:6px;padding:9px 4px;border:0;border-radius:12px;background:transparent;font-size:.82rem;font-weight:500;color:var(--muted);box-shadow:none}
+.modes button svg{width:18px;height:18px}
+.modes button[aria-pressed="true"]{background:var(--surface);color:var(--green);font-weight:700;box-shadow:0 2px 8px rgba(20,51,94,.1)}
+.autoloc{align-items:center;justify-content:space-between;gap:14px;margin:14px 2px 10px;padding:0;border:0;background:none;border-radius:0}
+.autoloc span{gap:0}.autoloc b{font-size:.92rem}.autoloc small{font-size:.76rem}
+.autoloc input{appearance:none;-webkit-appearance:none;position:relative;width:46px;height:28px;margin:0;border-radius:99px;background:var(--line);cursor:pointer;transition:background .2s}
+.autoloc input::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:inset-inline-start .2s}
+.autoloc input:checked{background:var(--green)}
+.autoloc input:checked::after{inset-inline-start:21px}
+.autoloc input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.autoloc input,.autoloc input::after{transition:none}}
+.fstat[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -2249,9 +2266,9 @@ function drawFollow(box) {
   const on = !!REC && T.phase === "recording", loc = F.locating, heardAny = followHeard().H.length > 0;
   if (loc) setTimeout(locIdx, on ? 0 : 300); // يُبنى فهرس المصحف مسبقاً
   box.innerHTML = `
-    ${!on && !heardAny && !F.found ? `<label class="autoloc"><input type="checkbox" id="autoloc" ${loc ? "checked" : ""}><span><b>ابدأ من أي موضع</b><small>اقرأ من أي مكان في القرآن، ويتعرّف مثاني على الآية وينتقل إليها</small></span></label>` : ""}
+    ${!on && !heardAny && !F.found ? `<label class="autoloc"><span><b>ابدأ من أي موضع</b><small>يتعرّف مثاني على الآية وينتقل إليها</small></span><input type="checkbox" role="switch" id="autoloc" ${loc ? "checked" : ""}></label>` : ""}
     <div id="floc">${F.found && Date.now() - F.foundAt < 6000 ? `<div class="toast green">${ICON.check.replace("<svg", '<svg width="20" height="20"')}<span>تعرّفتُ على موضعك: ${ref(F.found)}</span></div>` : F.locMiss && !F.found ? `<div class="toast gold"><span>لم أتعرّف على موضع القراءة، فأتابعك في الوجه المحدد.</span></div>` : ""}</div>
-    <div class="fstat"><div class="prog"><i id="fprog" style="width:0"></i></div><span class="tiny muted" id="fcount"></span></div>
+    <div class="fstat" ${loc ? "hidden" : ""}><div class="prog"><i id="fprog" style="width:0"></i></div><span class="tiny muted" id="fcount"></span></div>
     <div id="ftoast"></div>
     ${loc ? `<div class="card locwait" id="flocw">${ICON.wave}<b>${on ? "أستمع إليك…" : "اقرأ من أي موضع"}</b><span class="tiny muted">${on ? "ابدأ القراءة من أي آية، وسأتعرّف على موضعك وأنتقل إليه." : "اضغط الميكروفون وابدأ من أي آية في القرآن."}</span></div>` : ""}
     <div class="page fpage" ${loc ? "hidden" : ""}><div class="page-in"><div class="page-in2" id="fpage">${F.html}</div></div></div>
