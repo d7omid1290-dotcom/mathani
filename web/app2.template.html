@@ -1047,9 +1047,11 @@ b,strong,.qc b{font-weight:700}
 .ntx{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;background:var(--surface);color:inherit;resize:vertical}
 
 /* إطار السورة على طراز مصحف المدينة (DigitalKhatt، رخصة AGPL-3.0، web/img) */
-.sfr{width:100%;aspect-ratio:7.95;display:grid;place-items:center;background:url("data:image/svg+xml;base64,/*SFRAME*/") center/100% 100% no-repeat}
+.sfr{position:relative;width:100%;aspect-ratio:7.95;display:grid;place-items:center}
+.sfr::before{content:"";position:absolute;inset:0;background:url("data:image/svg+xml;base64,/*SFRAME*/") center/100% 100% no-repeat;filter:hue-rotate(-38deg) saturate(.95)}
+.sfr span{position:relative}
 .sfr span{font-family:var(--naskh);font-weight:700;font-size:.9em;line-height:1;color:#141414;transform:translateY(.04em)}
-.rd[data-rt="night"] .sfr{filter:brightness(.82) saturate(.9)}
+.rd[data-rt="night"] .sfr::before{filter:hue-rotate(-38deg) brightness(.82) saturate(.85)}
 .rd .rh span:first-child,.rd[data-rt="light"] .rh span:first-child{color:var(--rink)}
 </style>
 </head>
