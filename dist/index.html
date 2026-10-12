@@ -1059,6 +1059,8 @@ b,strong,.qc b{font-weight:700}
 .rd .frame{padding:0}
 .rd .ln{column-gap:.16em}
 .rd .lines.measure .ln{column-gap:.16em}
+.rd .lines.c{gap:.9em}
+.rd .lines.c .ln,.rd .lines.c.measure .ln{column-gap:.2em}
 </style>
 </head>
 <body>
@@ -1991,10 +1993,10 @@ function kashidaJustify(L, W) {
     const ws = [...ln.querySelectorAll(".a")]; if (ws.length < 2) continue;
     ln.classList.remove("short");
     if (ln.scrollWidth < wmax * (ln.classList.contains("ends") ? 0.7 : 0.72)) { ln.classList.add("short"); continue; }
-    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.8 / tw); if (n <= 0) continue;
+    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.92 / tw); if (n <= 0) continue;
     const C = ws.map(el => ({ el, t: el.dataset.o || el.textContent, sl: kashidaSlots(el.dataset.o || el.textContent), c: 0 }));
     const cand = C.filter(x => x.sl.length); if (!cand.length) continue;
-    const cap = 4;
+    const cap = 6;
     while (n > 0 && cand.some(x => x.c < cap * Math.min(2, x.sl.length))) {
       for (const x of cand) { if (n <= 0) break; if (x.c < cap * Math.min(2, x.sl.length)) { x.c++; n--; } }
     }
@@ -2089,7 +2091,8 @@ function fitPage(root) {
   txt.forEach(ln => { const w = ln.scrollWidth; if (w > w0) ln.style.fontSize = (w0 / w).toFixed(4) + "em"; });
   L.classList.remove("measure");
   // سقف موحّد: لا يكبر خط وجهٍ قصير الأسطر عن بقية الأوجه، فيبقى الحجم ثابتاً عند التقليب
-  const byW = F0 * (W / Math.max(w0, 15.5 * F0)) * 0.99, byH = H / (n * (p2 => p2)(1.62));
+  const cen = L.classList.contains("c");  // الفاتحة وأول البقرة: أسطر قليلة في الوسط، فتكبر لتملأ الوجه
+  const byW = F0 * (W / Math.max(w0, (cen ? 8 : 15.5) * F0)) * (cen ? 0.96 : 0.99), byH = H / (n * (cen ? 2.4 : 1.62));
   let F = Math.max(13, Math.min(byW, byH, 40 * (ST.fs || 1)));
   pv.style.setProperty("--pf", F + "px");
   // تصحيح بالقياس الفعلي لارتفاع الأسطر (يختلف بحسب مقاييس الخط)
