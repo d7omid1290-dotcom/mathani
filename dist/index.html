@@ -1021,7 +1021,7 @@ b,strong,.qc b{font-weight:700}
 /* ألوان القراءة: أبيض بحبر أسود افتراضياً، وورقي، وليلي */
 .rd[data-rt="light"]{--rpaper:#FFFDF8;--rink:#141414;--rmut:#8B8678;--mk-b:#8C6A2E;--mk-c:#8C6A2E;--mm-b:#0B7A58;
   --sb-o:#B8954F;--sb-f:#FBF5E6;--sb-p:#FFFDF8;--sb-t:#141414;--sb-m:#0B5D47}
-.rd[data-rt="sepia"]{--rpaper:#F6F4EE;--rink:#2A2017;--rmut:#8F7C60;--mk-b:#9A7432;--mk-c:#9A7432;--mm-b:#0B7A58;
+.rd[data-rt="sepia"]{--rpaper:#FBF1D9;--rink:#2A2017;--rmut:#8F7C60;--mk-b:#9A7432;--mk-c:#9A7432;--mm-b:#0B7A58;
   --sb-o:#A9843F;--sb-f:#EFE3C8;--sb-p:#F8F1E2;--sb-t:#2A2017;--sb-m:#7A5A22}
 .rd[data-rt="night"]{--rpaper:#0F1412;--rink:#E8E3D6;--rmut:#7E8A84;--mk-b:#C9A45C;--mk-c:#C9A45C;--mm-b:#4FC59A;
   --sb-o:#9C7E45;--sb-f:#1A211E;--sb-p:#121815;--sb-t:#EADBB8;--sb-m:#C9A45C}
@@ -2014,7 +2014,7 @@ function kashidaJustify(L, W) {
 /* ---------- المصحف وجهاً وجهاً ---------- */
 const DOTS = I('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
 const readTheme = () => ST.rt || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia");
-const RT_BG = { sepia: "#F6F4EE", light: "#FFFDF8", night: "#0F1412" };
+const RT_BG = { sepia: "#FBF1D9", light: "#FFFDF8", night: "#0F1412" };
 function pageReader(p, dir) {
   const keys = DATA.pages[p];
   document.body.classList.add("immersive"); document.body.style.background = RT_BG[readTheme()];
@@ -2147,7 +2147,7 @@ function moreSheet(p) {
     ${o("quiz", ICON.quiz, "اختبر نفسك", "أسئلة من هذا الوجه")}
     ${ss.map(n => o("s" + n, ICON.star, `عن سورة ${DATA.surahs[n]}`, "المقاصد والموضوعات والفضائل")).join("")}
     <div class="small muted" style="margin-top:16px">مظهر القراءة</div>
-    <div class="themes">${[["light", "أبيض", "#FFFDF8", "#141414"], ["sepia", "سكري", "#F6F4EE", "#2A2017"], ["night", "ليلي", "#0F1412", "#E8E3D6"]].map(([id, t, bg, fg]) =>
+    <div class="themes">${[["light", "أبيض", "#FFFDF8", "#141414"], ["sepia", "سكري", "#FBF1D9", "#2A2017"], ["night", "ليلي", "#0F1412", "#E8E3D6"]].map(([id, t, bg, fg]) =>
       `<button data-rt="${id}" aria-pressed="${readTheme() === id}" style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"><span>بِسْمِ اللَّه</span>${t}</button>`).join("")}</div>
     <div class="row" style="margin-top:14px;justify-content:space-between"><span class="small muted">حجم الخط</span>
       <div class="row" style="gap:6px"><button class="btn" id="fzm2" style="padding:8px 14px">أصغر</button><button class="btn" id="fzp2" style="padding:8px 14px">أكبر</button></div></div>`);
