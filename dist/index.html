@@ -840,6 +840,27 @@ b,strong,.qc b{font-weight:700}
 .autoloc input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.autoloc input,.autoloc input::after{transition:none}}
 .fstat[hidden]{display:none}
+
+/* الرئيسية: بطاقة متابعة الحفظ وصفوف هادئة */
+.cont{margin-top:14px;padding:16px;border-radius:22px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.ctop{display:flex;gap:14px;align-items:center}
+.cpg{width:54px;height:54px;flex:none;display:grid;place-items:center;border-radius:16px;background:var(--green-soft);color:var(--green);font-weight:700;font-size:1.1rem}
+.ctop small{font-size:.74rem;color:var(--muted)}
+.ct{font-family:var(--kufi);font-weight:700;font-size:1.45rem;line-height:1.3}
+.cs{font-size:.8rem;color:var(--muted)}
+.cbar{display:flex;flex-direction:column;gap:6px}
+.cbtns{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.cbtns .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:14px;font-weight:700}
+.cbtns .btn svg{width:18px;height:18px}
+.hrow{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;padding:12px 14px;border:1px solid var(--line);border-radius:18px;background:var(--surface);text-align:start;font:inherit;color:inherit;cursor:pointer}
+.hrow .grow{display:flex;flex-direction:column;gap:3px;min-width:0}
+.hrow small{font-size:.74rem;color:var(--muted)}.hrow b{font-size:.98rem}
+.hsub{font-weight:400;font-size:.8rem;color:var(--muted);margin-inline-start:4px}
+.hic{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:13px;background:var(--green-soft);color:var(--green)}
+.hic svg{width:21px;height:21px}.hic.gold{background:var(--gold-soft);color:var(--gold)}
+.hrow .wbtn{font-size:.82rem;font-weight:700;color:var(--on);background:var(--green);border-radius:999px;padding:6px 16px}
+.hrow:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.cont+.hrow{margin-top:14px}
 </style>
 </head>
 <body>
@@ -1403,44 +1424,39 @@ function drawStrip0(id, cur, onPick) {
 
 /* ---------- الرئيسية ---------- */
 function home() {
-  const now = Date.now();
-  const due = Object.entries(ST.pages).filter(([, r]) => r.due <= now);
   const last = ST.last || 3, jz = juzOf(last), jp = juzPages(jz);
-  const mastered = jp.filter(p => ST.pages[p] && ST.pages[p].errors === 0).length;
+  const mastered = jp.filter(p => ST.pages[p] && ST.pages[p].errors === 0).length, pct = Math.round(mastered / jp.length * 100);
   let hijri = ""; try { hijri = new Intl.DateTimeFormat({ ar: "ar-SA", en: "en", ur: "ur" }[LG] + "-u-ca-islamic", { day: "numeric", month: "long" }).format(new Date()); } catch (e) {}
   const hr = new Date().getHours(), greet = hr < 12 ? "صباح الخير" : "مساء الخير";
-  const np = nextPrayer();
-  const SAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
-  const qcs = [["المساعد", "", ICON.mic, () => go("assistant"), "asGo"],
-    ["التفسير", "", ICON.tafsir, () => { S.tp = last; go("tafsir"); }],
-    ["استمع", "", ICON.listen, () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
-    ["المتشابهات", "", ICON.layers, () => openReader(last, "mushaf")],
-    ["اختبر", "", ICON.quiz, () => openReader(last, "quiz")],
-    ["المراجعة", due.length ? AR(due.length) : "", ICON.review, () => go("review")],
-    [np.n, fmtT(np.at), SAL, () => go("salah"), "salahGo"],
-    ["حلقة مباشرة", "", ICON.users, () => LIVE.start()]];
+  const np = nextPrayer(), chev = ICON.chev.replace("<svg", '<svg width="18" height="18"');
   $("#view").innerHTML = `
     <div class="hd"><span class="av">${esc((ST.name || "م").trim()[0])}</span>
       <div class="hi"><small>${greet}</small><b>${ST.name ? esc(ST.name) : "حافظ القرآن"}</b></div><div class="date">${hijri}</div></div>
-    <section class="heroC"><div class="in">
-      <div><div class="k">تابع حفظك</div><div class="t">سورة ${pageSurah(last)}</div><div class="s">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div>
-        <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
-      <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div>${mastered ? `<b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small>` : `<b style="font-size:1.1rem">ابدأ</b><small>${AR(jp.length)} وجهاً في الجزء</small>`}</div></div>
-    </div></section>
+    <section class="cont">
+      <div class="ctop"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
+      <div class="cbar"><span class="wprog"><i style="width:${pct}%"></i></span><span class="tiny muted">${mastered ? `${AR(mastered)} من ${AR(jp.length)} أوجه متقنة في الجزء` : `${AR(jp.length)} وجهاً في هذا الجزء`}</span></div>
+      <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
+    </section>
     ${wirdMini()}
-    <div class="qg">${qcs.map(([t, sub, ic, , id], i) => `<button class="qt" data-q="${i}"${id ? ` id="${id}"` : ""}><span class="ic">${ic}${sub && i === 5 ? `<i class="bd">${sub}</i>` : ""}</span><b>${t}</b>${sub && i !== 5 ? `<small>${sub}</small>` : ""}</button>`).join("")}</div>`;
-  document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][3]());
+    <button class="hrow" id="salahGo"><span class="hic gold">${HICON.moon}</span><span class="grow"><small>الصلاة القادمة</small><b>${np.n} <span class="hsub">${fmtT(np.at)}، ${leftTxt(np.at - Date.now())}</span></b></span><span class="muted">${chev}</span></button>
+    <button class="hrow" id="liveGo"><span class="hic">${ICON.users}</span><span class="grow"><small>مع معلمك أو زملائك</small><b>الحلقة المباشرة</b></span><span class="muted">${chev}</span></button>`;
+  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start();
   bindWirdHome();
   bindAll();
 }
+const HICON = {
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>',
+  sprout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"/><path d="M12 12C12 8 9 5 4 5c0 4 3 7 8 7z"/><path d="M12 14c0-3.5 2.5-6 7-6 0 3.5-2.5 6-7 6z"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'
+};
 /* الورد في الرئيسية: سطر واحد مختصر */
 function wirdMini() {
-  const w = ST.wird;
-  if (!w || !w.setup) return `<button class="wmini" id="wirdGo"><span class="we">🌱</span><span class="grow"><b>حدّد وردك اليومي</b><small>حفظ أو تلاوة بمقدار يناسبك</small></span><span class="wbtn">ابدأ</span></button>`;
+  const w = ST.wird, chev = ICON.chev.replace("<svg", '<svg width="18" height="18"');
+  if (!w || !w.setup) return `<button class="hrow" id="wirdGo"><span class="hic">${HICON.cal}</span><span class="grow"><small>الورد اليومي</small><b>حدّد وردك</b></span><span class="wbtn">ابدأ</span></button>`;
   const d = WD.day(WD.today());
-  if (!d) return `<button class="wmini" id="wirdGo"><span class="we">🌿</span><span class="grow"><b>اليوم يوم راحة</b><small>ليس من أيام وردك</small></span></button>`;
+  if (!d) return `<button class="hrow" id="wirdGo"><span class="hic">${HICON.cal}</span><span class="grow"><small>الورد اليومي</small><b>اليوم يوم راحة</b></span><span class="muted">${chev}</span></button>`;
   const pc = Math.round(WD.pct(d) * 100), done = WD.complete(d);
-  return `<button class="wmini" id="wirdGo"><span class="we">${done ? "🌳" : "🌱"}</span><span class="grow"><b>${done ? "اكتمل وردك اليوم" : "وردك اليوم"}</b><span class="wprog"><i style="width:${pc}%"></i></span></span><b class="wpc">${AR(pc)}٪</b></button>`;
+  return `<button class="hrow" id="wirdGo"><span class="hic">${HICON.sprout}</span><span class="grow"><small>${done ? "اكتمل وردك اليوم" : "وردك اليوم"}</small><span class="wprog"><i style="width:${pc}%"></i></span></span><b class="wpc">${AR(pc)}٪</b></button>`;
 }
 function pageItem(p, sub, tas = true) {
   return `<button class="item" ${tas ? `data-tas="${p}"` : `data-read="${p}"`}><span class="pg" style="--h:${heat(+p)}">${AR(p)}</span>
