@@ -880,6 +880,58 @@ b,strong,.qc b{font-weight:700}
 #liveGo .hic{background:#E6EEFB;color:#2F5FA8}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #liveGo .hic{background:#1A2A44;color:#9CC0F5}}
 :root[data-theme="dark"] #liveGo .hic{background:#1A2A44;color:#9CC0F5}
+/* التفسير: شريط علوي بهوية مثاني وبطاقات أهدأ */
+.tband{margin:0 -16px 14px;padding:calc(var(--top) + 16px) 16px 20px;color:#fff;background:var(--star),var(--hero);background-size:56px 56px,auto,auto;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.tband::after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;inset-inline-start:-70px;bottom:-110px;background:radial-gradient(circle,rgba(217,174,82,.3),transparent 70%)}
+.tbin{position:relative;z-index:1}
+.tbk{font-family:var(--kufi);font-weight:700;font-size:1.05rem;color:#F1D79A;margin-bottom:10px}
+.tbrow{display:flex;align-items:center;gap:10px}
+.tbpick{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:#fff;font:inherit;cursor:pointer;text-align:center}
+.tbpick b{font-family:var(--kufi);font-weight:700;font-size:1.7rem;line-height:1.3}
+.tbpick small{font-size:.76rem;opacity:.78}
+.tbnav{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(241,215,154,.35);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;padding:0}
+.tbnav svg{width:20px;height:20px}.tbnav:disabled{opacity:.35}
+.tsrcs{display:flex;gap:4px;padding:4px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line);box-shadow:none}
+.tsrcs button,.tsrcs button[aria-pressed="true"]{flex:1;border:0;border-radius:12px;padding:9px 4px;background:transparent;color:var(--muted);font:inherit;font-size:.84rem;font-weight:500;box-shadow:none}
+.tsrcs button[aria-pressed="true"]{background:var(--surface);color:var(--green);font-weight:700;box-shadow:0 2px 8px rgba(20,51,94,.1)}
+.tsrcs button:disabled{opacity:.4}
+#tlist{margin-top:14px}
+.tsura{display:flex;align-items:center;gap:12px;margin:18px 4px 12px}
+.tsura::before,.tsura::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-2))}
+.tsura::after{background:linear-gradient(270deg,transparent,var(--gold-2))}
+.tsura span{font-family:var(--kufi);font-weight:700;font-size:1.2rem;color:var(--green);padding:4px 16px;border:1px solid var(--gold-2);border-radius:999px;background:var(--surface)}
+.tcard{border-radius:22px;box-shadow:0 10px 26px rgba(20,51,94,.06);border:1px solid var(--line)}
+.tcard+.tcard{margin-top:12px}
+.tcard .q{padding:16px 18px 10px;border-bottom:0;background:linear-gradient(180deg,var(--paper),var(--surface))}
+.tcard .tx{position:relative;margin:0 14px 14px;padding:12px 14px;border-radius:16px;background:var(--surface-2);font-size:calc(.94rem * (0.6 + var(--fs) * .4));line-height:2;color:var(--ink)}
+.tlb{display:block;margin-bottom:2px;font-size:.7rem;font-weight:700;color:var(--gold)}
+.tlb::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold-2);margin-inline-end:6px;vertical-align:middle}
+.ghl{display:flex;flex-direction:column}
+.ghl div{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-top:1px dashed var(--line)}
+.ghl div:first-child{border-top:0;padding-top:2px}
+.ghl b{flex:none;font-family:var(--quran);font-weight:400;font-size:1.15rem;color:var(--green)}
+.ghl span{font-size:.88rem;line-height:1.8}
+.tcard .mchip{margin:0 16px 14px}
+
+/* المصحف: فهرس أهدأ */
+.mbt{font-family:var(--kufi);font-weight:700;font-size:1.5rem;line-height:1.35}
+.mbs{font-size:.8rem;opacity:.78}
+.mcont{display:flex;align-items:center;gap:8px;width:100%;margin-top:14px;padding:10px 14px;border-radius:16px;border:1px solid rgba(241,215,154,.35);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:.84rem;cursor:pointer;text-align:start}
+.mcont svg{width:18px;height:18px;color:#F1D79A;flex:none}
+.mcont b{margin-inline-start:auto;font-weight:700}
+.mband+.tsrcs{display:flex}
+.mband ~ .search{margin-top:12px}
+.slc{background:var(--surface);border-radius:20px;border:1px solid var(--line);box-shadow:0 8px 22px rgba(20,51,94,.05);overflow:hidden}
+.slc .sl{display:flex;align-items:center;gap:12px;width:100%;margin:0;padding:12px 14px;border:0;border-radius:0;box-shadow:none;background:transparent;text-align:start;font:inherit;color:inherit;cursor:pointer}
+.slc .sl+.sl{border-top:1px solid var(--line)}
+.slc .sl .no{width:36px;height:36px;flex:none;display:grid;place-items:center;clip-path:none;border-radius:11px;background:var(--green-soft);color:var(--green);font-weight:700;font-size:.85rem}
+.slc .sl .nm{font-size:1.15rem}
+.slc .sinfo{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:50%;color:var(--muted);background:transparent;padding:0}
+.slc .sinfo:hover,.slc .sinfo:focus-visible{color:var(--green);background:var(--green-soft)}
+.jz .tile .pp{display:none}
+.jz .grid{gap:8px}
+.jz .tile{min-height:0;aspect-ratio:auto;padding:10px 0;border-radius:12px;box-shadow:none;border:1px solid var(--line);align-items:center;justify-content:center;text-align:center;background:var(--h,var(--surface))}
+.jz .tile b{font-weight:500;font-size:.9rem}
 </style>
 </head>
 <body>
@@ -1489,10 +1541,15 @@ function pageItem(p, sub, tas = true) {
 function mushaf() {
   S.mview = S.mview || "surah";
   const done = Object.keys(ST.pages).length;
-  $("#view").innerHTML = bar("المصحف", "برواية حفص عن عاصم") + `
-    <div class="juzhead pattern"><div class="tiny" style="opacity:.8">مصحف المدينة برواية حفص</div><b style="font-size:1.3rem">${AR(SURAHS.length)} سورة، ${AR(30)} جزءاً، ${AR(PAGES.length)} وجهاً</b>
-      ${stripHTML("mStrip", ST.last || 3)}</div>
-    <div class="seg" style="grid-template-columns:1fr 1fr;margin-top:14px" role="group">
+  const lp = ST.last || 3;
+  $("#view").innerHTML = `
+    <header class="tband mband"><div class="tbin">
+      <div class="tbk">المصحف</div>
+      <div class="mbt">مصحف المدينة برواية حفص</div>
+      <div class="mbs">${AR(SURAHS.length)} سورة، ${AR(30)} جزءاً، ${AR(PAGES.length)} وجهاً</div>
+      <button class="mcont" data-read="${lp}">${ICON.book}<span>تابع القراءة</span><b>سورة ${pageSurah(lp)}، الوجه ${AR(lp)}</b></button>
+    </div></header>
+    <div class="seg tsrcs" role="group">
       <button data-mv="surah" aria-pressed="${S.mview === "surah"}">السور</button><button data-mv="juz" aria-pressed="${S.mview === "juz"}">الأجزاء</button></div>
     ${S.mview === "surah" ? `<input class="search" id="q" type="search" placeholder="ابحث عن سورة…" value="${esc(S.q || "")}" aria-label="ابحث عن سورة"><div id="slist" style="margin-top:12px"></div>`
       : `<div class="legend"><span><i style="background:var(--surface-2)"></i>لم يُسمَّع</span><span><i style="background:var(--green-soft)"></i>متقن</span><span><i style="background:var(--gold-soft)"></i>يحتاج مراجعة</span><span><i style="background:var(--err-soft)"></i>ضعيف</span></div>
@@ -1500,18 +1557,16 @@ function mushaf() {
           return `<details class="jz" ${open ? "open" : ""}><summary><span class="no" style="width:38px;height:38px;display:grid;place-items:center;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:12px">${AR(j)}</span>
             <span class="grow"><div style="font-weight:600">الجزء ${JUZ_NAMES[j]}</div><div class="tiny muted">${pageSurah(ps[0])} ${AR(V(DATA.pages[ps[0]][0]).a)}، الأوجه ${AR(ps[0])}–${AR(ps.at(-1))}</div></span>
             ${dn ? `<span class="chip">${AR(dn)}/${AR(ps.length)}</span>` : ""}</summary>
-            <div class="grid">${ps.map(p => `<button class="tile" data-read="${p}" aria-label="الوجه ${AR(p)}"><span class="pp" style="--h:${heat(p)}"></span><b>${AR(p)}</b></button>`).join("")}</div></details>`; }).join("")}`}`;
+            <div class="grid">${ps.map(p => `<button class="tile" data-read="${p}" aria-label="الوجه ${AR(p)}" style="--h:${heat(p)}"><b>${AR(p)}</b></button>`).join("")}</div></details>`; }).join("")}`}`;
   document.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { S.mview = b.dataset.mv; mushaf(); });
-  raf(() => drawStrip("mStrip", ST.last || 3, p => openReader(p, "mushaf")));
   if (S.mview === "surah") {
     const draw = () => {
       const q = (S.q || "").trim(), qn = M.norm(q).join(" ");
       const qd = q.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
       const list = SURAHS.filter(n => !q || (/^\d+$/.test(qd) ? String(n) === qd : qn && M.norm(DATA.surahs[n]).join(" ").includes(qn)));
-      $("#slist").innerHTML = list.length ? list.map(n => { const I2 = DATA.surahInfo[n];
+      $("#slist").innerHTML = list.length ? `<div class="slc">` + list.map(n => { const I2 = DATA.surahInfo[n];
         return `<button class="sl" data-read="${I2.page}"><span class="no">${AR(n)}</span><span class="grow"><div class="nm">${DATA.surahs[n]}</div>
-          <div class="tiny muted">${I2.rev}، ${ayat(I2.n)}، الوجه ${AR(I2.page)}</div></span><span class="link sinfo" data-sinfo="${n}" role="button" tabindex="0">عن السورة</span></button>`; }).join("")
-        : `<div class="info">لا توجد سورة بهذا الاسم.</div>`;
+          <div class="tiny muted">${I2.rev}، ${ayat(I2.n)}، الوجه ${AR(I2.page)}</div></span><span class="sinfo" data-sinfo="${n}" role="button" tabindex="0" aria-label="عن السورة"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg></span></button>`; }).join("") + `</div>` : `<div class="info">لا توجد سورة بهذا الاسم.</div>`;
       bindAll();
       document.querySelectorAll("[data-sinfo]").forEach(b => b.onclick = e => { e.stopPropagation(); surahSheet(+b.dataset.sinfo); });
     };
@@ -1953,7 +2008,7 @@ function rMushafTafsir(p, keys) {
       const tx = useSrc === "muyassar" ? `<span class="lbl">التفسير الميسر</span>${TFV(v)}`
         : useSrc === "gharib" ? (v.gh.length ? `<span class="lbl">غريب الكلمات</span><div class="gh" style="margin-top:4px">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`)
         : "";
-      html += `<div class="ta"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
+      html += `<div class="ta tcard"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
         ${DATA.mutashabihat[k] ? `<button class="mchip" data-mut="${k}">${ICON.layers.replace("<svg", '<svg width="13" height="13"')}لها متشابه</button>` : ""}</div>`;
     }
     html += useSrc === "dorar" ? DSRC : `<div class="src">${useSrc === "muyassar" ? "التفسير الميسر، مجمع الملك فهد." : "السراج في بيان غريب القرآن."}</div>`;
@@ -2556,13 +2611,16 @@ async function diagSheet() {
 /* ---------- شاشة التفسير (من الشريط السفلي) ---------- */
 function tafsirTab() {
   const p = S.tp = S.tp || ST.last || 3, src = ST.tsrc || "muyassar";
-  $("#view").innerHTML = bar("التفسير", "اقرأ الآيات وتفسيرها") + `
-    <div class="tfh">
-      <button class="ibtn" id="tpPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
-      <button class="pick" id="tpPick"><span class="grow"><b>سورة ${pageSurah(p)}</b><small>الوجه ${AR(p)}، الآيات ${pageRange(p)}، الجزء ${JUZ_NAMES[juzOf(p)]}</small></span>${ICON.chev.replace("<svg", '<svg width="18" height="18" style="color:var(--muted);transform:rotate(-90deg)"')}</button>
-      <button class="ibtn" id="tpNext" aria-label="الوجه التالي" ${p >= PAGES.length ? "disabled" : ""}>${ICON.next}</button>
-    </div>
-    <div class="srcs" role="group" aria-label="مصدر التفسير">
+  $("#view").innerHTML = `
+    <header class="tband"><div class="tbin">
+      <div class="tbk">التفسير</div>
+      <div class="tbrow">
+        <button class="tbnav" id="tpPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
+        <button class="tbpick" id="tpPick"><b>سورة ${pageSurah(p)}</b><small>الوجه ${AR(p)}، الآيات ${pageRange(p)}، الجزء ${JUZ_NAMES[juzOf(p)]} ▾</small></button>
+        <button class="tbnav" id="tpNext" aria-label="الوجه التالي" ${p >= PAGES.length ? "disabled" : ""}>${ICON.next}</button>
+      </div></div></header>
+    
+    <div class="srcs tsrcs" role="group" aria-label="مصدر التفسير">
       <button data-ts="muyassar" aria-pressed="${src === "muyassar"}">الميسر</button>
       <button data-ts="dorar" aria-pressed="${src === "dorar"}" id="tsDorar">موسوعة التفسير</button>
       <button data-ts="gharib" aria-pressed="${src === "gharib"}">غريب الكلمات</button></div>
@@ -2595,12 +2653,12 @@ function fillTafsir(p, src) {
     const shown = new Set();
     for (const k of keys) {
       const v = V(k);
-      if (v.a === 1) html += `<div class="banner" style="margin:14px 8px 12px">سورة ${DATA.surahs[v.s]}</div>`;
+      if (v.a === 1) html += `<div class="tsura"><span>سورة ${DATA.surahs[v.s]}</span></div>`;
       if (use === "dorar") { const g = gs.find(g => g.n === v.s && g.from <= v.a && g.to >= v.a && g.sections.ijmali);
         if (g && !shown.has(g)) { shown.add(g); html += `<div class="tgroup"><span class="lbl">المعنى الإجمالي للآيات ${AR(g.from)}${g.to > g.from ? "–" + AR(g.to) : ""}</span>${esc(g.sections.ijmali.text)}</div>`; } }
-      const tx = use === "muyassar" ? TFV(v)
-        : use === "gharib" ? (v.gh.length ? `<div class="gh">${v.gh.map(g => `<span><b>${esc(g.w)}</b>${esc(g.m)}</span>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`) : "";
-      html += `<div class="ta"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
+      const tx = use === "muyassar" ? `<span class="tlb">التفسير الميسر</span>${TFV(v)}`
+        : use === "gharib" ? (v.gh.length ? `<span class="tlb">غريب الكلمات</span><div class="ghl">${v.gh.map(g => `<div><b>${esc(g.w)}</b><span>${esc(g.m)}</span></div>`).join("")}</div>` : `<span class="muted small">لا كلمات غريبة في هذه الآية.</span>`) : "";
+      html += `<div class="ta tcard"><div class="q" data-k="${k}">${esc(v.t)} <span class="end">${AR(v.a)}</span></div>${tx ? `<div class="tx">${tx}</div>` : ""}
         ${DATA.mutashabihat[k] ? `<button class="mchip" data-mut="${k}">${ICON.layers.replace("<svg", '<svg width="13" height="13"')}لها متشابه</button>` : ""}</div>`;
     }
     html += use === "dorar" ? DSRC : `<div class="src">${use === "muyassar" ? "التفسير الميسر، مجمع الملك فهد." : "السراج في بيان غريب القرآن."}</div>`;
