@@ -20,7 +20,8 @@ def face(fam, file, w, rng):
     return f"@font-face{{font-family:'{fam}';font-style:normal;font-weight:{w};font-display:swap;src:url(data:font/woff2;base64,{b}) format('woff2');unicode-range:{rng}}}"
 FONTS = "".join([face("Amiri Quran", "amiri-quran-arabic-400-normal.woff2", 400, AR_RANGE), face("Amiri Quran", "amiri-quran-latin-400-normal.woff2", 400, LAT_RANGE),
     face("Amiri", "amiri-arabic-700-normal.woff2", 700, AR_RANGE)] +
-    [face("Readex Pro", f"readex-pro-arabic-{w}-normal.woff2", w, AR_RANGE) + face("Readex Pro", f"readex-pro-latin-{w}-normal.woff2", w, LAT_RANGE) for w in (400, 600, 700)])
+    [face("IBM Plex Sans Arabic", f"ibm-plex-sans-arabic-arabic-{w}-normal.woff2", w, AR_RANGE) + face("IBM Plex Sans Arabic", f"ibm-plex-sans-arabic-latin-{w}-normal.woff2", w, LAT_RANGE) for w in (400, 500, 700)] +
+    [face("Reem Kufi", "reem-kufi-arabic-700-normal.woff2", 700, AR_RANGE), face("Reem Kufi", "reem-kufi-latin-700-normal.woff2", 700, LAT_RANGE)])
 html = html.replace("<style>", "<style>" + FONTS, 1)
 os.makedirs(f"{root}/dist/dorar", exist_ok=True)
 for f in dorar_files: shutil.copy(f, f"{root}/dist/dorar/")

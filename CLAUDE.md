@@ -13,7 +13,7 @@ npm test                    # 18 اختبار منطق + اختبارات الو
 ## البنية
 - `web/core.js` — المنطق الخالص (يُختبر في Node): التطبيع `norm`، الكلمات `tokens` و`mtokens` (دمج «يا/ها» كالرسم العثماني)، المحاذاة `align`، تقييم التسميع `evaluate`، المتابعة اللحظية `follow`، كشف الانتقال `slipTo`، الاختبارات `makeQuiz`، الجدولة `schedule`.
 - `web/app2.template.html` — الواجهة كلها (CSS + JS). العناصر النائبة `/*CORE*/ /*DATA*/ /*CONTENT*/ /*LAYOUT*/ /*DORAR*/` يملؤها bundle.py.
-- `web/fonts/` — Amiri Quran وAmiri وReadex Pro (رخصة OFL)، تُضمَّن base64 في البناء.
+- `web/fonts/` — Amiri Quran وAmiri وIBM Plex Sans Arabic وReem Kufi (رخصة OFL)، تُضمَّن base64 في البناء.
 - `data/mathani-quran.json` — 6236 آية: النص (حفص)، التفسير الميسر `tf`، الغريب `gh`، الوجه `p`، فهرس المتشابهات، السور، الأجزاء.
 - `data/layout.json` — أسطر مصحف المدينة الخمسة عشر لكل وجه: `["h",سورة] | ["b"] | ["t",[[سورة:آية, من, إلى]...]]` (الفهارس على `mtokens`).
 - `data/content-juz1.json` — مسودات التدبّر للجزء الأول (موضوع الوجه، الفوائد) + أوامر ونواهٍ مقتبسة حرفياً ومُتحقق منها.

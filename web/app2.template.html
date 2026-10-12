@@ -16,7 +16,7 @@
   --paper:#FCFDFF;
   --shadow:0 1px 2px rgba(10,30,60,.05),0 6px 18px rgba(10,30,60,.07);
   --quran:"Amiri Quran","Amiri","Scheherazade New",serif; --naskh:"Amiri",serif;
-  --ui:"Readex Pro","Segoe UI","Tahoma",system-ui,sans-serif;
+  --ui:"IBM Plex Sans Arabic","Segoe UI","Tahoma",system-ui,sans-serif; --kufi:"Reem Kufi","IBM Plex Sans Arabic",sans-serif;
   --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
   --fs:1;
   box-sizing:border-box;
@@ -794,6 +794,35 @@ body{background:var(--bg);background-image:none}
 /* مظهر القراءة الفاتح */
 .rd[data-rt="light"]{--rline:#CFE5DA;--mk-b:#2FAE85;--mk-bg:#E2F4EC;--mk-c:#0B5D47;--bn-bg:#0B5D47;--bn-b:#0B5D47}
 .rhint{background:#062A20}
+
+/* ===== تحديث الواجهة: رئيسية مختصرة وخطوط IBM Plex Sans Arabic وReem Kufi ===== */
+body{font-size:15px;line-height:1.7;font-feature-settings:"kern"}
+.bar h1{font-family:var(--kufi);font-weight:700;font-size:1.55rem;letter-spacing:0;line-height:1.35}
+.bar h1 small{font-family:var(--ui);font-size:.78rem;font-weight:400;letter-spacing:0}
+.hero .logo{font-family:var(--kufi);font-weight:700}
+.sec2 h2,.sec h2,.htitle h3{font-weight:700}
+.hd .hi b{font-weight:700;font-size:1.2rem}
+.heroC .t{font-family:var(--kufi);font-weight:700;font-size:1.6rem;line-height:1.35}
+.heroC .k{font-weight:500}
+.heroC{margin-top:12px;padding:18px 20px}
+.heroC .go{margin-top:12px}
+b,strong,.qc b{font-weight:700}
+.wmini{display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;padding:12px 14px;border:0;border-radius:18px;background:var(--surface);box-shadow:0 8px 24px rgba(20,51,94,.06);text-align:start;font:inherit;color:inherit;cursor:pointer}
+.wmini .we{font-size:1.4rem;width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--green-soft)}
+.wmini .grow{display:flex;flex-direction:column;gap:4px;min-width:0}
+.wmini b{font-size:.98rem}.wmini small{font-size:.76rem;color:var(--muted)}
+.wmini .wbtn{font-size:.82rem;font-weight:700;color:var(--on);background:var(--green);border-radius:999px;padding:6px 14px}
+.wprog{display:block;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}.wprog i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#159A72,#D9AE52)}
+.wpc{font-size:.9rem;color:var(--green)}
+.qg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px;margin-top:18px;padding:16px 8px;background:var(--surface);border-radius:22px;box-shadow:0 8px 24px rgba(20,51,94,.06)}
+.qt{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;padding:4px 0;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.qt .ic{position:relative;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:var(--green);background:var(--green-soft)}
+.qt .ic svg{width:22px;height:22px}
+.qt:nth-child(4) .ic,.qt:nth-child(7) .ic{color:var(--gold);background:var(--gold-soft)}
+.qt b{font-size:.78rem;font-weight:500;line-height:1.3;text-align:center}
+.qt small{font-size:.66rem;color:var(--muted);margin-top:-4px}
+.qt .bd{position:absolute;top:-4px;inset-inline-end:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--err);color:#fff;font-style:normal;font-size:.66rem;font-weight:700;display:grid;place-items:center}
+.qt:focus-visible .ic{outline:2px solid var(--green);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -1020,19 +1049,21 @@ function drawStrip0(id, cur, onPick) {
 /* ---------- الرئيسية ---------- */
 function home() {
   const now = Date.now();
-  const due = Object.entries(ST.pages).filter(([, r]) => r.due <= now).sort((a, b) => b[1].errors - a[1].errors);
+  const due = Object.entries(ST.pages).filter(([, r]) => r.due <= now);
   const last = ST.last || 3, jz = juzOf(last), jp = juzPages(jz);
   const mastered = jp.filter(p => ST.pages[p] && ST.pages[p].errors === 0).length;
   let hijri = ""; try { hijri = new Intl.DateTimeFormat({ ar: "ar-SA", en: "en", ur: "ur" }[LG] + "-u-ca-islamic", { day: "numeric", month: "long" }).format(new Date()); } catch (e) {}
   const hr = new Date().getHours(), greet = hr < 12 ? "صباح الخير" : "مساء الخير";
-  // آية اليوم: من الآيات التي لها متشابه، تتغير يومياً
-  const pool = Object.keys(DATA.mutashabihat), vk = pool[Math.floor(now / 864e5) % pool.length], vv = V(vk);
-  const qcs = [["سمّع", "الوجه مخفي", ICON.mic, "linear-gradient(135deg,#0A5C46,#1FA37A)", () => openTasmee(last)],
-    ["التفسير", "آية وتفسيرها", ICON.tafsir, "linear-gradient(135deg,#0F766E,#5EC9B4)", () => { S.tp = last; go("tafsir"); }],
-    ["استمع", "تلاوة وتكرار", ICON.listen, "linear-gradient(135deg,#155E75,#3BB3C9)", () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
-    ["المتشابهات", "قارن وافهم", ICON.layers, "linear-gradient(135deg,#B07816,#E2B04E)", () => openReader(last, "mushaf")],
-    ["اختبر", "أسئلة الوجه", ICON.quiz, "linear-gradient(135deg,#3B3F8F,#7276D6)", () => openReader(last, "quiz")],
-    ["حلقة مباشرة", "سمّع مع معلمك", ICON.users, "linear-gradient(135deg,#9A3412,#EA7A3B)", () => LIVE.start()]];
+  const np = nextPrayer();
+  const SAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
+  const qcs = [["المساعد", "", ICON.mic, () => go("assistant"), "asGo"],
+    ["التفسير", "", ICON.tafsir, () => { S.tp = last; go("tafsir"); }],
+    ["استمع", "", ICON.listen, () => { openReader(last, "mushaf"); playFrom(DATA.pages[last][0]); }],
+    ["المتشابهات", "", ICON.layers, () => openReader(last, "mushaf")],
+    ["اختبر", "", ICON.quiz, () => openReader(last, "quiz")],
+    ["المراجعة", due.length ? AR(due.length) : "", ICON.review, () => go("review")],
+    [np.n, fmtT(np.at), SAL, () => go("salah"), "salahGo"],
+    ["حلقة مباشرة", "", ICON.users, () => LIVE.start()]];
   $("#view").innerHTML = `
     <div class="hd"><span class="av">${esc((ST.name || "م").trim()[0])}</span>
       <div class="hi"><small>${greet}</small><b>${ST.name ? esc(ST.name) : "حافظ القرآن"}</b></div><div class="date">${hijri}</div></div>
@@ -1041,24 +1072,20 @@ function home() {
         <button class="go" data-tas="${last}">${ICON.mic}سمّع الآن</button></div>
       <div class="ring2" style="--p:${Math.round(mastered / jp.length * 100)}"><div>${mastered ? `<b>${AR(mastered)}</b><small>من ${AR(jp.length)} في الجزء</small>` : `<b style="font-size:1.1rem">ابدأ</b><small>${AR(jp.length)} وجهاً في الجزء</small>`}</div></div>
     </div></section>
-    <button class="acard" id="asGo"><span class="amicb">${ICON.mic}</span><span class="grow"><b>المساعد القرآني</b><span>تحدّث معه: اشرح لي، سمّعني، راجعني، تدبّر، خطتي</span></span></button>
-    ${salahHome()}
-    ${wirdHome()}
-    <div class="sec2"><h2>ابدأ من هنا</h2></div>
-    <div class="hs">${qcs.map(([t, sub, ic, bg], i) => `<button class="qc" data-q="${i}"><span class="ic" style="background:${bg}">${ic}</span><b>${t}</b><span class="t">${sub}</span></button>`).join("")}</div>
-    <div class="sec2"><h2>آية اليوم</h2><button data-read="${vv.p}">افتح الوجه</button></div>
-    <div class="votd"><div class="lbl">سورة ${sName(vk)}، الآية ${AR(vv.a)}</div><div class="ay">﴿${esc(vv.t)}﴾</div>
-      <div class="rf">لهذه الآية متشابه؛ هل تعرف أين؟</div>
-      <details><summary>اعرض التفسير والمتشابه</summary><div class="tx">${TF(vk)}</div>
-        <button class="btn block" style="margin-top:10px;background:var(--gold-soft);color:var(--gold)" data-mut="${vk}">${ICON.layers}قارن بمتشابهها</button></details></div>
-    <div class="sec2"><h2>ورد المراجعة</h2>${due.length ? `<button id="allRev">عرض الكل</button>` : ""}</div>
-    ${due.length ? due.slice(0, 3).map(([p, r]) => `<button class="mini" data-tas="${p}"><span class="pn">${AR(p)}</span><span class="grow"><div style="font-weight:600">سورة ${pageSurah(+p)}</div>
-      <div class="tiny muted">${r.errors ? `${AR(r.errors)} مواضع ضعف` : "مراجعة تثبيت"}</div></span>${ICON.chev.replace("<svg", '<svg width="18" height="18" style="color:var(--muted)"')}</button>`).join("")
-      : `<div class="mini" style="color:var(--muted)">لا مراجعة مستحقة الآن. سمّع وجهاً وسيُبنى وردك من أخطائك.</div>`}`;
-  document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][4]());
-  if ($("#allRev")) $("#allRev").onclick = () => go("review");
-  bindWirdHome(); $("#salahGo").onclick = () => go("salah"); $("#asGo").onclick = () => go("assistant");
+    ${wirdMini()}
+    <div class="qg">${qcs.map(([t, sub, ic, , id], i) => `<button class="qt" data-q="${i}"${id ? ` id="${id}"` : ""}><span class="ic">${ic}${sub && i === 5 ? `<i class="bd">${sub}</i>` : ""}</span><b>${t}</b>${sub && i !== 5 ? `<small>${sub}</small>` : ""}</button>`).join("")}</div>`;
+  document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => qcs[+b.dataset.q][3]());
+  bindWirdHome();
   bindAll();
+}
+/* الورد في الرئيسية: سطر واحد مختصر */
+function wirdMini() {
+  const w = ST.wird;
+  if (!w || !w.setup) return `<button class="wmini" id="wirdGo"><span class="we">🌱</span><span class="grow"><b>حدّد وردك اليومي</b><small>حفظ أو تلاوة بمقدار يناسبك</small></span><span class="wbtn">ابدأ</span></button>`;
+  const d = WD.day(WD.today());
+  if (!d) return `<button class="wmini" id="wirdGo"><span class="we">🌿</span><span class="grow"><b>اليوم يوم راحة</b><small>ليس من أيام وردك</small></span></button>`;
+  const pc = Math.round(WD.pct(d) * 100), done = WD.complete(d);
+  return `<button class="wmini" id="wirdGo"><span class="we">${done ? "🌳" : "🌱"}</span><span class="grow"><b>${done ? "اكتمل وردك اليوم" : "وردك اليوم"}</b><span class="wprog"><i style="width:${pc}%"></i></span></span><b class="wpc">${AR(pc)}٪</b></button>`;
 }
 function pageItem(p, sub, tas = true) {
   return `<button class="item" ${tas ? `data-tas="${p}"` : `data-read="${p}"`}><span class="pg" style="--h:${heat(+p)}">${AR(p)}</span>
