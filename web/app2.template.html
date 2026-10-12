@@ -1018,6 +1018,8 @@ b,strong,.qc b{font-weight:700}
 const DATA = /*DATA*/;
 const CONTENT = /*CONTENT*/;
 const LAYOUT = /*LAYOUT*/;
+// الرسم العثماني (نص مجمع الملك فهد) لعرض صفحات المصحف فقط، مرتّباً على فهارس كلمات النص الإملائي
+const UTH = /*UTHMANI*/;
 /* موسوعة التفسير — الدرر السنية: ما ضُمِّن هنا، والباقي يُحمَّل من dorar/{رقم السورة}.json عند النشر */
 const DORAR_INLINE = /*DORAR*/;
 const DORAR_CACHE = {};
@@ -1542,15 +1544,20 @@ function layoutHTML(p, hide) {
   let h = `<div class="lines${centered ? " c" : ""}${hide ? " hide" : ""}" id="lines">`;
   for (const l of L) {
     if (l[0] === "h") { h += `<div class="ln hdr"><div class="banner">سورة ${DATA.surahs[l[1]]}</div></div>`; continue; }
-    if (l[0] === "b") { h += `<div class="ln bsm">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`; continue; }
+    if (l[0] === "b") { h += `<div class="ln bsm">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>`; continue; }
     let words = 0, row = "";
     for (const [k, i0, i1] of l[1]) {
       const T = mt(k), m = DATA.mutashabihat[k] ? " m" : "";
+      const UW = UTH.verses[k] || [];
       for (let i = i0; i <= i1 && i < T.length; i++) { words++;
-        row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(T[i]).replace(/ (?=[\u06D6-\u06DC])/g, "")}</span>`;
+        const w = UW[i] ?? T[i];
+        if (w) row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(w).replace(/ (?=[\u06D6-\u06DC])/g, "")}</span>`;
         if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">\u06DD${AR(V(k).a)}</span>`; }
     }
-    h += `<div class="ln${words <= 1 ? " one" : ""}">${row}</div>`;
+    // السطر الأخير من السورة وحده يجوز أن يقصر عن العرض، كما في المصحف المطبوع
+    const [lk, , li1] = l[1].at(-1), [ls, la] = lk.split(":").map(Number);
+    const endS = li1 >= mt(lk).length - 1 && la === DATA.surahInfo[ls].n;
+    h += `<div class="ln${words <= 1 ? " one" : ""}${endS ? " ends" : ""}">${row}</div>`;
   }
   return h + `</div>`;
 }
@@ -1584,7 +1591,7 @@ function kashidaJustify(L, W) {
     if (!ln.classList.length || ln.classList.length > 1 && !ln.classList.contains("one")) { if (ln.classList.contains("hdr") || ln.classList.contains("bsm")) continue; }
     const ws = [...ln.querySelectorAll(".a")]; if (ws.length < 2) continue;
     ln.classList.remove("short");
-    if (!ln.classList.contains("one") && ln.scrollWidth < wmax * 0.7) { ln.classList.add("short"); continue; }
+    if (ln.classList.contains("ends") && ln.scrollWidth < wmax * 0.7) { ln.classList.add("short"); continue; }
     const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.8 / tw); if (n <= 0) continue;
     const C = ws.map(el => ({ el, t: el.dataset.o || el.textContent, sl: kashidaSlots(el.dataset.o || el.textContent), c: 0 }));
     const cand = C.filter(x => x.sl.length); if (!cand.length) continue;
@@ -1668,7 +1675,13 @@ function fitPage() {
   L.querySelectorAll(".a[data-o]").forEach(el => { el.textContent = el.dataset.o; delete el.dataset.o; });
   pv.style.setProperty("--pf", F0 + "px");
   L.classList.add("measure");
-  let w0 = 1; for (const ln of L.children) w0 = Math.max(w0, ln.scrollWidth);
+  for (const ln of L.children) ln.style.fontSize = "";
+  const txt = [...L.children].filter(ln => !ln.classList.contains("hdr") && !ln.classList.contains("bsm"));
+  const ws = txt.map(ln => ln.scrollWidth).sort((a, b) => b - a);
+  // سطر واحد أعرض من البقية لا يُصغّر الوجه كله: يُضبط خط ذلك السطر وحده
+  let w0 = Math.max(1, ws.length > 2 && ws[0] > ws[1] * 1.04 ? ws[1] : ws[0] || 1);
+  for (const ln of L.children) w0 = Math.max(w0, ln.classList.contains("hdr") || ln.classList.contains("bsm") ? ln.scrollWidth : 0);
+  txt.forEach(ln => { const w = ln.scrollWidth; if (w > w0) ln.style.fontSize = (w0 / w).toFixed(4) + "em"; });
   L.classList.remove("measure");
   // سقف موحّد: لا يكبر خط وجهٍ قصير الأسطر عن بقية الأوجه، فيبقى الحجم ثابتاً عند التقليب
   const byW = F0 * (W / Math.max(w0, 18.3 * F0)) * 0.985, byH = H / (n * (p2 => p2)(1.62));
@@ -2451,7 +2464,7 @@ async function profile() {
       <div class="row" style="margin-top:12px"><div class="grow"><b>${AR(Object.values(ST.approved).filter(Boolean).length)}</b> <span class="small muted">من ${AR(Object.keys(CONTENT.pages).length)} وجهاً معتمد</span></div><button class="btn" id="openReview">افتح المراجعة</button></div></div>
     <div class="sec"><h2>الميكروفون</h2></div><div class="card row"><div class="grow small muted">إذا لم يعمل التسجيل، افحص السبب.</div><button class="btn" data-diag>افحص الميكروفون</button></div>
     <div class="sec"><h2>المصادر</h2></div>
-    <div class="card small">${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></div>
+    <div class="card small">${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">رسم صفحات المصحف: النص العثماني لمجمع الملك فهد لطباعة المصحف الشريف (Uthmanic Hafs)، بخط DigitalKhatt Madina</div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></div>
     <div class="sec"><h2>بياناتي</h2></div>
     <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
   $("#langBtn").onclick = langSheet;

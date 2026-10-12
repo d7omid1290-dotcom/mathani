@@ -16,9 +16,10 @@ npm test                    # 18 اختبار منطق + اختبارات الو
 - `web/fonts/` — DigitalKhatt Madina (صفحات المصحف) وAmiri Quran وAmiri وIBM Plex Sans Arabic وReem Kufi (رخصة OFL)، تُضمَّن base64 في البناء.
 - `data/mathani-quran.json` — 6236 آية: النص (حفص)، التفسير الميسر `tf`، الغريب `gh`، الوجه `p`، فهرس المتشابهات، السور، الأجزاء.
 - `data/layout.json` — أسطر مصحف المدينة الخمسة عشر لكل وجه: `["h",سورة] | ["b"] | ["t",[[سورة:آية, من, إلى]...]]` (الفهارس على `mtokens`).
+- `data/uthmani.json` — الرسم العثماني (نص مجمع الملك فهد) لكل آية مرتباً على فهارس `mtokens`، لعرض صفحات المصحف فقط؛ التسميع والبحث على النص الإملائي.
 - `data/content-juz1.json` — مسودات التدبّر للجزء الأول (موضوع الوجه، الفوائد) + أوامر ونواهٍ مقتبسة حرفياً ومُتحقق منها.
 - `data/dorar/{n}.json` — موسوعة التفسير (الدرر السنية) لكل سورة؛ 1 و2 مضمّنتان، والبقية تُحمَّل عند الحاجة من `dist/dorar/`.
-- `scripts/` — `fetch_sources.sh`, `build_data.py`, `build_layout.py`, `content_juz1.py`, `fetch_dorar.py`, `bundle.py`.
+- `scripts/` — `fetch_sources.sh`, `build_data.py`, `build_layout.py`, `build_uthmani.py`, `content_juz1.py`, `fetch_dorar.py`, `bundle.py`.
 
 ## الشاشات (الشريط السفلي)
 الرئيسية — المصحف (قراءة وجهاً وجهاً، وضع غامر، 15 سطراً بضبط المدّ/الكشيدة، 3 مظاهر) — **سمّع** (مباشر: الوجه مخفي وينكشف؛ تسجيل صوتي + Whisper؛ كتابة) — التفسير — حسابي.
