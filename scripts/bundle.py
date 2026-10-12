@@ -30,5 +30,7 @@ for f in dorar_files: shutil.copy(f, f"{root}/dist/dorar/")
 # التفسير الميسر مترجماً (data/tafsir/{lang}.json) يُحمَّل عند اختيار اللغة
 os.makedirs(f"{root}/dist/tafsir", exist_ok=True)
 for f in glob.glob(f"{root}/data/tafsir/*.json"): shutil.copy(f, f"{root}/dist/tafsir/")
+os.makedirs(f"{root}/dist/audio", exist_ok=True)
+for f in glob.glob(f"{root}/web/audio/*.mp3"): shutil.copy(f, f"{root}/dist/audio/")
 open(f"{root}/dist/index.html", "w", encoding="utf-8").write(html)
 print("dist/index.html", round(len(html.encode()) / 1024), "KB | dorar:", len(dorar_files), "surahs")
