@@ -984,6 +984,23 @@ b,strong,.qc b{font-weight:700}
 .rd[data-rt="light"] .ln.hdr .banner{box-shadow:inset 0 0 0 3px var(--bn-bg),inset 0 0 0 4px rgba(241,215,154,.7);color:#F1D79A}
 .rd .ln.hdr .banner::before,.rd .ln.hdr .banner::after{width:.55em;height:.55em;border-width:2px}
 .rd .ln.hdr .banner{font-family:var(--naskh);font-weight:700;display:flex;align-items:center;justify-content:center;height:1.75em;line-height:1;padding:0 .8em}
+
+/* مظهر مصحف المدينة: إطار مزخرف وعلامات آيات بخط المصحف */
+.rd .ln .end,.rd .ln .end.m{font-family:var(--quran);font-size:1em;min-width:0;height:auto;padding:0;margin:0;border:0;background:none;box-shadow:none;border-radius:0;
+  display:inline;color:var(--mk-b);font-weight:400;line-height:inherit}
+.rd .ln .end.m{color:var(--mm-b)}
+.rd .frame{position:relative;border:1.5px solid var(--bn-b);border-radius:10px;padding:4px 9px 2px;
+  background:none;box-shadow:inset 0 0 0 4px var(--rpaper),inset 0 0 0 5px color-mix(in srgb,var(--bn-b) 60%,transparent)}
+.rd .frame::before,.rd .frame::after{content:"";position:absolute;left:50%;width:9px;height:9px;background:var(--bn-b);transform:translate(-50%,-50%) rotate(45deg);border:2px solid var(--rpaper)}
+.rd .frame::before{top:0}.rd .frame::after{top:100%}
+.rd .rh{padding:8px 6px 4px;border-bottom:1px solid color-mix(in srgb,var(--bn-b) 35%,transparent);margin:0 2px}
+.rd .rh span{font-size:.8rem}
+.rd .rf{padding:2px 0 6px}
+.rd .rf span{display:inline-grid;place-items:center;min-width:2.2em;height:1.6em;padding:0 .5em;border-radius:999px;border:1px solid color-mix(in srgb,var(--bn-b) 60%,transparent);color:var(--bn-c);font-size:.78rem}
+.rd[data-rt="light"] .rf span{color:var(--bn-bg)}
+.rd .ln .end{color:color-mix(in srgb,var(--mk-b) 55%,var(--rink))}
+.rd .ln .end.m{color:var(--mm-b)}
+.rd .rf{padding-top:6px}
 </style>
 </head>
 <body>
@@ -1864,7 +1881,7 @@ function layoutHTML(p, hide) {
       const T = mt(k), m = DATA.mutashabihat[k] ? " m" : "";
       for (let i = i0; i <= i1 && i < T.length; i++) { words++;
         row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(T[i])}</span>`;
-        if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">${AR(V(k).a)}</span>`; }
+        if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">\u06DD${AR(V(k).a)}</span>`; }
     }
     h += `<div class="ln${words <= 1 ? " one" : ""}">${row}</div>`;
   }
@@ -1931,7 +1948,7 @@ function pageReader(p, dir) {
       <div class="frame">
         <div class="rh"><span>سورة ${pageSurah(p)}</span><span>الجزء ${JUZ_NAMES[juzOf(p)]}</span></div>
         <div class="rb" id="rb" style="overflow:hidden"><div id="ptext" style="display:flex;flex-direction:column;flex:1;min-height:0">${layoutHTML(p, S.hide)}</div></div>
-        <div class="rf">${AR(p)}</div>
+        <div class="rf"><span>${AR(p)}</span></div>
       </div>
     </div>
     <div class="rtop"><button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>
