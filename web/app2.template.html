@@ -1035,6 +1035,22 @@ b,strong,.qc b{font-weight:700}
 .sban .m circle{fill:var(--sb-p);stroke:var(--sb-o);stroke-width:1}
 .sban .s path{fill:var(--sb-m)}
 .sban span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--naskh);font-weight:700;font-size:.82em;color:var(--sb-t);line-height:1}
+
+/* لون واحد للنص وعلاماته، وتحديد الآية عند الضغط المطوّل، وعلامة التعليق */
+.rd[data-rt]{--mk-b:var(--rink);--mk-c:var(--rink);--mm-b:var(--rink)}
+.rd .ln .end,.rd .ln .end.m{color:var(--rink)}
+.rd .ln .a.sel,.rd .ln .end.sel{background:color-mix(in srgb,#C9A45C 30%,transparent);border-radius:4px}
+.rd .ln .end.nt{position:relative}
+.rd .ln .end.nt::after{content:"";position:absolute;top:-.05em;left:50%;width:.28em;height:.28em;border-radius:50%;background:#C9A45C;transform:translateX(-50%)}
+.rd .frame{background:var(--rpaper)}
+.rd .frame{position:relative;z-index:1}.rd .frame.nb{position:absolute;z-index:0}
+.ntx{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;background:var(--surface);color:inherit;resize:vertical}
+
+/* إطار السورة على طراز مصحف المدينة (DigitalKhatt، رخصة AGPL-3.0، web/img) */
+.sfr{width:100%;aspect-ratio:7.95;display:grid;place-items:center;background:url("data:image/svg+xml;base64,/*SFRAME*/") center/100% 100% no-repeat}
+.sfr span{font-family:var(--naskh);font-weight:700;font-size:.9em;line-height:1;color:#141414;transform:translateY(.04em)}
+.rd[data-rt="night"] .sfr{filter:brightness(.82) saturate(.9)}
+.rd .rh span:first-child,.rd[data-rt="light"] .rh span:first-child{color:var(--rink)}
 </style>
 </head>
 <body>
@@ -1580,7 +1596,7 @@ function layoutHTML(p, hide) {
   const L = LAYOUT.pages[p], centered = p <= 2;
   let h = `<div class="lines${centered ? " c" : ""}${hide ? " hide" : ""}" id="lines">`;
   for (const l of L) {
-    if (l[0] === "h") { h += `<div class="ln hdr"><div class="sban">${SBAN}<span>سورة ${DATA.surahs[l[1]]}</span></div></div>`; continue; }
+    if (l[0] === "h") { h += `<div class="ln hdr"><div class="sfr"><span>سورة ${DATA.surahs[l[1]]}</span></div></div>`; continue; }
     if (l[0] === "b") { h += `<div class="ln bsm">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>`; continue; }
     let words = 0, row = "";
     for (const [k, i0, i1] of l[1]) {
@@ -1589,7 +1605,7 @@ function layoutHTML(p, hide) {
       for (let i = i0; i <= i1 && i < T.length; i++) { words++;
         const w = UW[i] ?? T[i];
         if (w) row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(w).replace(/ (?=[\u06D6-\u06DC])/g, "")}</span>`;
-        if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">\u06DD${AR(V(k).a)}</span>`; }
+        if (i === T.length - 1) row += `<span class="end${m}${ST.notes && ST.notes[k] ? " nt" : ""}" data-k="${k}">\u06DD${AR(V(k).a)}</span>`; }
     }
     // السطر الأخير من السورة وحده يجوز أن يقصر عن العرض، كما في المصحف المطبوع
     const [lk, , li1] = l[1].at(-1), [ls, la] = lk.split(":").map(Number);
@@ -1657,9 +1673,7 @@ function pageReader(p, dir) {
   $("#view").innerHTML = `
     <div class="rd ${dir ? "go-" + dir : ""}" id="rd" data-rt="${readTheme()}">
       <div class="frame">
-        <div class="rh"><span>سورة ${pageSurah(p)}</span><span>الجزء ${JUZ_NAMES[juzOf(p)]}</span></div>
-        <div class="rb" id="rb" style="overflow:hidden"><div id="ptext" style="display:flex;flex-direction:column;flex:1;min-height:0">${layoutHTML(p, S.hide)}</div></div>
-        <div class="rf"><span>${AR(p)}</span></div>
+        ${frameInner(p, true)}
       </div>
     </div>
     <div class="rtop"><button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>
@@ -1671,7 +1685,7 @@ function pageReader(p, dir) {
       <button class="btn" id="rPlay" style="padding:9px 12px">${ICON.listen}استمع</button>
       <button class="btn primary" id="rTas" style="padding:9px 12px">${ICON.mic}سمّع</button>
       <button class="ibtn" id="pgNext" aria-label="الوجه التالي" ${p >= PAGES.length ? "disabled" : ""}>${ICON.next}</button></div>
-    ${ST.rhint ? "" : `<div class="rhint" id="rhint">المس الصفحة لإظهار الأدوات، واضغط مطوّلاً على الآية لمعناها ومتشابهها</div>`}`;
+    ${ST.rhint ? "" : `<div class="rhint" id="rhint">المس الصفحة لإظهار الأدوات، واضغط مطوّلاً على الآية لتكتب عليها تعليقك</div>`}`;
   const rd = $("#rd");
   if (!ST.rhint) { ST.rhint = 1; save(); setTimeout(() => { const h = $("#rhint"); if (h) h.remove(); }, 4500); }
   $("#back").onclick = () => { document.body.classList.remove("immersive"); go(S.tab === "tasmee" ? "mushaf" : S.tab); };
@@ -1686,16 +1700,18 @@ function pageReader(p, dir) {
   let holdT = null, held = false;
   const setUI = v => { S.ui = v; rd.classList.toggle("ui", v); document.body.classList.toggle("rui", v); clearTimeout(S.uiT); if (v) S.uiT = setTimeout(() => setUI(false), 5000); };
   setUI(!!S.ui);
+  let px = 0, py = 0;
   $("#ptext").addEventListener("pointerdown", e => {
-    const a = e.target.closest(".a"); held = false; if (!a || S.hide) return;
-    holdT = setTimeout(() => { held = true; a.classList.add("hold"); setTimeout(() => a.classList.remove("hold"), 400); ayahSheet(a.dataset.k); }, 450);
+    const a = e.target.closest(".a,.end"); held = false; px = e.clientX; py = e.clientY; if (!a || S.hide) return;
+    holdT = setTimeout(() => { held = true; const k = a.dataset.k; document.querySelectorAll(`#lines [data-k="${k}"]`).forEach(x => x.classList.add("sel")); noteSheet(k); }, 480);
   });
+  $("#ptext").addEventListener("pointermove", e => { if (Math.abs(e.clientX - px) + Math.abs(e.clientY - py) > 10) clearTimeout(holdT); });
   ["pointerup", "pointerleave", "pointercancel"].forEach(ev => $("#ptext").addEventListener(ev, () => clearTimeout(holdT)));
   rd.addEventListener("contextmenu", e => e.preventDefault());
   rd.onclick = e => {
     if (held) { held = false; return; }
+    document.querySelectorAll("#lines .sel").forEach(x => x.classList.remove("sel"));
     const w = e.target.closest(".w"); if (w) { w.classList.add("shown"); return; }
-    const a = e.target.closest(".a[data-i]"); if (a && !S.hide) { a.classList.add("hold"); setTimeout(() => a.classList.remove("hold"), 400); wordSheet(a.dataset.k, +a.dataset.i); return; }
     setUI(!S.ui);
   };
   bindSwipePage(rd, p);
@@ -1703,10 +1719,16 @@ function pageReader(p, dir) {
   // إعادة الضبط بعد تحميل خط المصحف، فقياس الأسطر بالخط البديل يعطي عرضاً خاطئاً
   if (document.fonts && !document.fonts.check('20px "DigitalKhatt Madina"', "بسم")) document.fonts.load('20px "DigitalKhatt Madina"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
 }
-function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); LIVE.page(q); }
+function frameInner(p, main) {
+  return `<div class="rh"><span>سورة ${pageSurah(p)}</span><span>الجزء ${JUZ_NAMES[juzOf(p)]}</span></div>
+        <div class="rb"${main ? ' id="rb"' : ""} style="overflow:hidden"><div${main ? ' id="ptext"' : ""} style="display:flex;flex-direction:column;flex:1;min-height:0">${main ? layoutHTML(p, S.hide) : layoutHTML(p, S.hide).replace(' id="lines"', "")}</div></div>
+        <div class="rf"><span>${AR(p)}</span></div>`;
+}
+function turn(p, d, still) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, still ? "" : d > 0 ? "next" : "prev"); LIVE.page(q); }
 // يتسع الوجه للشاشة: يُحسب ارتفاع الصفحة ثم يُصغَّر الخط حتى يسع الوجه كله بلا تمرير
-function fitPage() {
-  const box = $("#rb"), pv = $("#rd"), L = $("#lines"); if (!box || !pv || !L) return;
+function fitPage(root) {
+  const pv = root || $("#rd"); if (!pv) return;
+  const box = pv.querySelector(".rb"), L = pv.querySelector(".lines"); if (!box || !L) return;
   const W = box.clientWidth, H = box.clientHeight; if (!W || !H) return;
   const n = L.children.length, F0 = 20;
   L.querySelectorAll(".a[data-o]").forEach(el => { el.textContent = el.dataset.o; delete el.dataset.o; });
@@ -1732,30 +1754,38 @@ function fitPage() {
 }
 window.addEventListener("resize", () => { if (S.reader && S.rview === "mushaf") fitPage(); });
 
-// تقليب منساب: الوجه يتبع الإصبع، ثم ينزلق خارجاً ويدخل الوجه التالي من الجهة المقابلة
+// تقليب منساب: الوجه يتبع الإصبع والوجه المجاور يظهر بجانبه، ثم يستقر الجديد مكانه بلا ومضة
 function bindSwipePage(el, p) {
   const fr = el.querySelector(".frame");
-  let x0 = null, y0 = null, dx = 0, lock = null, t0 = 0;
-  const W = () => el.clientWidth || innerWidth;
+  let x0 = null, y0 = null, dx = 0, lock = null, t0 = 0, nb = null, nd = 0;
+  const W = () => fr.offsetWidth + 24;
   const edge = d => (d > 0 && p >= PAGES.length) || (d < 0 && p <= 1);
-  el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; lock = null; t0 = Date.now(); fr.style.transition = "none"; }, { passive: true });
+  const mkNb = d => {
+    if (nb && nd === d) return; if (nb) nb.remove(); nb = null; nd = d; if (edge(d)) return;
+    nb = document.createElement("div"); nb.className = "frame nb";
+    nb.style.cssText = `position:absolute;left:${fr.offsetLeft}px;top:${fr.offsetTop}px;width:${fr.offsetWidth}px;height:${fr.offsetHeight}px;transition:none`;
+    nb.innerHTML = frameInner(p + d, false); el.appendChild(nb); fitPage(nb);
+  };
+  const place = (x, anim) => {
+    const t = anim ? "transform .24s cubic-bezier(.2,.7,.3,1)" : "none";
+    fr.style.transition = t; fr.style.transform = x ? `translateX(${x}px)` : "";
+    if (nb) { nb.style.transition = t; nb.style.transform = `translateX(${x - nd * W()}px)`; }
+  };
+  el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; lock = null; t0 = Date.now(); }, { passive: true });
   el.addEventListener("touchmove", e => {
     if (x0 == null) return;
     const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
     if (lock == null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) lock = Math.abs(mx) > Math.abs(my) ? "x" : "y";
     if (lock !== "x") return;
-    dx = edge(mx > 0 ? 1 : -1) ? mx * 0.25 : mx;   // مقاومة عند أول المصحف وآخره
-    fr.style.transform = `translateX(${dx}px)`;
+    const d = mx > 0 ? 1 : -1; mkNb(d);            // كالمصحف الورقي: السحب لليمين إلى الوجه التالي
+    dx = edge(d) ? mx * 0.25 : mx; place(dx, false);
   }, { passive: true });
   el.addEventListener("touchend", () => {
     if (x0 == null) return; x0 = null;
     if (lock !== "x") return;
     const d = dx > 0 ? 1 : -1, fast = Math.abs(dx) > 30 && Date.now() - t0 < 250;
-    fr.style.transition = "transform .22s cubic-bezier(.2,.7,.3,1)";
-    if ((Math.abs(dx) > W() * 0.22 || fast) && !edge(d)) {   // كالمصحف الورقي: السحب لليمين إلى الوجه التالي
-      fr.style.transform = `translateX(${d * W()}px)`;
-      setTimeout(() => turn(p, d), 200);
-    } else fr.style.transform = "";
+    if ((Math.abs(dx) > W() * 0.2 || fast) && !edge(d) && nb) { place(d * W(), true); setTimeout(() => turn(p, d, true), 240); }
+    else place(0, true);
   }, { passive: true });
 }
 function moreSheet(p) {
@@ -1853,6 +1883,21 @@ function compareHTML(k, other, title) {
   const side = (key, arr) => `<div class="side"><h4>${ref(key)}</h4><div class="ayah">${arr.map(x => x.same ? esc(x.w) : `<span class="diff">${esc(x.w)}</span>`).join(" ")}</div>
     <div class="ctx"><b>السياق:</b> ${TF(key)}</div></div>`;
   return `<section class="compare"><header>${title}</header>${side(k, d.a)}${side(other, d.b)}</section>`;
+}
+// تعليق المستخدم على الآية: يُحفظ في جهازه فقط
+function noteSheet(k) {
+  const cur = (ST.notes || {})[k] || "";
+  openSheet(`<div class="row"><h3 class="grow" style="margin:0">${ref(k)}</h3></div>
+    <div class="ayah" style="margin:6px 0 10px">${esc(V(k).t)} <span class="end">${AR(V(k).a)}</span></div>
+    <label class="small muted" for="ntx">تعليقك على الآية</label>
+    <textarea id="ntx" rows="4" class="ntx" placeholder="اكتب ملاحظتك أو فائدتك…">${esc(cur)}</textarea>
+    <div class="row" style="gap:8px;margin-top:10px"><button class="btn primary grow" id="ntSave">حفظ التعليق</button>${cur ? `<button class="btn" id="ntDel">حذف</button>` : ""}</div>
+    <div class="row" style="gap:8px;margin-top:8px"><button class="btn grow" id="ntTf">${ICON.tafsir}المعنى والمتشابه</button><button class="btn grow" id="ntPlay">${ICON.listen}استمع</button></div>`);
+  const done = () => { closeSheet(); document.querySelectorAll("#lines .sel").forEach(x => x.classList.remove("sel")); if (S.reader) pageReader(S.reader, ""); };
+  $("#ntSave").onclick = () => { const t = $("#ntx").value.trim(); ST.notes = ST.notes || {}; if (t) ST.notes[k] = t; else delete ST.notes[k]; save(); done(); };
+  if ($("#ntDel")) $("#ntDel").onclick = () => { delete ST.notes[k]; save(); done(); };
+  $("#ntTf").onclick = () => { closeSheet(); ayahSheet(k); };
+  $("#ntPlay").onclick = () => { closeSheet(); playFrom(k); };
 }
 function ayahSheet(k) {
   const v = V(k), ps = DATA.mutashabihat[k] || [];

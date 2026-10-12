@@ -1,0 +1,5 @@
+surah-frame.svg — إطار اسم السورة على طراز مصحف المدينة
+المصدر: DigitalKhatt (https://github.com/DigitalKhatt/digitalkhatt.org) الملف ClientApp/src/assets/ayaframe.svg
+Copyright (c) 2017 Amine Anane
+الرخصة: GNU Affero General Public License v3 أو أحدث (https://www.gnu.org/licenses/agpl-3.0.html)
+الملف مضمّن دون تعديل، وإشعار حقوقه داخله محفوظ.
