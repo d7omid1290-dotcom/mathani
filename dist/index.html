@@ -861,6 +861,25 @@ b,strong,.qc b{font-weight:700}
 .hrow .wbtn{font-size:.82rem;font-weight:700;color:var(--on);background:var(--green);border-radius:999px;padding:6px 16px}
 .hrow:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 .cont+.hrow{margin-top:14px}
+
+/* الرئيسية: شريط علوي بهوية مثاني */
+.hband{margin:0 -16px;padding:calc(var(--top) + 20px) 20px 64px;color:#fff;background:var(--star),var(--hero);background-size:56px 56px,auto,auto;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
+.hband::after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;inset-inline-end:-80px;top:-90px;background:radial-gradient(circle,rgba(217,174,82,.32),transparent 70%)}
+.hbin{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px}
+.hbtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.hlogo{font-family:var(--kufi);font-weight:700;font-size:1.5rem;color:#F1D79A;line-height:1}
+.hdate{font-size:.78rem;opacity:.8}
+.hgreet{font-family:var(--kufi);font-weight:700;font-size:1.65rem;line-height:1.35}
+.hmotto{font-size:.85rem;opacity:.75}
+.hpray{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:7px 14px;border-radius:999px;border:1px solid rgba(241,215,154,.35);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:.85rem;cursor:pointer;backdrop-filter:blur(4px)}
+.hpray svg{width:16px;height:16px;color:#F1D79A}.hpray b{font-weight:700}.hpray small{opacity:.75;font-size:.76rem}
+.hband+.cont{margin-top:-44px;position:relative;z-index:2;border:0;box-shadow:0 18px 40px rgba(6,42,32,.14)}
+.cpg{background:linear-gradient(135deg,#0A4D3B,#159A72);color:#fff;box-shadow:0 6px 14px rgba(21,154,114,.3)}
+.cont .wprog i,.hrow .wprog i{background:linear-gradient(90deg,#159A72,#D9AE52)}
+.hrow{box-shadow:0 8px 22px rgba(20,51,94,.06);border-color:transparent}
+#liveGo .hic{background:#E6EEFB;color:#2F5FA8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #liveGo .hic{background:#1A2A44;color:#9CC0F5}}
+:root[data-theme="dark"] #liveGo .hic{background:#1A2A44;color:#9CC0F5}
 </style>
 </head>
 <body>
@@ -1430,15 +1449,18 @@ function home() {
   const hr = new Date().getHours(), greet = hr < 12 ? "صباح الخير" : "مساء الخير";
   const np = nextPrayer(), chev = ICON.chev.replace("<svg", '<svg width="18" height="18"');
   $("#view").innerHTML = `
-    <div class="hd"><span class="av">${esc((ST.name || "م").trim()[0])}</span>
-      <div class="hi"><small>${greet}</small><b>${ST.name ? esc(ST.name) : "حافظ القرآن"}</b></div><div class="date">${hijri}</div></div>
+    <header class="hband"><div class="hbin">
+      <div class="hbtop"><span class="hlogo">مثاني</span><span class="hdate">${hijri}</span></div>
+      <div class="hgreet">${greet}${ST.name ? `، ${esc(ST.name)}` : ""}</div>
+      <div class="hmotto">احفظ ما تفهم، وافهم ما تحفظ</div>
+      <button class="hpray" id="salahGo">${HICON.moon}<span>${np.n}</span><b>${fmtT(np.at)}</b><small>${leftTxt(np.at - Date.now())}</small></button>
+    </div></header>
     <section class="cont">
       <div class="ctop"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
       <div class="cbar"><span class="wprog"><i style="width:${pct}%"></i></span><span class="tiny muted">${mastered ? `${AR(mastered)} من ${AR(jp.length)} أوجه متقنة في الجزء` : `${AR(jp.length)} وجهاً في هذا الجزء`}</span></div>
       <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
     </section>
     ${wirdMini()}
-    <button class="hrow" id="salahGo"><span class="hic gold">${HICON.moon}</span><span class="grow"><small>الصلاة القادمة</small><b>${np.n} <span class="hsub">${fmtT(np.at)}، ${leftTxt(np.at - Date.now())}</span></b></span><span class="muted">${chev}</span></button>
     <button class="hrow" id="liveGo"><span class="hic">${ICON.users}</span><span class="grow"><small>مع معلمك أو زملائك</small><b>الحلقة المباشرة</b></span><span class="muted">${chev}</span></button>`;
   $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start();
   bindWirdHome();
