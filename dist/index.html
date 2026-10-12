@@ -3522,7 +3522,7 @@ function salah() {
     $("#pGeo").onclick = () => { $("#pGeo").textContent = "…"; geoLocate(ok => { closeSheet(); if (!ok) alert(tr("تعذّر تحديد موقعك. اسمح للمتصفح بالوصول إلى الموقع، أو اختر مدينة.")); salah(); }); };
     document.querySelectorAll("[data-city]").forEach(b => b.onclick = () => { const [nm, la, lo] = CITIES[+b.dataset.city]; c.loc = { name: nm, lat: la, lng: lo, auto: false }; save(); closeSheet(); salah(); }); };
   document.querySelectorAll("[data-bell]").forEach(b => b.onclick = () => { c.alerts[b.dataset.bell] = !c.alerts[b.dataset.bell]; save(); askNotify(); salah(); });
-  $("#pTest").onclick = () => { askNotify(); playAdhan(); };
+  $("#pTest").onclick = () => { askNotify(); playAdhan(nextPrayer().n); };
   $("#pMethod").onchange = e => { c.method = e.target.value; save(); salah(); };
   document.querySelectorAll("[data-asr]").forEach(b => b.onclick = () => { c.asr = +b.dataset.asr; save(); salah(); });
   $("#qStart").onclick = () => compass(q.bearing);
@@ -3548,9 +3548,19 @@ function adhanState() {
 }
 function askNotify() { try { if (window.Notification && Notification.permission === "default") Notification.requestPermission(); } catch (e) {} }
 let ADHAN_AUDIO = null;
-function playAdhan() {
-  if (ADHAN_URL) { try { ADHAN_AUDIO = ADHAN_AUDIO || new Audio(ADHAN_URL); ADHAN_AUDIO.currentTime = 0; ADHAN_AUDIO.play().catch(() => chime()); return; } catch (e) {} }
-  chime();
+function playAdhan(nm) {
+  if (ADHAN_URL) { try { ADHAN_AUDIO = ADHAN_AUDIO || new Audio(ADHAN_URL); ADHAN_AUDIO.currentTime = 0; ADHAN_AUDIO.play().catch(() => { chime(); announce(nm); }); return; } catch (e) {} }
+  chime(); announce(nm);
+}
+/* إعلان صوتي بعد النغمة: «حان الآن وقت صلاة …» بصوت الجهاز */
+function announce(nm) {
+  try { const S = window.speechSynthesis; if (!S || !window.SpeechSynthesisUtterance) return;
+    const txt = nm ? `حان الآن وقت صلاة ${nm}` : "حان الآن وقت الصلاة";
+    const lang = LG === "en" ? "en" : LG === "ur" ? "ur" : "ar", say = LG === "ar" ? txt : tr(txt);
+    let done = false; const go = () => { if (done) return; done = true; S.cancel(); const u = new SpeechSynthesisUtterance(say); const v = S.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith(lang));
+      if (v) u.voice = v; u.lang = v ? v.lang : (lang === "ar" ? "ar-SA" : lang); u.rate = .9; u.pitch = 1; S.speak(u); };
+    setTimeout(() => S.getVoices().length ? go() : (S.onvoiceschanged = () => { S.onvoiceschanged = null; go(); }, setTimeout(go, 600)), 1900);
+  } catch (e) {}
 }
 function chime() { // نغمة هادئة من ثلاث درجات
   try { const C = window.AudioContext || window.webkitAudioContext, ctx = new C();
@@ -3566,7 +3576,7 @@ function adhanTick() {
     if (k === "sunrise" || !c.alerts[k]) continue;
     const diff = now - t[k];
     if (diff >= 0 && diff < 120000 && c.fired !== dk + k) {
-      c.fired = dk + k; save(); playAdhan();
+      c.fired = dk + k; save(); playAdhan(nm);
       const msg = tr(`حان الآن وقت صلاة ${nm}`);
       try { if (window.Notification && Notification.permission === "granted") new Notification(tr("مثاني"), { body: msg }); } catch (e) {}
       openSheet(`<div class="empty" style="padding:8px 0"><div class="sdome">${HICON.dome}</div><h3 style="margin:8px 0 4px">${msg}</h3><p class="small muted" style="margin:0"><span>${esc(c.loc.name)}</span>، <span>${fmtT(t[k])}</span></p></div>`);
