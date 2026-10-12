@@ -561,7 +561,7 @@ body{background:#F3F7FC;background-image:linear-gradient(180deg,#E6EFFA 0,#F3F7F
 .pv .text .a.m + .end{border-color:var(--gold-2);background:var(--gold-soft);color:var(--gold);box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--gold-2)}
 .pv .text .a:active{background:var(--sky-soft)}
 .pv.go-next .page{animation:pgN .28s ease-out} .pv.go-prev .page{animation:pgP .28s ease-out}
-@keyframes pgN{from{transform:translateX(-40px);opacity:.3}} @keyframes pgP{from{transform:translateX(40px);opacity:.3}}
+@keyframes pgN{from{transform:translateX(-100%)}} @keyframes pgP{from{transform:translateX(100%)}}
 @media (prefers-reduced-motion:reduce){.pv.go-next .page,.pv.go-prev .page{animation:none}}
 .pnav2{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px}
 .pnav2 button{width:40px;height:40px;border-radius:50%;border:0;background:var(--surface);box-shadow:0 6px 16px rgba(20,51,94,.08);color:var(--green);display:grid;place-items:center}
@@ -598,7 +598,7 @@ body.immersive{background:var(--rpaper)}
 .rd .text .a.m{text-decoration:none}
 .rd .text .a.m + .end{border-color:var(--gold-2);background:var(--gold-soft);color:var(--gold);box-shadow:0 0 0 2px var(--rpaper),0 0 0 3px var(--gold-2)}
 .rd .end{box-shadow:0 0 0 2px var(--rpaper),0 0 0 3px var(--sky-2)}
-.rd.go-next .frame{animation:pgN .26s ease-out} .rd.go-prev .frame{animation:pgP .26s ease-out}
+.rd.go-next .frame{animation:pgN .24s cubic-bezier(.2,.7,.3,1)} .rd.go-prev .frame{animation:pgP .24s cubic-bezier(.2,.7,.3,1)}
 /* الأدوات تظهر باللمس */
 .rtop,.rbot{position:fixed;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:460px;z-index:16;display:flex;align-items:center;gap:8px;
   background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);border-radius:20px;padding:8px;box-shadow:0 12px 30px rgba(10,30,60,.18);
@@ -1006,6 +1006,17 @@ b,strong,.qc b{font-weight:700}
 .rd .lines,.rd .ln .end,.rd .ln .end.m{font-family:var(--mushaf)}
 .rd .ln.bsm{font-size:1.18em}
 .rd .ln.hdr .banner{font-size:.86em}
+
+/* صفحة نظيفة على طريقة تطبيقات المصاحف: بلا إطار، والنص يملأ الصفحة */
+.rd{overflow:hidden;padding-inline:10px}
+.rd .frame,.rd .frame{border:0;border-radius:0;box-shadow:none;padding:0 2px;background:none;will-change:transform}
+.rd .frame::before,.rd .frame::after{content:none}
+.rd .rh{border-bottom:0;padding:4px 4px 6px;margin:0}
+.rd .rh span{font-size:.78rem;font-weight:500;color:var(--rmut)}
+.rd .rh span:first-child{font-weight:700}
+.rd .rf{padding:4px 0 2px}
+.rd .rf span{border:0;min-width:0;height:auto;padding:0;font-size:.8rem;color:var(--rmut)}
+.rd[data-rt="light"] .rf span{color:var(--rmut)}
 </style>
 </head>
 <body>
@@ -1664,7 +1675,7 @@ function pageReader(p, dir) {
   bindSwipePage(rd, p);
   fitPage();
   // إعادة الضبط بعد تحميل خط المصحف، فقياس الأسطر بالخط البديل يعطي عرضاً خاطئاً
-  if (document.fonts && !document.fonts.check('20px "DigitalKhatt Madina"')) document.fonts.load('20px "DigitalKhatt Madina"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
+  if (document.fonts && !document.fonts.check('20px "DigitalKhatt Madina"', "بسم")) document.fonts.load('20px "DigitalKhatt Madina"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
 }
 function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); LIVE.page(q); }
 // يتسع الوجه للشاشة: يُحسب ارتفاع الصفحة ثم يُصغَّر الخط حتى يسع الوجه كله بلا تمرير
@@ -1695,13 +1706,30 @@ function fitPage() {
 }
 window.addEventListener("resize", () => { if (S.reader && S.rview === "mushaf") fitPage(); });
 
+// تقليب منساب: الوجه يتبع الإصبع، ثم ينزلق خارجاً ويدخل الوجه التالي من الجهة المقابلة
 function bindSwipePage(el, p) {
-  let x0 = null, y0 = null;
-  el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
-  el.addEventListener("touchend", e => {
-    if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
-    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
-    turn(p, dx > 0 ? 1 : -1); // كالمصحف الورقي: السحب لليمين إلى الوجه التالي
+  const fr = el.querySelector(".frame");
+  let x0 = null, y0 = null, dx = 0, lock = null, t0 = 0;
+  const W = () => el.clientWidth || innerWidth;
+  const edge = d => (d > 0 && p >= PAGES.length) || (d < 0 && p <= 1);
+  el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; lock = null; t0 = Date.now(); fr.style.transition = "none"; }, { passive: true });
+  el.addEventListener("touchmove", e => {
+    if (x0 == null) return;
+    const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
+    if (lock == null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) lock = Math.abs(mx) > Math.abs(my) ? "x" : "y";
+    if (lock !== "x") return;
+    dx = edge(mx > 0 ? 1 : -1) ? mx * 0.25 : mx;   // مقاومة عند أول المصحف وآخره
+    fr.style.transform = `translateX(${dx}px)`;
+  }, { passive: true });
+  el.addEventListener("touchend", () => {
+    if (x0 == null) return; x0 = null;
+    if (lock !== "x") return;
+    const d = dx > 0 ? 1 : -1, fast = Math.abs(dx) > 30 && Date.now() - t0 < 250;
+    fr.style.transition = "transform .22s cubic-bezier(.2,.7,.3,1)";
+    if ((Math.abs(dx) > W() * 0.22 || fast) && !edge(d)) {   // كالمصحف الورقي: السحب لليمين إلى الوجه التالي
+      fr.style.transform = `translateX(${d * W()}px)`;
+      setTimeout(() => turn(p, d), 200);
+    } else fr.style.transform = "";
   }, { passive: true });
 }
 function moreSheet(p) {
