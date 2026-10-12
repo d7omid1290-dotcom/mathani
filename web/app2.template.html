@@ -631,10 +631,10 @@ body.immersive{background:var(--rpaper)}
 /* ===== راحة العين: مظاهر القراءة ===== */
 .rd{--rpaper:#F7F1E3;--rink:#3A2E21;--rmut:#8F7C60;--rline:#D8C7A4;--mk-b:#BE9B5C;--mk-bg:#EFE3C7;--mk-c:#6B5326;
   --mm-b:#C27A1C;--mm-bg:#F4D9A6;--mm-c:#7A4708;--bn-bg:transparent;--bn-b:#BE9B5C;--bn-c:#5A4422}
-.rd[data-rt="light"]{--rpaper:#FFFEFB;--rink:#1C2433;--rmut:#7A8597;--rline:#C9DCEB;--mk-b:#5FB3E4;--mk-bg:#E6F4FC;--mk-c:#14335E;
-  --mm-b:#D9A441;--mm-bg:#FBEFD5;--mm-c:#8A5A0A;--bn-bg:#14335E;--bn-b:#14335E;--bn-c:#FFFFFF}
-.rd[data-rt="night"]{--rpaper:#141B24;--rink:#D9D3C3;--rmut:#7F8A99;--rline:#2A3646;--mk-b:#4E7FA3;--mk-bg:#1B2838;--mk-c:#A9C7DE;
-  --mm-b:#A77B2E;--mm-bg:#2D2414;--mm-c:#E2C084;--bn-bg:transparent;--bn-b:#4E7FA3;--bn-c:#B9CCDD}
+.rd[data-rt="light"]{--rpaper:#FFFEFB;--rink:#1C2433;--rmut:#7A8597;--rline:#D5E3DC;--mk-b:#3E9A7B;--mk-bg:#E3F1EB;--mk-c:#0B4A39;
+  --mm-b:#D9A441;--mm-bg:#FBEFD5;--mm-c:#8A5A0A;--bn-bg:#0B5D47;--bn-b:#0B5D47;--bn-c:#FFFFFF}
+.rd[data-rt="night"]{--rpaper:#141B24;--rink:#D9D3C3;--rmut:#7F8A99;--rline:#2A3646;--mk-b:#8C7340;--mk-bg:#221F18;--mk-c:#E2C084;
+  --mm-b:#A77B2E;--mm-bg:#2D2414;--mm-c:#E2C084;--bn-bg:transparent;--bn-b:#8C7340;--bn-c:#E2C084}
 .rd{background:var(--rpaper);color:var(--rink);padding:calc(var(--top) + 6px) 6px calc(var(--bottom) + 6px);transition:background .25s}
 body.immersive{background:#F7F1E3}
 .rd .frame{border:1px solid var(--rline);box-shadow:none;border-radius:4px;padding:6px 7px 4px}
@@ -966,6 +966,24 @@ b,strong,.qc b{font-weight:700}
 .pstats .pst span{color:rgba(255,255,255,.78)}
 .card .mini{box-shadow:none;border-radius:14px;padding:8px 4px;background:none}
 .card .mini+.mini{margin-top:0;border-top:1px solid var(--line);border-radius:0}
+
+/* صفحات المصحف: إطار أنيق وأسطر قصيرة في الوسط */
+.rd .ln.short{justify-content:center;column-gap:.3em}
+.rd .frame{border:0;border-radius:0;padding:4px 4px 2px;background:
+  linear-gradient(var(--rline),var(--rline)) top/100% 1px no-repeat,
+  linear-gradient(var(--rline),var(--rline)) bottom/100% 1px no-repeat}
+.rd .rh{font-size:.8rem;padding:6px 4px 6px;align-items:center}
+.rd .rh span:first-child{font-weight:700;color:var(--bn-c)}
+.rd[data-rt="light"] .rh span:first-child{color:var(--bn-bg)}
+.rd .rf{padding:4px 0 6px}
+.rd .rf{display:flex;justify-content:center}
+.rd .rf::before{content:none}
+.rd .ln.hdr .banner{font-family:var(--quran);font-size:.74em;line-height:1.5;width:92%;padding:.12em .8em;border-radius:.5em;
+  border:1.5px solid var(--bn-b);box-shadow:inset 0 0 0 3px var(--rpaper),inset 0 0 0 4px color-mix(in srgb,var(--bn-b) 55%,transparent);
+  background:var(--bn-bg) linear-gradient(90deg,transparent,color-mix(in srgb,var(--bn-b) 14%,transparent),transparent)}
+.rd[data-rt="light"] .ln.hdr .banner{box-shadow:inset 0 0 0 3px var(--bn-bg),inset 0 0 0 4px rgba(241,215,154,.7);color:#F1D79A}
+.rd .ln.hdr .banner::before,.rd .ln.hdr .banner::after{width:.55em;height:.55em;border-width:2px}
+.rd .ln.hdr .banner{font-family:var(--naskh);font-weight:700;display:flex;align-items:center;justify-content:center;height:1.75em;line-height:1;padding:0 .8em}
 </style>
 </head>
 <body>
@@ -1539,9 +1557,12 @@ function kashidaJustify(L, W) {
   const probe = document.createElement("span"); probe.textContent = "ـــــــــــــــــــ"; probe.style.cssText = "position:absolute;visibility:hidden";
   L.appendChild(probe); const tw = probe.getBoundingClientRect().width / 10; probe.remove(); if (!tw) return;
   L.classList.add("measure");
+  let wmax = 1; for (const ln of L.children) if (!ln.classList.contains("hdr") && !ln.classList.contains("bsm")) wmax = Math.max(wmax, ln.scrollWidth);
   for (const ln of L.children) {
     if (!ln.classList.length || ln.classList.length > 1 && !ln.classList.contains("one")) { if (ln.classList.contains("hdr") || ln.classList.contains("bsm")) continue; }
     const ws = [...ln.querySelectorAll(".a")]; if (ws.length < 2) continue;
+    ln.classList.remove("short");
+    if (!ln.classList.contains("one") && ln.scrollWidth < wmax * 0.7) { ln.classList.add("short"); continue; }
     const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.8 / tw); if (n <= 0) continue;
     const C = ws.map(el => ({ el, t: el.dataset.o || el.textContent, sl: kashidaSlots(el.dataset.o || el.textContent), c: 0 }));
     const cand = C.filter(x => x.sl.length); if (!cand.length) continue;
@@ -1613,6 +1634,8 @@ function pageReader(p, dir) {
   };
   bindSwipePage(rd, p);
   fitPage();
+  // إعادة الضبط بعد تحميل خط المصحف، فقياس الأسطر بالخط البديل يعطي عرضاً خاطئاً
+  if (document.fonts && !document.fonts.check('20px "Amiri Quran"')) document.fonts.load('20px "Amiri Quran"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
 }
 function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); LIVE.page(q); }
 // يتسع الوجه للشاشة: يُحسب ارتفاع الصفحة ثم يُصغَّر الخط حتى يسع الوجه كله بلا تمرير
@@ -1625,7 +1648,8 @@ function fitPage() {
   L.classList.add("measure");
   let w0 = 1; for (const ln of L.children) w0 = Math.max(w0, ln.scrollWidth);
   L.classList.remove("measure");
-  const byW = F0 * (W / w0) * 0.985, byH = H / (n * (p2 => p2)(1.62));
+  // سقف موحّد: لا يكبر خط وجهٍ قصير الأسطر عن بقية الأوجه، فيبقى الحجم ثابتاً عند التقليب
+  const byW = F0 * (W / Math.max(w0, 18.3 * F0)) * 0.985, byH = H / (n * (p2 => p2)(1.62));
   let F = Math.max(13, Math.min(byW, byH, 40 * (ST.fs || 1)));
   pv.style.setProperty("--pf", F + "px");
   // تصحيح بالقياس الفعلي لارتفاع الأسطر (يختلف بحسب مقاييس الخط)
