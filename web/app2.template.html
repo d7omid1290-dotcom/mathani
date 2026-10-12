@@ -1053,6 +1053,12 @@ b,strong,.qc b{font-weight:700}
 .sfr span{font-family:var(--naskh);font-weight:700;font-size:.9em;line-height:1;color:#141414;transform:translateY(.04em)}
 .rd[data-rt="night"] .sfr::before{filter:hue-rotate(-38deg) brightness(.82) saturate(.85)}
 .rd .rh span:first-child,.rd[data-rt="light"] .rh span:first-child{color:var(--rink)}
+
+/* آيات أكبر: هوامش أقل ومسافات كلمات أضيق، والأسطر الأعرض تُضغط قليلاً وحدها */
+.rd{padding-inline:5px}
+.rd .frame{padding:0}
+.rd .ln{column-gap:.16em}
+.rd .lines.measure .ln{column-gap:.16em}
 </style>
 </head>
 <body>
@@ -1740,12 +1746,12 @@ function fitPage(root) {
   const txt = [...L.children].filter(ln => !ln.classList.contains("hdr") && !ln.classList.contains("bsm"));
   const ws = txt.map(ln => ln.scrollWidth).sort((a, b) => b - a);
   // سطر واحد أعرض من البقية لا يُصغّر الوجه كله: يُضبط خط ذلك السطر وحده
-  let w0 = Math.max(1, ws.length > 2 && ws[0] > ws[1] * 1.04 ? ws[1] : ws[0] || 1);
+  let w0 = Math.max(1, ws[Math.floor(ws.length * 0.25)] || 1, (ws[0] || 1) * 0.88);
   for (const ln of L.children) w0 = Math.max(w0, ln.classList.contains("hdr") || ln.classList.contains("bsm") ? ln.scrollWidth : 0);
   txt.forEach(ln => { const w = ln.scrollWidth; if (w > w0) ln.style.fontSize = (w0 / w).toFixed(4) + "em"; });
   L.classList.remove("measure");
   // سقف موحّد: لا يكبر خط وجهٍ قصير الأسطر عن بقية الأوجه، فيبقى الحجم ثابتاً عند التقليب
-  const byW = F0 * (W / Math.max(w0, 18.3 * F0)) * 0.985, byH = H / (n * (p2 => p2)(1.62));
+  const byW = F0 * (W / Math.max(w0, 15.5 * F0)) * 0.99, byH = H / (n * (p2 => p2)(1.62));
   let F = Math.max(13, Math.min(byW, byH, 40 * (ST.fs || 1)));
   pv.style.setProperty("--pf", F + "px");
   // تصحيح بالقياس الفعلي لارتفاع الأسطر (يختلف بحسب مقاييس الخط)
