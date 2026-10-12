@@ -21,6 +21,7 @@ def face(fam, file, w, rng):
 FONTS = "".join([face("Amiri Quran", "amiri-quran-arabic-400-normal.woff2", 400, AR_RANGE), face("Amiri Quran", "amiri-quran-latin-400-normal.woff2", 400, LAT_RANGE),
     face("Amiri", "amiri-arabic-700-normal.woff2", 700, AR_RANGE)] +
     [face("IBM Plex Sans Arabic", f"ibm-plex-sans-arabic-arabic-{w}-normal.woff2", w, AR_RANGE) + face("IBM Plex Sans Arabic", f"ibm-plex-sans-arabic-latin-{w}-normal.woff2", w, LAT_RANGE) for w in (400, 500, 700)] +
+    [face("DigitalKhatt Madina", "digitalkhatt-madina.woff2", 400, AR_RANGE)] +
     [face("Reem Kufi", "reem-kufi-arabic-700-normal.woff2", 700, AR_RANGE), face("Reem Kufi", "reem-kufi-latin-700-normal.woff2", 700, LAT_RANGE)])
 html = html.replace("<style>", "<style>" + FONTS, 1)
 os.makedirs(f"{root}/dist/dorar", exist_ok=True)

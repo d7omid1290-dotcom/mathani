@@ -15,7 +15,7 @@
   --gold:#B07816; --gold-2:#E2B04E; --gold-soft:#FBF0DA; --err:#C0353F; --err-soft:#FBE6E8; --ok:#1F8A62;
   --paper:#FCFDFF;
   --shadow:0 1px 2px rgba(10,30,60,.05),0 6px 18px rgba(10,30,60,.07);
-  --quran:"Amiri Quran","Amiri","Scheherazade New",serif; --naskh:"Amiri",serif;
+  --quran:"Amiri Quran","Amiri","Scheherazade New",serif; --naskh:"Amiri",serif; --mushaf:"DigitalKhatt Madina","Amiri Quran",serif;
   --ui:"IBM Plex Sans Arabic","Segoe UI","Tahoma",system-ui,sans-serif; --kufi:"Reem Kufi","IBM Plex Sans Arabic",sans-serif;
   --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
   --fs:1;
@@ -1001,6 +1001,11 @@ b,strong,.qc b{font-weight:700}
 .rd .ln .end{color:color-mix(in srgb,var(--mk-b) 55%,var(--rink))}
 .rd .ln .end.m{color:var(--mm-b)}
 .rd .rf{padding-top:6px}
+
+/* خط مصحف المدينة (DigitalKhatt، رخصة OFL) لصفحات المصحف */
+.rd .lines,.rd .ln .end,.rd .ln .end.m{font-family:var(--mushaf)}
+.rd .ln.bsm{font-size:1.18em}
+.rd .ln.hdr .banner{font-size:.86em}
 </style>
 </head>
 <body>
@@ -1542,7 +1547,7 @@ function layoutHTML(p, hide) {
     for (const [k, i0, i1] of l[1]) {
       const T = mt(k), m = DATA.mutashabihat[k] ? " m" : "";
       for (let i = i0; i <= i1 && i < T.length; i++) { words++;
-        row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(T[i])}</span>`;
+        row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(T[i]).replace(/ (?=[\u06D6-\u06DC])/g, "")}</span>`;
         if (i === T.length - 1) row += `<span class="end${m}" data-k="${k}">\u06DD${AR(V(k).a)}</span>`; }
     }
     h += `<div class="ln${words <= 1 ? " one" : ""}">${row}</div>`;
@@ -1652,7 +1657,7 @@ function pageReader(p, dir) {
   bindSwipePage(rd, p);
   fitPage();
   // إعادة الضبط بعد تحميل خط المصحف، فقياس الأسطر بالخط البديل يعطي عرضاً خاطئاً
-  if (document.fonts && !document.fonts.check('20px "Amiri Quran"')) document.fonts.load('20px "Amiri Quran"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
+  if (document.fonts && !document.fonts.check('20px "DigitalKhatt Madina"')) document.fonts.load('20px "DigitalKhatt Madina"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
 }
 function turn(p, d) { const q = p + d; if (q < 1 || q > PAGES.length) return; S.reader = q; ST.last = q; save(); S.ui = false; pageReader(q, d > 0 ? "next" : "prev"); LIVE.page(q); }
 // يتسع الوجه للشاشة: يُحسب ارتفاع الصفحة ثم يُصغَّر الخط حتى يسع الوجه كله بلا تمرير

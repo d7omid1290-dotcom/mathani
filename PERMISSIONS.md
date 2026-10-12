@@ -14,7 +14,7 @@
 - أسماء السور وتصنيفها: الموسوعة القرآنية quranpedia.net.
 - تخطيط أسطر مصحف المدينة (١٥ سطراً، ٦٠٤ أوجه): zonetecde/mushaf-layout على GitHub، المبني على بيانات Quran.com ومكتبة QUL.
 - التلاوات الصوتية آيةً آية: EveryAyah (everyayah.com)، تُشغَّل من خوادمه مباشرة ولا تُنسخ. وأسماء القرّاء كما في الموسوعة القرآنية (quranpedia.net/reciters).
-- الخطوط: Amiri Quran وAmiri (خالد حسني) وIBM Plex Sans Arabic وReem Kufi — رخصة SIL Open Font License، مضمّنة في التطبيق، وملفات الرخص في web/fonts.
+- الخطوط: DigitalKhatt New Madina لصفحات المصحف (أمين عنان وTarteel، https://github.com/DigitalKhatt/madinafont) وAmiri Quran وAmiri (خالد حسني) وIBM Plex Sans Arabic وReem Kufi — رخصة SIL Open Font License، مضمّنة في التطبيق، وملفات الرخص في web/fonts.
 
 ## المكتبات والنماذج الخارجية
 - PeerJS 1.5.4 (رخصة MIT): تُحمَّل من unpkg لغرفة التسميع المباشرة.
