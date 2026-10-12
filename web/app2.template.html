@@ -1064,6 +1064,40 @@ b,strong,.qc b{font-weight:700}
 /* بدون شريط تمرير ظاهر */
 html,body,*{scrollbar-width:none}
 ::-webkit-scrollbar{display:none;width:0;height:0}
+/* مواقيت الصلاة: تصميم جديد */
+.ph{position:relative;overflow:hidden;color:#fff;background:var(--star),var(--hero);background-size:72px 72px,auto,auto;border-radius:26px;padding:16px 18px 18px;margin-bottom:14px;box-shadow:0 16px 34px rgba(6,42,32,.22)}
+.ploc{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:.82rem;cursor:pointer}
+.ploc svg{width:15px;height:15px}
+.phx{display:flex;align-items:center;gap:12px;margin-top:16px}.phx>div{flex:1;display:flex;flex-direction:column}
+.phx small{opacity:.75;font-size:.8rem}.phx b{font-size:1.7rem;line-height:1.2}
+.pic2{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(233,210,154,.16);color:#F1D79A;flex:none}.pic2 svg{width:26px;height:26px}
+.pat{font-size:1.25rem;font-weight:600;color:#F1D79A}
+.pcd{font-size:2.6rem;font-weight:600;letter-spacing:.04em;text-align:center;margin:14px 0 10px;font-variant-numeric:tabular-nums;line-height:1}
+.pbar{height:5px;border-radius:9px;background:rgba(255,255,255,.2);overflow:hidden}.pbar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#E9D29A,#F7E7BC)}
+.psub{display:flex;justify-content:space-between;font-size:.78rem;opacity:.8;margin-top:8px}
+.pl2{background:var(--surface);border-radius:22px;padding:6px;box-shadow:var(--sh);margin-bottom:14px}
+.pr2{display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:16px}
+.pr2+.pr2{margin-top:2px}
+.pr2 b{font-size:1rem;font-weight:600}.pr2 b em{font-style:normal;font-size:.68rem;font-weight:600;color:var(--green);background:var(--green-soft);border-radius:99px;padding:2px 8px;vertical-align:2px;margin-inline-start:6px}
+.pr2 .pt{font-variant-numeric:tabular-nums;font-weight:600;font-size:1rem;min-width:72px;text-align:end}
+.pi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);flex:none}.pi svg{width:21px;height:21px}
+.pi.g{background:var(--green-soft);color:var(--green)}
+.pr2.cur{background:var(--green-soft)}.pr2.cur .pi{background:var(--green);color:#fff}.pr2.cur .pt,.pr2.cur b{color:var(--green)}
+.pr2.past b,.pr2.past .pt{color:var(--muted);font-weight:500}.pr2.past .pi{opacity:.6}
+.pb2{width:38px;height:38px;border-radius:12px;border:0;display:grid;place-items:center;cursor:pointer;background:transparent;color:var(--green);flex:none}.pb2 svg{width:20px;height:20px}
+.pb2[aria-pressed="false"]{color:var(--muted);opacity:.6}.pb0{width:38px;flex:none}
+.prow2{display:flex;align-items:center;gap:12px}.prow2 .grow{display:flex;flex-direction:column;gap:2px}
+.btn.sm{padding:8px 14px;font-size:.85rem}
+.qc2{text-align:center}.qc2 .qtxt{display:flex;flex-direction:column;gap:2px;align-items:center}.qc2 .qtxt b{font-size:1.8rem;color:var(--green);line-height:1.1}
+.qc2 .rose{background:radial-gradient(circle,var(--surface) 0 58%,transparent 59%),repeating-conic-gradient(var(--line) 0 1deg,transparent 1deg 15deg),var(--surface);border:1.5px solid var(--line)}
+.qc2 .rose .qd{position:absolute;font-size:.75rem;font-weight:700;color:var(--muted);font-family:var(--ui)}
+.qc2 .rose .q0{top:9%;left:50%;transform:translateX(-50%);color:var(--err)}.qc2 .rose .q1{right:9%;top:50%;transform:translateY(-50%)}
+.qc2 .rose .q2{bottom:9%;left:50%;transform:translateX(-50%)}.qc2 .rose .q3{left:9%;top:50%;transform:translateY(-50%)}
+.qc2 .kaaba i{background:linear-gradient(var(--gold),color-mix(in srgb,var(--gold) 40%,transparent));width:3px;margin-left:-1.5px;top:24%}
+.qc2 .kaaba b{top:8%;width:34px;height:34px}.qc2 .kaaba b svg{width:100%;height:100%}
+.seg{display:flex;background:var(--surface-2);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;border-radius:10px;padding:9px 6px;font:inherit;font-size:.85rem;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 </style>
 </head>
 <body>
@@ -3101,27 +3135,53 @@ function salahHome() {
   return `<button class="ptile" id="salahGo"><span class="pic">🕌</span><span class="grow"><span class="tiny muted">الصلاة القادمة</span><b>${n.n}</b><span class="small muted"><span>${fmtT(n.at)}</span>، <span>${leftTxt(n.at - Date.now())}</span></span></span>
     <span class="tiny muted" style="text-align:end">${c && c.loc ? esc(c.loc.name) : "مكة المكرمة"}<br><span style="color:var(--green);font-weight:600">القبلة والمواقيت</span></span></button>`;
 }
+const PIC = {
+  fajr: I('<path d="M3 19h18"/><path d="M15.5 9.8A5 5 0 1 1 10.2 4.5a4 4 0 0 0 5.3 5.3z"/><path d="M18 4.5v2M17 5.5h2"/>'),
+  sunrise: I('<path d="M3 19h18"/><path d="M7 19a5 5 0 0 1 10 0"/><path d="M12 4v6M9.5 6.5L12 4l2.5 2.5"/><path d="M4.5 14.5l1.2.7M19.5 14.5l-1.2.7"/>'),
+  dhuhr: I('<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>'),
+  asr: I('<path d="M3 20h18"/><circle cx="12" cy="13" r="3.6"/><path d="M12 5.5V7M5.5 13H7M17 13h1.5M7.3 8.3l1 1M16.7 8.3l-1 1"/>'),
+  maghrib: I('<path d="M3 17h18M6 21h12"/><path d="M7 17a5 5 0 0 1 10 0"/><path d="M12 4v6M9.5 7.5L12 10l2.5-2.5"/>'),
+  isha: I('<path d="M17 14.5A7 7 0 1 1 9.5 5a5.5 5.5 0 0 0 7.5 9.5z"/><path d="M18 3.5v2.5M16.75 4.75h2.5M20.5 9v1.6M19.7 9.8h1.6"/>'),
+  bellOff: I('<path d="M6 16V11a6 6 0 0 1 9.3-5"/><path d="M18 11v5l1.5 2H8"/><path d="M10 20a2 2 0 0 0 4 0"/><path d="M4 4l16 16"/>'),
+  chevD: I('<path d="M6 9l6 6 6-6"/>'),
+  kaaba: '<svg viewBox="0 0 32 32"><path d="M6 10l10-4 10 4v14l-10 4-10-4z" fill="#1A1A1A"/><path d="M6 10l10 4 10-4" fill="none" stroke="#3A3A3A" stroke-width="1"/><path d="M6 14.5l10 4 10-4" fill="none" stroke="#D9AE52" stroke-width="1.8"/><path d="M16 14v14" stroke="#2E2E2E" stroke-width="1"/></svg>'
+};
+const cdTxt = ms => { const t = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, x = t % 60;
+  return AR(String(h).padStart(2, "0")) + ":" + AR(String(m).padStart(2, "0")) + ":" + AR(String(x).padStart(2, "0")); };
+function prevPrayerAt(now, t) {
+  let at = null; for (const [k] of PRAY) if (t[k] <= now) at = t[k];
+  if (at) return at; const y = new Date(now); y.setDate(y.getDate() - 1); return todayTimes(y).isha;
+}
 function salah() {
-  const c = salahCfg(), t = todayTimes(), n = nextPrayer(), q = PT.qibla(c.loc.lat, c.loc.lng);
-  const hij = (() => { try { return new Intl.DateTimeFormat({ ar: "ar-SA", en: "en", ur: "ur" }[LG] + "-u-ca-islamic", { day: "numeric", month: "long", year: "numeric" }).format(new Date()); } catch (e) { return ""; } })();
+  const c = salahCfg(), now = new Date(), t = todayTimes(now), n = nextPrayer(), q = PT.qibla(c.loc.lat, c.loc.lng);
+  const hij = (() => { try { return new Intl.DateTimeFormat({ ar: "ar-SA", en: "en", ur: "ur" }[LG] + "-u-ca-islamic", { day: "numeric", month: "long", year: "numeric" }).format(now); } catch (e) { return ""; } })();
+  const prev = prevPrayerAt(now, t), pc = Math.min(100, Math.max(0, (now - prev) / (n.at - prev) * 100));
+  const ticks = ["N", "E", "S", "W"].map((d, i) => `<span class="qd q${i}">${d}</span>`).join("");
   $("#view").innerHTML = bar("مواقيت الصلاة", hij, true) + `
-    <div class="pnext"><div><div class="tiny" style="opacity:.8">الصلاة القادمة</div><div class="pn2">${n.n}</div><div><span>${fmtT(n.at)}</span>، <span id="pleft">${leftTxt(n.at - Date.now())}</span></div></div><div class="pbig">${HICON.dome}</div></div>
-    <div class="card"><div class="row"><span class="grow"><b>${esc(c.loc.name)}</b><div class="tiny muted">${c.loc.lat.toFixed(2)}°، ${c.loc.lng.toFixed(2)}°</div></span><button class="btn" id="pLoc">${HICON.pin}<span>حدّد موقعي</span></button></div>
-      <button class="link" id="pCity" style="margin-top:6px">أو اختر مدينة</button></div>
-    <div class="card plist">${PRAY.map(([k, nm]) => `<div class="prow ${n.k === k ? "cur" : ""}"><b class="grow">${nm}</b><span class="pt">${fmtT(t[k])}</span>
-      ${k === "sunrise" ? `<span style="width:40px"></span>` : `<button class="pbell" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? "🔔" : "🔕"}</button>`}</div>`).join("")}</div>
-    <div class="card"><div class="row"><span class="grow"><b>تنبيه الأذان</b><div class="tiny muted" id="pNote">${adhanState()}</div></span><button class="btn primary" id="pTest">${HICON.bell}<span>جرّب</span></button></div></div>
+    <section class="ph">
+      <button class="ploc" id="pLoc">${HICON.pin}<span>${esc(c.loc.name)}</span>${PIC.chevD}</button>
+      <div class="phx"><span class="pic2">${PIC[n.k]}</span><div><small>الصلاة القادمة</small><b>${n.n}</b></div><span class="pat">${fmtT(n.at)}</span></div>
+      <div class="pcd" id="pcd" dir="ltr">${cdTxt(n.at - now)}</div>
+      <div class="pbar"><i style="width:${pc.toFixed(1)}%"></i></div>
+      <div class="psub"><span>متبقٍّ على الأذان</span><span id="pleft">${leftTxt(n.at - now)}</span></div>
+    </section>
+    <div class="pl2">${PRAY.map(([k, nm]) => { const past = t[k] <= now && n.k !== k, cur = n.k === k, sr = k === "sunrise";
+      return `<div class="pr2 ${cur ? "cur" : ""} ${past ? "past" : ""}"><span class="pi">${PIC[k]}</span><b class="grow">${nm}${cur ? ` <em>القادمة</em>` : ""}</b><span class="pt">${fmtT(t[k])}</span>
+        ${sr ? `<span class="pb0"></span>` : `<button class="pb2" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? HICON.bell : PIC.bellOff}</button>`}</div>`; }).join("")}</div>
+    <div class="card prow2"><span class="pi g">${HICON.spk}</span><span class="grow"><b>صوت الأذان</b><div class="tiny muted" id="pNote">${adhanState()}</div></span><button class="btn sm" id="pTest">جرّب</button></div>
     <div class="sec2"><h2>القبلة</h2></div>
-    <div class="card qcard"><div class="dial" id="dial"><div class="rose" id="rose"><span class="nn">N</span><div class="kaaba" style="transform:rotate(${q.bearing}deg)"><i></i><b>🕋</b></div></div><div class="phone"></div></div>
-      <div class="qtxt"><b>${AR(Math.round(q.bearing))}°</b> <span class="small muted">من الشمال باتجاه عقارب الساعة</span><div class="tiny muted"><span>${FM("المسافة إلى مكة المكرمة: {0} كم", q.km)}</span></div><div class="tiny" id="qhint" style="margin-top:6px;color:var(--muted)">ضع الجوال مسطحاً، ثم اضغط «شغّل البوصلة» ولفّ حتى يشير السهم إلى الكعبة.</div></div>
-      <button class="btn block" id="qStart" style="margin-top:12px">🧭 شغّل البوصلة</button></div>
+    <div class="card qc2"><div class="dial" id="dial"><div class="rose" id="rose">${ticks}<div class="kaaba" style="transform:rotate(${q.bearing}deg)"><i></i><b>${PIC.kaaba}</b></div></div><div class="phone"></div></div>
+      <div class="qtxt"><b dir="ltr">${AR(Math.round(q.bearing))}°</b><span class="small muted">من الشمال باتجاه عقارب الساعة</span><span class="tiny muted">${FM("المسافة إلى مكة المكرمة: {0} كم", q.km)}</span></div>
+      <div class="tiny muted" id="qhint" style="margin-top:8px">ضع الجوال مسطحاً، ثم اضغط «شغّل البوصلة» ولفّ حتى يشير السهم إلى الكعبة.</div>
+      <button class="btn block" id="qStart" style="margin-top:12px">شغّل البوصلة</button></div>
     <div class="sec2"><h2>طريقة الحساب</h2></div>
     <div class="card"><select id="pMethod" class="wsel" style="margin-top:0">${Object.entries(PT.METHODS).map(([k, m]) => `<option value="${k}" ${c.method === k ? "selected" : ""}>${m.n}</option>`).join("")}</select>
-      <div class="chips" style="margin-top:10px"><button class="wopt" style="flex:1" data-asr="1" aria-pressed="${c.asr === 1}"><b>العصر: الجمهور</b></button><button class="wopt" style="flex:1" data-asr="2" aria-pressed="${c.asr === 2}"><b>العصر: الحنفي</b></button></div>
-      <div class="tiny muted" style="margin-top:8px">المواقيت محسوبة فلكياً على جهازك بحسب موقعك وطريقة الحساب، وقد تختلف دقائق عن تقويم بلدك الرسمي.</div></div>`;
+      <div class="seg" style="margin-top:10px"><button data-asr="1" aria-pressed="${c.asr === 1}">العصر: الجمهور</button><button data-asr="2" aria-pressed="${c.asr === 2}">العصر: الحنفي</button></div>
+      <div class="tiny muted" style="margin-top:10px">المواقيت محسوبة فلكياً على جهازك بحسب موقعك وطريقة الحساب، وقد تختلف دقائق عن تقويم بلدك الرسمي.</div></div>`;
   $("#back").onclick = () => go("home");
-  $("#pLoc").onclick = () => { $("#pLoc").textContent = "…"; geoLocate(ok => { if (!ok) alert(tr("تعذّر تحديد موقعك. اسمح للمتصفح بالوصول إلى الموقع، أو اختر مدينة.")); salah(); }); };
-  $("#pCity").onclick = () => { openSheet(`<h3>اختر مدينة</h3><div class="langs">${CITIES.map(([nm], i) => `<button class="item" data-city="${i}">${nm}</button>`).join("")}</div>`);
+  clearInterval(window.__pcd); window.__pcd = setInterval(() => { const e = $("#pcd"); if (!e) return clearInterval(window.__pcd); const m = nextPrayer(); if (m.k !== n.k) return salah(); e.textContent = cdTxt(m.at - Date.now()); }, 1000);
+  $("#pLoc").onclick = () => { openSheet(`<h3>الموقع</h3><button class="btn primary block" id="pGeo">${HICON.pin}<span>حدّد موقعي</span></button><div class="small muted" style="margin:14px 0 6px">أو اختر مدينة</div><div class="langs">${CITIES.map(([nm], i) => `<button class="item" data-city="${i}">${nm}</button>`).join("")}</div>`);
+    $("#pGeo").onclick = () => { $("#pGeo").textContent = "…"; geoLocate(ok => { closeSheet(); if (!ok) alert(tr("تعذّر تحديد موقعك. اسمح للمتصفح بالوصول إلى الموقع، أو اختر مدينة.")); salah(); }); };
     document.querySelectorAll("[data-city]").forEach(b => b.onclick = () => { const [nm, la, lo] = CITIES[+b.dataset.city]; c.loc = { name: nm, lat: la, lng: lo, auto: false }; save(); closeSheet(); salah(); }); };
   document.querySelectorAll("[data-bell]").forEach(b => b.onclick = () => { c.alerts[b.dataset.bell] = !c.alerts[b.dataset.bell]; save(); askNotify(); salah(); });
   $("#pTest").onclick = () => { askNotify(); playAdhan(); };
