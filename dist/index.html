@@ -1247,6 +1247,11 @@ button.hqfire{border:0;background:none;cursor:pointer;font:inherit;padding:0}
 .lhlink{font-size:11.5px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.2);word-break:break-all;margin-bottom:6px}
 .lsc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-top:24px;padding:28px 18px;border-radius:28px;background:var(--surface,#fff);box-shadow:0 10px 28px rgba(11,42,33,.07)}
 .lsring{display:grid;place-items:center;width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;margin-bottom:12px;box-shadow:0 0 0 10px rgba(22,154,114,.12)}
+.lvv{position:fixed;inset-inline-start:10px;bottom:84px;z-index:60;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto}
+.lvv video{width:110px;height:82px;object-fit:cover;border-radius:14px;background:#000;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.lvv video.me{width:76px;height:56px;opacity:.9}
+.lvv.inl{position:relative;inset:auto;flex-direction:row;flex-wrap:wrap;justify-content:center;max-height:none;margin-bottom:12px}
+.lvv.inl video:not(.me){width:100%;max-width:340px;height:auto;aspect-ratio:4/3}
 .lsring svg{width:44px;height:44px}.lsring.on{animation:fpulse2 1.8s ease-in-out infinite}
 .lsc b{font-size:22px}.lsc small{font-size:14px;color:var(--muted)}.lsc p{margin:14px 0 0;font-size:14px;color:var(--muted)}
 .lsh{margin:20px 4px 10px;font-size:15px}
@@ -1763,7 +1768,7 @@ const accChip = a => `<span class="chip ${a >= .9 ? "" : a >= .7 ? "mid" : "low"
 const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
   T: { page: 3, from: null, to: null, mode: "live", phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, progText: "" },
   quiz: null };
-function go(tab) { if (RR.on) rrStop(false); if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
+function go(tab) { if (RR.on) rrStop(false); if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } const vv = document.getElementById("lvVids"); if (vv) document.body.appendChild(vv); S.tab = tab; S.reader = null; render(); scrollTo(0, 0); if (typeof LIVE !== "undefined") LIVE.vids(); }
 function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); if (S.rview === "mushaf") LIVE.page(+p); }
 /* تعرّف على الآية في الرئيسية نفسها */
 const FND = { st: "idle", k: null, heard: "", sr: null };
@@ -1874,14 +1879,16 @@ function halaqa() {
 function liveStu() {
   const L = LIVE.state, p = L.cur;
   if (!L.peer) return go("halaqa");
+  const vv = $("#lvVids"); if (vv) document.body.appendChild(vv);
   $("#view").innerHTML = bar(esc(L.hname || "الحلقة المباشرة"), L.remote ? "متصل بالمعلم" : "جارٍ الاتصال…", true) + `
-    <div class="lsc"><div class="lsring ${L.remote ? "on" : ""}">${ICON.mic}</div>
+    <div class="lsc"><div id="lsVid" class="lsvid"></div><div class="lsring ${L.remote ? "on" : ""}" id="lsRing">${ICON.mic}</div>
       <b>${p ? `سورة ${pageSurah(p)}` : "بانتظار المعلم"}</b>
       <small>${p ? `الوجه ${AR(p)}، الآيات ${pageRange(p)}` : "سيظهر هنا الموضع الذي يختاره المعلم"}</small>
       <p>سمّع من حفظك، والمعلم يسمعك ويتابعك على المصحف.</p></div>
     <h4 class="lsh">في الحلقة الآن${L.roster ? ` (${AR(L.roster.length)})` : ""}</h4>
     <div class="lsr">${(L.roster || []).map(r => `<div class="lsp ${r.host ? "host" : ""}"><span>${esc((r.n || "؟").trim().replace(/^(الشيخ|الأستاذ|ال)\s*/, "").charAt(0) || "؟")}</span><b>${esc(r.n)}</b>${r.host ? "<small>المعلم</small>" : ""}</div>`).join("") || `<p class="tiny muted">تظهر هنا أسماء زملائك عند دخولهم.</p>`}</div>
     <div class="two" style="margin-top:16px"><button class="btn" id="lsChat">💬 الدردشة</button><button class="btn" id="lsEnd" style="color:var(--err)">مغادرة الحلقة</button></div>`;
+  LIVE.vids(); const hv = $("#lsVid video[id^='au-']:not([hidden])"); if (hv) $("#lsRing").style.display = "none";
   $("#back").onclick = () => go("halaqa"); $("#lsChat").onclick = () => LIVE.chatSheet(); $("#lsEnd").onclick = () => LIVE.end(true);
 }
 /* اختيار السورة قبل التسميع والمعلّم والحلقة */
@@ -3498,18 +3505,19 @@ const LIVE = (() => {
     el.innerHTML = `<span class="dot ${L.remote ? "on" : ""}"></span><div class="grow"><b>حلقة مباشرة</b><small>${esc(L.status)}</small></div>
       <button id="lvChat" aria-label="الدردشة" class="lvch">💬${L.unread ? `<i>${AR(L.unread)}</i>` : ""}</button>
       ${L.host ? `<button id="lvShare" aria-label="شارك رابط الحلقة">${ICON.share}</button>` : ""}
+      <button id="lvCam" aria-pressed="${!L.cam}" aria-label="${L.cam ? "أطفئ الكاميرا" : "شغّل الكاميرا"}" class="lvch">${L.cam ? "📷" : "🚫"}</button>
       <button id="lvMute" aria-pressed="${L.muted}" aria-label="${L.muted ? "شغّل الميكروفون" : "اكتم الميكروفون"}">${L.muted ? ICON.micoff : ICON.mic}</button>
       <button id="lvEnd" class="end2" aria-label="أنهِ الحلقة">إنهاء</button>`;
-    if (L.host) $("#lvShare").onclick = shareSheet; $("#lvChat").onclick = chatSheet;
+    if (L.host) $("#lvShare").onclick = shareSheet; $("#lvChat").onclick = chatSheet; $("#lvCam").onclick = camToggle;
     $("#lvMute").onclick = () => { L.muted = !L.muted; L.stream && L.stream.getAudioTracks().forEach(t => t.enabled = !L.muted); bar(); };
     $("#lvEnd").onclick = () => end(true);
   }
   const setStatus = t => { L.status = t; bar(); };
   const count = () => { L.remote = L.calls.filter(c => c.open !== false && c._live).length; setStatus(L.remote ? (L.host ? `متصل مع ${AR(L.remote)}` : "متصل بالحلقة") : L.host ? "بانتظار من يدخل بالرابط…" : "جارٍ الاتصال…"); };
   function playRemote(call) {
-    call.on("stream", st => { call._live = true; let a = $("#au-" + call.peer); if (!a) { a = document.createElement("audio"); a.id = "au-" + call.peer; a.autoplay = true; a.setAttribute("playsinline", ""); document.body.appendChild(a); }
-      a.srcObject = st; a.play().catch(() => {}); count(); });
-    const gone = () => { call._live = false; const a = $("#au-" + call.peer); a && a.remove(); L.calls = L.calls.filter(c => c !== call); count(); };
+    call.on("stream", st => { call._live = true; vids(); let a = $("#au-" + call.peer); if (!a) { a = document.createElement("video"); a.id = "au-" + call.peer; a.autoplay = true; a.setAttribute("playsinline", ""); ($("#lvVids") || document.body).appendChild(a); }
+      a.srcObject = st; a.hidden = !st.getVideoTracks().length; a.play().catch(() => {}); vids(); count(); });
+    const gone = () => { call._live = false; const a = $("#au-" + call.peer); a && a.remove(); L.calls = L.calls.filter(c => c !== call); vids(); count(); };
     call.on("close", gone); call.on("error", gone);
     L.calls.push(call);
   }
@@ -3531,8 +3539,20 @@ const LIVE = (() => {
   }
   async function mic() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("mic");
-    return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    const au = { echoCancellation: true, noiseSuppression: true };
+    try { const st = await navigator.mediaDevices.getUserMedia({ audio: au, video: { facingMode: "user", width: { ideal: 480 }, height: { ideal: 360 } } }); L.cam = true; return st; }
+    catch (e) { if (e && e.name === "NotAllowedError") { try { L.cam = false; return await navigator.mediaDevices.getUserMedia({ audio: au }); } catch (e2) { throw e2; } } L.cam = false; return navigator.mediaDevices.getUserMedia({ audio: au }); }
   }
+  /* لوحة الفيديو: المعلم يرى طلابه، والطالب يرى معلمه، وكلٌّ يرى نفسه صغيراً */
+  function vids() {
+    let el = $("#lvVids"); if (!L.peer) { el && el.remove(); return; }
+    if (!el) { el = document.createElement("div"); el.id = "lvVids"; el.className = "lvv"; document.body.appendChild(el); }
+    const host = S.tab === "liveStu" && $("#lsVid"); if (host && el.parentNode !== host) host.appendChild(el); else if (!host && el.parentNode !== document.body) document.body.appendChild(el);
+    el.classList.toggle("inl", !!host);
+    let me = $("#vd-me"); if (L.stream && L.stream.getVideoTracks().length) { if (!me) { me = document.createElement("video"); me.id = "vd-me"; me.muted = true; me.autoplay = true; me.setAttribute("playsinline", ""); me.className = "me"; me.srcObject = L.stream; el.appendChild(me); me.play().catch(() => {}); } me.hidden = !L.cam; }
+    el.hidden = !el.querySelector("video:not([hidden])");
+  }
+  function camToggle() { if (!L.stream) return; const v = L.stream.getVideoTracks(); if (!v.length) return openSheet(`<h3>الكاميرا</h3><div class="alert">لم يُسمح بالكاميرا عند الدخول. اسمح بها من إعدادات المتصفح ثم ادخل الحلقة من جديد.</div>`); L.cam = !L.cam; v.forEach(t => t.enabled = L.cam); bar(); vids(); }
   function fail(e) {
     const msg = e && e.message === "mic" ? "لا يمكن الوصول إلى الميكروفون. افتح مثاني في Chrome أو Safari واسمح بالميكروفون."
       : e && e.name === "NotAllowedError" ? "لم يُسمح بالميكروفون. اسمح به من إعدادات المتصفح ثم حاول مرة أخرى."
@@ -3557,7 +3577,7 @@ const LIVE = (() => {
       setStatus("جارٍ التجهيز…");
       L.stream = await mic(); await loadLib();
       const H = typeof fixed === "object" && fixed ? fixed : null;
-      L.host = true; L.room = H ? H.id : rid(); L.hname = H ? H.name : ""; L.peer = newPeer(L.room); bar();
+      L.host = true; L.room = H ? H.id : rid(); L.hname = H ? H.name : ""; L.peer = newPeer(L.room); bar(); vids();
       L.peer.on("open", () => { count(); if (!H) shareSheet(); });
       L.peer.on("call", call => { call.answer(L.stream); playRemote(call); });
       L.peer.on("connection", wire);
@@ -3569,7 +3589,7 @@ const LIVE = (() => {
   async function join(room, n) {
     try { if (n) L.hname = n;
       L.stream = await mic(); await loadLib();
-      L.host = false; L.room = room; L.peer = newPeer(); setStatus("جارٍ الاتصال…");
+      L.host = false; L.room = room; L.peer = newPeer(); setStatus("جارٍ الاتصال…"); vids();
       L.peer.on("open", () => { playRemote(L.peer.call(room, L.stream)); wire(L.peer.connect(room, { reliable: true })); go("liveStu"); });
       L.peer.on("error", fail);
     } catch (e) { fail(e); }
@@ -3578,21 +3598,24 @@ const LIVE = (() => {
     L.calls.forEach(c => { try { c.close(); } catch (e) {} }); L.conns.forEach(c => { try { c.close(); } catch (e) {} });
     if (L.peer) { try { L.peer.destroy(); } catch (e) {} }
     if (L.stream) L.stream.getTracks().forEach(t => t.stop());
-    document.querySelectorAll("audio[id^='au-']").forEach(a => a.remove());
+    document.querySelectorAll("[id^='au-']").forEach(a => a.remove()); const vv = $("#lvVids"); vv && vv.remove();
     Object.assign(L, { peer: null, stream: null, calls: [], conns: [], muted: false, remote: 0, room: null, unread: 0 });
     if (user && location.search.includes("room=")) history.replaceState(null, "", location.pathname);
-    bar(); if (S.tab === "liveStu") go("halaqa");
+    L.cam = false; bar(); if (S.tab === "liveStu") go("halaqa");
   }
   function page(p) { if (!L.peer || L.syncing) return; L.conns.forEach(c => c.open && c.send({ t: "page", p })); }
   function boot() {
     const q = new URLSearchParams(location.search), room = q.get("room"), hn = (q.get("n") || "").slice(0, 40); if (!room || !/^mathani-[a-z0-9]{3,20}$/.test(room)) return;
     if (!(ST.myHalaqa && ST.myHalaqa.id === room)) { ST.joined = { id: room, name: hn || (ST.joined && ST.joined.id === room ? ST.joined.name : "حلقتي") }; save(); }
     openSheet(`<div class="empty" style="padding:10px 0 4px">${ICON.users}<h3 style="margin:6px 0">${hn ? esc(hn) : "دعوة إلى حلقة مباشرة"}</h3>
-      <p class="small muted" style="margin:0">ستسمع معلمك ويسمعك، وتقرآن من الوجه نفسه.</p></div>
+      <p class="small muted" style="margin:0">تدخل من المتصفح مباشرة بلا تثبيت، بالصوت والكاميرا.</p></div>
+      <label class="tiny muted" for="lvNm">اسمك كما يراه المعلم وزملاؤك</label>
+      <input class="psq" id="lvNm" maxlength="30" value="${esc(ST.name || "")}" placeholder="اكتب اسمك" autocomplete="name">
       <button class="btn primary block" id="lvJoin">${ICON.mic}انضم الآن</button>`);
-    $("#lvJoin").onclick = () => { closeSheet(); join(room, hn); };
+    const nm = $("#lvNm"), ok = () => { const v = nm.value.trim(); if (v.length < 2) { nm.focus(); nm.style.borderColor = "var(--err)"; return; } ST.name = v; save(); closeSheet(); join(room, hn); };
+    $("#lvJoin").onclick = ok; nm.onkeydown = e => { if (e.key === "Enter") ok(); }; if (!ST.name) setTimeout(() => nm.focus(), 50);
   }
-  return { start, join, end, page, boot, state: L, shareSheet, chatSheet };
+  return { start, join, end, page, boot, state: L, shareSheet, chatSheet, vids };
 })();
 
 
