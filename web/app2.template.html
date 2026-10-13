@@ -1181,7 +1181,7 @@ html,body,*{scrollbar-width:none}
 .hband.hqh{padding-bottom:26px}.hqh .hbin{align-items:flex-start}.hqstats{align-self:stretch}
 .hqname{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:8px 14px;border-radius:999px;border:1px solid rgba(217,174,85,.55);background:rgba(255,255,255,.08);color:#F3E3B5;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
 .hqname svg{width:18px;height:18px}.hqname small{opacity:.7;font-size:12px}
-.hqstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.hqstats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:18px}
 .hqstats span{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
 .hqstats b{font-size:22px;color:#fff}.hqstats small{font-size:11.5px;color:rgba(255,255,255,.72)}
 .hqstats b{display:inline-flex;align-items:center;gap:4px}.flame{width:28px;height:28px}.strk:not(.on) .flame{opacity:.75}.strk.on{border-color:rgba(242,163,58,.5);background:rgba(242,163,58,.12)}
@@ -1191,6 +1191,11 @@ html,body,*{scrollbar-width:none}
 .hfind{display:flex;align-items:center;gap:12px;width:calc(100% - 32px);margin:14px 16px 0;padding:14px 16px;border-radius:22px;border:1px dashed rgba(14,90,67,.35);background:var(--soft,#E6F0EB);color:#0E5A43;font:inherit;text-align:start;cursor:pointer}
 .hfind .hqi{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff}
 .hfind b{display:block;font-size:15px}.hfind small{display:block;font-size:12px;color:var(--muted)}
+.hqfire{position:absolute;left:4px;top:-14px;width:84px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;filter:drop-shadow(0 6px 16px rgba(232,100,31,.4))}
+.hqfire svg{position:absolute;inset:0;width:100%;height:100%}
+.hqfire b{position:relative;font-size:28px;line-height:1;color:#7A2A05}
+.hqfire small{position:relative;font-size:11px;color:#7A2A05;font-weight:700}
+
 </style>
 </head>
 <body>
@@ -1254,7 +1259,7 @@ const ICON = {
   home: I('<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
   book: I('<path d="M12 6c-2-1.5-5-2-8-1.5V19c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V4.5C17 4 14 4.5 12 6z"/><path d="M12 6v14.5"/>'),
   mic: I('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
-  halaqa: I('<path d="M3 20c2.7-1.3 6-1.3 9 0 3-1.3 6.3-1.3 9 0V10c-2.7-1.3-6-1.3-9 0-3-1.3-6.3-1.3-9 0z"/><path d="M12 10v10"/><circle cx="12" cy="4.5" r="1.6"/><circle cx="5.5" cy="5.8" r="1.4"/><circle cx="18.5" cy="5.8" r="1.4"/>'),
+  halaqa: I('<path d="M3 20c2.7-1.3 6-1.3 9 0 3-1.3 6.3-1.3 9 0V10c-2.7-1.3-6-1.3-9 0-3-1.3-6.3-1.3-9 0z"/><path d="M12 10v10"/>'),
   review: I('<path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/>'),
   user: I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
   tafsir: I('<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M9 9h6M9 13h4"/>'),
@@ -1404,9 +1409,10 @@ function halaqa() {
   const todayN = ST.sessions.filter(x => x.at >= t0).length, mast = Object.values(ST.pages).filter(r => r && r.errors === 0).length;
   const hname = ST.halaqa || "حلقتي";
   $("#view").innerHTML = `<header class="hband hqh"><div class="hbin">
+      <div class="hqfire ${st.cur ? "on" : ""}" title="أيام متتالية"><svg viewBox="0 0 64 76"><defs><linearGradient id="fg1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E4571B"/><stop offset=".6" stop-color="#F59A2E"/><stop offset="1" stop-color="#FFC857"/></linearGradient><linearGradient id="fg2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFB13B"/><stop offset="1" stop-color="#FFE29A"/></linearGradient></defs><path fill="url(#fg1)" d="M33 2c3 13 13 19 19 29 4 7 6 14 6 20a26 26 0 0 1-52 0c0-10 5-18 11-24 0 7 3 12 8 14-3-12 2-27 8-39z"/><path fill="url(#fg2)" opacity=".9" d="M32 34c6 6 12 11 12 20a12 12 0 0 1-24 0c0-6 4-11 7-14 1 4 3 6 5 6-1-5-1-8 0-12z"/></svg><b>${AR(st.cur || 0)}</b><small>يوم</small></div>
       <div class="hgreet">أهلاً${ST.name ? `، ${esc(ST.name)}` : ""}</div>
-      <button class="hqname" id="hqName"><span class="hqnl">حلقتك</span><b>${esc(hname)}</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
-      <div class="hqstats"><span><b>${AR(todayN)}</b><small>تسميع اليوم</small></span><span><b>${AR(mast)}</b><small>أوجه متقنة</small></span><span class="strk ${st.cur ? "on" : ""}"><b><svg class="flame" viewBox="0 0 24 24"><path fill="#F2A33A" d="M12 2c1 3.5-1.5 5-2.5 7.5C8.6 11.8 9.5 14 11 14c-2.2-1.6-.6-4.6 1.5-6 .3 3 3.5 4.5 3.5 8a5 5 0 0 1-10 0c0-1.6.6-3 1.4-4.2C9 8.6 12 6.5 12 2z"/><path fill="#FFD36B" d="M12 13c1.8 1.6 2.6 3 2.6 4.3a2.6 2.6 0 0 1-5.2 0c0-1.3.9-2.6 2.6-4.3z"/></svg>${AR(st.cur || 0)}</b><small>أيام متتالية</small></span></div>
+      <button class="hqname" id="hqName"><span class="hqnl">حلقة</span><b>${esc(hname)}</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
+      <div class="hqstats"><span><b>${AR(todayN)}</b><small>تسميع اليوم</small></span><span><b>${AR(mast)}</b><small>أوجه متقنة</small></span></div>
     </div></header><div class="hqs">
     ${c("hqTas", ICON.mic, "التسميع", "وردك أو سورة تختارها، على المصحف", "main")}
     ${c("hqTeach", ICON.listen, "المصحف المعلّم", "استمع للشيخ وردّد بعده آيةً آية")}
