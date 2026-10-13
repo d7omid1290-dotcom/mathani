@@ -1153,6 +1153,21 @@ html,body,*{scrollbar-width:none}
 .hti{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff}
 .hti svg{width:22px;height:22px}
 .htile+.htile .hti{background:linear-gradient(135deg,#B8862E,#D9AE55)}
+.tchip{border:0;background:var(--soft,#E6F0EB);color:var(--brand,#0E5A43);font:inherit;font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer}
+.thd{display:flex;align-items:center;justify-content:space-between}
+.tsteps{display:flex;justify-content:center;gap:6px;margin:12px 0 4px}
+.tsteps span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:5px 10px 5px 12px;border-radius:999px;background:transparent;transition:.2s}
+.tsteps i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--line,#e5e2da);font-size:11px}
+.tsteps .on{background:var(--soft,#E6F0EB);color:var(--brand,#0E5A43);font-weight:700}.tsteps .on i{background:var(--brand,#0E5A43);color:#fff}
+.tsteps .done i{background:#D9AE55;color:#fff}
+.tbig{min-height:56px;font-size:16px;gap:10px}.tbig svg{width:20px;height:20px}
+.tbig.rec{background:linear-gradient(135deg,#B8862E,#D9AE55)}
+.tround{width:48px;height:48px;border-radius:50%;border:0;background:var(--surface,#fff);box-shadow:var(--sh);font-size:26px;line-height:1;color:var(--brand,#0E5A43);cursor:pointer}
+.tround:disabled{opacity:.35}
+.tprog{flex:1;height:6px;border-radius:9px;background:var(--line,#e5e2da);overflow:hidden;margin:0 8px}.tprog i{display:block;height:100%;background:linear-gradient(90deg,#0E5A43,#169A72);border-radius:9px}
+.fsteps{display:flex;justify-content:space-between;gap:6px;margin:4px 0 12px}
+.fsteps span{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);text-align:center;background:var(--surface,#fff);border-radius:16px;padding:10px 4px;box-shadow:var(--sh)}
+.fsteps i{font-style:normal;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;font-size:12px}
 </style>
 </head>
 <body>
@@ -2212,10 +2227,11 @@ function teacher() {
     : ph === "repeat" ? `<div class="tst"><span class="dot pulse r"></span>ردّد الآية الآن… ثم اضغط «انتهيت»</div>`
     : ph === "result" ? (TCH.score >= 0.85 ? `<div class="tst ok">${ICON.check || ""}أحسنت! قراءة صحيحة، ننتقل للآية التالية…</div>`
       : `<div class="tst bad">قاربت. الكلمات بالأحمر لم تُسمع بوضوح. أعد الاستماع ثم ردّد مرة أخرى.</div>`)
-    : `<div class="tst">اضغط «ابدأ» لتسمع الآية ثم تردّدها.</div>`;
+    : `<div class="tst">استمع للآية بصوت الشيخ، ثم ردّدها بعده.</div>`;
   $("#view").innerHTML = bar("المصحف المعلّم", `بصوت ${TREC()[1]}`, true) + `
     <div class="tcard">
-      <div class="thd"><span>سورة ${surahN}</span><span>الآية ${AR(v.a)}</span></div>
+      <div class="thd"><button class="tchip" id="tPick">سورة ${surahN} ▾</button><span>الآية ${AR(v.a)}</span></div>
+      <div class="tsteps">${[["listen","استمع"],["repeat","ردّد"],["result","النتيجة"]].map(([id,t],i)=>`<span class="${ph===id?"on":(["listen","repeat","result"].indexOf(ph)>i?"done":"")}"><i>${AR(i+1)}</i>${t}</span>`).join("")}</div>
       <div class="tay" dir="rtl">${wHTML} <span class="tend">۝${AR(v.a)}</span></div>
       ${status}
       ${TCH.err ? `<div class="err">${TCH.err}</div>` : ""}
@@ -2223,12 +2239,12 @@ function teacher() {
       ${TCH.recUrl && ph === "result" ? `<button class="link" id="tMine" style="margin-top:6px">${ICON_PLAY.replace("<svg", '<svg width="14" height="14"')} استمع لتسجيلك</button>` : ""}
     </div>
     <div class="tbtns">
-      ${ph === "repeat" ? `<button class="btn primary block" id="tDone">انتهيت</button>`
-        : ph === "listen" ? `<button class="btn block" id="tSkipL">ردّد الآن</button>`
-        : ph === "result" && TCH.score < 0.85 ? `<button class="btn primary" id="tAgain">أعد الاستماع</button><button class="btn" id="tRetry">ردّد مرة أخرى</button>`
-        : ph === "result" ? "" : `<button class="btn primary block" id="tGo">ابدأ</button>`}
+      ${ph === "repeat" ? `<button class="btn primary block tbig rec" id="tDone">${ICON.check || ""}انتهيت</button>`
+        : ph === "listen" ? `<button class="btn block tbig" id="tSkipL">${ICON.mic}ردّد الآن</button>`
+        : ph === "result" && TCH.score < 0.85 ? `<button class="btn primary tbig" id="tAgain">${ICON_PLAY}أعد الاستماع</button><button class="btn tbig" id="tRetry">${ICON.mic}ردّد مرة أخرى</button>`
+        : ph === "result" ? "" : `<button class="btn primary block tbig" id="tGo">${ICON_PLAY}ابدأ الاستماع</button>`}
     </div>
-    <div class="tnav"><button class="btn" id="tPrev" ${idx === 0 ? "disabled" : ""}>السابقة</button><button class="link" id="tPick">اختر سورة</button><button class="btn" id="tNext" ${idx >= total - 1 ? "disabled" : ""}>التالية</button></div>
+    <div class="tnav"><button class="tround" id="tPrev" aria-label="الآية السابقة" ${idx === 0 ? "disabled" : ""}>‹</button><span class="tprog"><i style="width:${(idx + 1) / total * 100}%"></i></span><button class="tround" id="tNext" aria-label="الآية التالية" ${idx >= total - 1 ? "disabled" : ""}>›</button></div>
     <div class="tiny muted" style="text-align:center;margin-top:10px">التلاوة من EveryAyah، والتعرف على الصوت من متصفحك (الأفضل Chrome).</div>`;
   $("#back").onclick = () => { teachStop(); go("home"); };
   const on = (id, f) => { const e = $(id); if (e) e.onclick = f; };
@@ -2444,7 +2460,7 @@ function buildFollow(startWi) {
   }
   html += open ? "</div>" : "";
   return { keys, E, disp, owner, html, forced: new Set(), prev: [], finals: [], session: [], interim: "", typed: "", done: false, last: null,
-    hOff: 0, locating: ST.autoLoc !== false && !S.T.noLoc, preText };
+    hOff: 0, locating: ST.autoLoc === true && !S.T.noLoc, preText };
 }
 /* التسميع من أي موضع: يُعرف موضع القراءة في المصحف كله ثم يُنتقل إليه */
 let LOCIDX = null;
@@ -2477,6 +2493,7 @@ function drawFollow(box) {
   box.innerHTML = `
     ${!on && !heardAny && !F.found ? `<label class="autoloc"><span><b>ابدأ من أي موضع</b><small>يتعرّف مثاني على الآية وينتقل إليها</small></span><input type="checkbox" role="switch" id="autoloc" ${loc ? "checked" : ""}></label>` : ""}
     <div id="floc">${F.found && Date.now() - F.foundAt < 6000 ? `<div class="toast green">${ICON.check.replace("<svg", '<svg width="20" height="20"')}<span>تعرّفتُ على موضعك: ${ref(F.found)}</span></div>` : F.locMiss && !F.found ? `<div class="toast gold"><span>لم أتعرّف على موضع القراءة، فأتابعك في الوجه المحدد.</span></div>` : ""}</div>
+    ${!on && !heardAny && !loc ? `<div class="fsteps"><span><i>١</i>اضغط الميكروفون</span><span><i>٢</i>اقرأ من حفظك</span><span><i>٣</i>تظهر الكلمات الصحيحة</span></div>` : ""}
     <div class="fstat" ${loc ? "hidden" : ""}><div class="prog"><i id="fprog" style="width:0"></i></div><span class="tiny muted" id="fcount"></span></div>
     <div id="ftoast"></div>
     ${loc ? `<div class="card locwait" id="flocw">${ICON.wave}<b>${on ? "أستمع إليك…" : "اقرأ من أي موضع"}</b><span class="tiny muted">${on ? "ابدأ القراءة من أي آية، وسأتعرّف على موضعك وأنتقل إليه." : "اضغط الميكروفون وابدأ من أي آية في القرآن."}</span></div>` : ""}
