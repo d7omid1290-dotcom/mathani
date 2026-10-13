@@ -864,7 +864,7 @@ b,strong,.qc b{font-weight:700}
 
 /* الرئيسية: شريط علوي بهوية مثاني */
 .hband{margin:0 -16px;padding:calc(var(--top) + 46px) 20px 72px;color:#fff;background:var(--star),var(--hero);background-size:72px 72px,auto,auto;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
-.hband::after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;inset-inline-end:-80px;top:-90px;background:radial-gradient(circle,rgba(217,174,82,.32),transparent 70%)}
+.hband::after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;inset-inline-end:-80px;top:-90px;background:radial-gradient(circle,rgba(255,255,255,.13),transparent 70%)}
 .hbin{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px}
 .hbtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .hlogo{font-family:var(--logo);font-weight:700;font-size:1.5rem;color:#F1D79A;line-height:1}
@@ -934,7 +934,7 @@ b,strong,.qc b{font-weight:700}
 .jz .tile b{font-weight:500;font-size:.9rem}
 /* شريط العنوان في كل الشاشات: هوية مثاني */
 .bar{position:relative;top:auto;z-index:1;margin:0 -16px 16px;padding:calc(var(--top) + 42px) 18px 22px;display:flex;align-items:center;gap:12px;color:#fff;background:var(--star),var(--hero);background-size:72px 72px,auto,auto;border-radius:0 0 28px 28px;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:hidden;box-shadow:none;border:0}
-.bar::after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;inset-inline-start:-70px;bottom:-120px;background:radial-gradient(circle,rgba(217,174,82,.3),transparent 70%);pointer-events:none}
+.bar::after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;inset-inline-start:-70px;bottom:-120px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent 70%);pointer-events:none}
 .bar>*{position:relative;z-index:1}
 .bar h1{color:#fff;font-size:1.6rem}
 .bar h1 small{color:rgba(255,255,255,.75);margin-top:2px}
@@ -1199,10 +1199,10 @@ html,body,*{scrollbar-width:none}
 .fay{font-family:"Amiri Quran",serif;font-size:20px;line-height:2;margin-top:8px;color:var(--ink,#14231E);max-height:7.5em;overflow:hidden}
 .fbt{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}.fbt .btn{min-height:46px}.fbt .btn:not(.primary){background:#fff;color:#0E5A43}
 
-.hqfire{position:absolute;left:0;top:4px;display:flex;align-items:center;gap:4px;padding:6px 12px 6px 10px;border-radius:999px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.12)}
-.hqfire .fe{font-size:26px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
-.hqfire b{font-size:20px;color:#fff;line-height:1}
-.hqfire:not(.on) .fe{filter:grayscale(.6);opacity:.8}
+.hqfire{position:absolute;left:0;top:-6px;width:74px;height:74px;display:grid;place-items:center}
+.hqfire .fe{grid-area:1/1;font-size:62px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.hqfire b{grid-area:1/1;margin-top:20px;font-size:21px;color:#fff;line-height:1;text-shadow:0 1px 3px rgba(110,30,0,.75),0 0 8px rgba(110,30,0,.4)}
+
 
 .rd .lines.hide .a.rrcur{filter:blur(6px);background:rgba(22,154,114,.18);border-radius:6px}
 .rd .lines.hide .a.rrbad{background:rgba(200,50,50,.22)}
@@ -1213,6 +1213,16 @@ html,body,*{scrollbar-width:none}
 .rrmic svg{width:26px;height:26px}@keyframes fpulse2{50%{box-shadow:0 0 0 12px rgba(226,91,75,.08)}}
 .rrh{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:#0E5A43;font:inherit;font-size:12px;font-weight:700}.rrh svg{width:22px;height:22px}
 body.rrec .rtop,body.rrec .rbot{display:none}
+.bmcols{display:flex;gap:12px;justify-content:center;margin:6px 0 16px}
+.bmc{width:38px;height:38px;border-radius:50%;border:3px solid transparent;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.bmc[aria-pressed="true"]{border-color:#fff;outline:2px solid #14231E}
+.bmdot svg{width:22px;height:22px}
+.bmb svg{width:22px;height:22px}
+.cbtns.cb3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px}.cb3 .btn{padding-inline:8px;gap:6px}
+.ffind{background:linear-gradient(135deg,#B8862E,#D9AE55);color:#fff}.ffind.on{animation:fpulse2 1.4s ease-in-out infinite}
+#findBox .fres{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:14px 16px;border-radius:18px;border:0;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;font:inherit;text-align:start;cursor:pointer}
+#findBox .fres small{display:block;color:#F3E3B5;font-size:12px}#findBox .fres b{display:block;font-size:17px;margin-top:2px}
+#findBox .fmsg{margin-top:10px;font-size:13px;color:var(--muted);text-align:center}
 </style>
 </head>
 <body>
@@ -1727,19 +1737,17 @@ function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz"
 /* تعرّف على الآية في الرئيسية نفسها */
 const FND = { st: "idle", k: null, heard: "", sr: null };
 function findUI() {
-  const big = `<span class="fic ${FND.st === "listen" ? "on" : ""}">${ICON.wave}</span>`;
   if (FND.st === "found") { const v = V(FND.k);
-    return `<div class="fres"><small>تعرّفتُ على الآية</small><b>سورة ${DATA.surahs[v.s]}، الآية ${AR(v.a)}</b><div class="fay">${esc(UTH.verses[FND.k] ? UTH.verses[FND.k].join(" ") : v.t)}</div>
-      <div class="fbt"><button class="btn primary" id="fRead">${ICON.book}افتحها</button><button class="btn" id="fAgain">${ICON.wave}أعد</button></div></div>`; }
-  const sub = FND.st === "listen" ? (FND.heard ? `«${esc(FND.heard.slice(-60))}»` : "أستمع إليك… اقرأ آية أو أكثر") : FND.st === "miss" ? "لم أتعرّف عليها، اقرأ آية كاملة ثم جرّب مرة أخرى" : FND.st === "nosr" ? "التعرّف على الصوت غير متاح في هذا المتصفح (جرّب Chrome)" : "اضغط واقرأ من أي موضع، ويخبرك مثاني بالسورة والآية";
-  return `<button class="frow" id="findGo">${big}<span class="grow"><b>${FND.st === "listen" ? "أستمع…" : "تعرّف على الآية"}</b><small>${sub}</small></span></button>`;
+    return `<button class="fres" id="fRead"><span class="grow"><small>تعرّفتُ على الآية، اضغط للدخول</small><b>سورة ${DATA.surahs[v.s]}، الآية ${AR(v.a)}</b></span><span class="fgo">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`; }
+  if (FND.st === "idle") return "";
+  const t = FND.st === "listen" ? (FND.heard ? `سمعتُ: «${esc(FND.heard.slice(-50))}»` : "أستمع إليك… اقرأ آية أو أكثر") : FND.st === "miss" ? "لم أتعرّف عليها، اقرأ آية كاملة ثم اضغط «تعرّف» مرة أخرى" : "التعرّف على الصوت غير متاح في هذا المتصفح (جرّب Chrome)";
+  return `<div class="fmsg">${t}</div>`;
 }
-function drawFind() { const b = $("#findBox"); if (b) { b.innerHTML = findUI(); bindFind(); } }
+function drawFind() { const b = $("#findBox"); if (b) { b.innerHTML = findUI(); bindFind(); } const g = $("#findGo"); if (g) { g.classList.toggle("on", FND.st === "listen"); g.innerHTML = ICON.wave + (FND.st === "listen" ? "أستمع…" : "تعرّف"); } }
 function stopFind() { if (FND.sr) { try { FND.sr.stop(); } catch (e) {} FND.sr = null; } }
 function bindFind() {
   const g = $("#findGo"); if (g) g.onclick = () => FND.st === "listen" ? (stopFind(), FND.st = "idle", drawFind()) : startFind();
   const r = $("#fRead"); if (r) r.onclick = () => { stopFind(); const k = FND.k; FND.st = "idle"; openReader(V(k).p, "mushaf"); };
-  const a = $("#fAgain"); if (a) a.onclick = startFind;
 }
 function startFind() {
   if (!SR) { FND.st = "nosr"; return drawFind(); }
@@ -1867,10 +1875,10 @@ function home() {
     <section class="cont">
       <div class="ctop"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
       <div class="cbar"><span class="wprog"><i style="width:${pct}%"></i></span><span class="tiny muted">${mastered ? `${AR(mastered)} من ${AR(jp.length)} أوجه متقنة في الجزء` : `${AR(jp.length)} وجهاً في هذا الجزء`}</span></div>
-      <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
+      <div class="cbtns cb3"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn ffind ${FND.st === "listen" ? "on" : ""}" id="findGo">${ICON.wave}${FND.st === "listen" ? "أستمع…" : "تعرّف"}</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
+      <div id="findBox">${findUI()}</div>
       <div class="cwird">${wirdMini()}</div>
     </section>
-    <div class="hfind" id="findBox">${findUI()}</div>
     <div class="htiles">
       <button class="htile" id="teachGo"><span class="hti">${ICON.listen}</span><b>المصحف المعلّم</b><small>استمع وردّد آيةً آية</small></button>
       <button class="htile" id="liveGo"><span class="hti">${ICON.users}</span><b>الحلقة المباشرة</b><small>مع معلمك أو زملائك</small></button>
@@ -2244,6 +2252,23 @@ function kashidaJustify(L, W) {
 const DOTS = I('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
 const readTheme = () => ST.rt || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia");
 const RT_BG = { sepia: "#FFFFFF", light: "#FFFDF8", night: "#0F1412" };
+/* الفواصل: يسمّيها الطالب ويختار لونها */
+const BMC = ["#C0392B", "#E67E22", "#D4A82A", "#1E8E5A", "#2E86C1", "#8E44AD"];
+const BMI = on => `<svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>`;
+const bmOf = p => (ST.bms || []).find(b => b.p === +p);
+function bmSheet(p) {
+  const cur = bmOf(p); let col = cur ? cur.c : BMC[0];
+  const list = (ST.bms || []).filter(b => b.p !== +p);
+  openSheet(`<h3>فاصل الوجه ${AR(p)}</h3>
+    <input class="psq" id="bmN" maxlength="24" placeholder="سمّ الفاصل، مثلاً: مراجعة الأحد" value="${esc(cur ? cur.n : "")}">
+    <div class="bmcols">${BMC.map(c => `<button class="bmc" data-c="${c}" style="background:${c}" aria-pressed="${c === col}"></button>`).join("")}</div>
+    <div class="two"><button class="btn primary" id="bmSave">${cur ? "حفظ" : "ضع الفاصل"}</button>${cur ? `<button class="btn" id="bmDel">أزل الفاصل</button>` : ""}</div>
+    ${list.length ? `<h4 style="margin:18px 0 8px">فواصلك</h4>${list.map(b => `<button class="item" data-bm="${b.p}"><span class="bmdot" style="color:${b.c}">${BMI(true)}</span><span class="grow"><b>${esc(b.n)}</b><div class="tiny muted">سورة ${pageSurah(b.p)}، الوجه ${AR(b.p)}</div></span></button>`).join("")}` : ""}`);
+  document.querySelectorAll(".bmc").forEach(b => b.onclick = () => { col = b.dataset.c; document.querySelectorAll(".bmc").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  $("#bmSave").onclick = () => { const n = $("#bmN").value.trim() || "فاصل"; ST.bms = (ST.bms || []).filter(b => b.p !== +p).concat({ p: +p, n, c: col, at: Date.now() }); save(); closeSheet(); pageReader(p); };
+  const d = $("#bmDel"); if (d) d.onclick = () => { ST.bms = ST.bms.filter(b => b.p !== +p); save(); closeSheet(); pageReader(p); };
+  document.querySelectorAll("[data-bm]").forEach(b => b.onclick = () => { closeSheet(); openReader(+b.dataset.bm, "mushaf"); });
+}
 /* التسميع داخل المصحف الأساسي: الكلمات مخفية وتنكشف مع القراءة */
 const RR = { on: false, p: 0, E: [], base: "", fin: "", int: "", sr: null, f: null };
 function rrStart(p) {
@@ -2287,6 +2312,7 @@ function pageReader(p, dir) {
     </div>
     <div class="rtop"><button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>
       <div class="t"><b>سورة ${pageSurah(p)}</b><small>الجزء ${JUZ_NAMES[juzOf(p)]}، الوجه ${AR(p)}</small></div>
+      <button class="ibtn bmb" id="bmBtn" aria-label="فاصل" ${bmOf(p) ? `style="color:${bmOf(p).c}"` : ""}>${BMI(!!bmOf(p))}</button>
       <button class="ibtn" id="hideSw" aria-pressed="${S.hide}" aria-label="إخفاء الآيات" style="${S.hide ? "background:var(--green);color:var(--on)" : ""}">${EYE}</button>
       <button class="ibtn" id="more" aria-label="المزيد">${DOTS}</button></div>
     <div class="rbot"><button class="ibtn" id="pgPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
@@ -2299,6 +2325,7 @@ function pageReader(p, dir) {
   if (!ST.rhint) { ST.rhint = 1; save(); setTimeout(() => { const h = $("#rhint"); if (h) h.remove(); }, 4500); }
   $("#back").onclick = () => { document.body.classList.remove("immersive"); go(S.tab === "tasmee" ? "mushaf" : S.tab); };
   $("#hideSw").onclick = () => { S.hide = !S.hide; S.ui = true; pageReader(p); };
+  $("#bmBtn").onclick = () => bmSheet(p);
   $("#more").onclick = () => moreSheet(p);
   $("#pgPrev").onclick = () => turn(p, -1);
   $("#pgNext").onclick = () => turn(p, 1);
