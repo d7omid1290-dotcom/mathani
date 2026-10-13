@@ -1305,6 +1305,34 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .rd .rf{padding:4px 0 6px;position:relative}
 .rd .rf::before{content:"";position:absolute;top:50%;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--fr) 70%,transparent) 30%,transparent 46%,transparent 54%,color-mix(in srgb,var(--fr) 70%,transparent) 70%,transparent)}
 .rd .rf span,.rd[data-rt="light"] .rf span{position:relative;display:inline-grid;place-items:center;min-width:2.3em;height:2.3em;padding:0 .4em;border-radius:50%;border:1px solid var(--fr);background:var(--frs);color:var(--rink);font-size:.78rem;font-weight:600}
+
+/* حركة وتفاعل: دخول متتابع للعناصر عند التنقل، وضغطة ناعمة، وانتقالات سلسة */
+@media (prefers-reduced-motion:no-preference){
+  body.enter #view > *{animation:vin .5s cubic-bezier(.2,.8,.2,1) both}
+  body.enter #view > *:nth-child(2){animation-delay:.05s}body.enter #view > *:nth-child(3){animation-delay:.1s}
+  body.enter #view > *:nth-child(4){animation-delay:.15s}body.enter #view > *:nth-child(5){animation-delay:.2s}
+  body.enter #view > *:nth-child(n+6){animation-delay:.25s}
+  body.enter .hq,body.enter .hrow,body.enter .item,body.enter .lsp{animation:vin .45s cubic-bezier(.2,.8,.2,1) both}
+  body.enter .hq:nth-of-type(2),body.enter .lsp:nth-child(2){animation-delay:.08s}body.enter .hq:nth-of-type(3),body.enter .lsp:nth-child(3){animation-delay:.14s}
+  body.enter .hq:nth-of-type(4),body.enter .lsp:nth-child(4){animation-delay:.2s}body.enter .hq:nth-of-type(5),body.enter .lsp:nth-child(n+5){animation-delay:.26s}
+  @keyframes vin{from{opacity:0;transform:translateY(14px)}}
+  button,.btn,.item,.hq,.hrow,.card,.lsp,.tabs button{transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s,background-color .2s,color .2s,opacity .2s}
+  button:active:not(:disabled),.btn:active,.item:active,.hq:active,.hrow:active{transform:scale(.97)}
+  .tabs button[aria-current="page"]:not(.fab) svg{animation:tpop .35s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes tpop{from{transform:scale(.7);opacity:.4}}
+  .tabs .fab:active .c{transform:scale(.92)}
+  .scrim{animation:sfade .22s ease-out}@keyframes sfade{from{background:rgba(10,15,13,0)}}
+  .sheet{animation:sup .34s cubic-bezier(.2,.9,.25,1.05)}@keyframes sup{from{transform:translateY(100%)}}
+  .sheet > *{animation:vin .4s .06s cubic-bezier(.2,.8,.2,1) both}
+  .hqi,.hic,.dic{transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+  .hq:active .hqi,.hrow:active .hic{transform:rotate(-8deg) scale(1.08)}
+  .daily{animation:vin .6s .2s cubic-bezier(.2,.8,.2,1) both}
+  .thbtn svg{transition:transform .5s cubic-bezier(.3,1.4,.5,1)}.thbtn:active svg{transform:rotate(90deg)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .hband,.bar,.tband,.ph{animation:drift 60s linear infinite}
+  @keyframes drift{from{background-position:0 0,0 0,0 0}to{background-position:-144px 72px,0 0,0 0}}
+}
 </style>
 </head>
 <body>
@@ -1488,7 +1516,7 @@ const accChip = a => `<span class="chip ${a >= .9 ? "" : a >= .7 ? "mid" : "low"
 const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
   T: { page: 3, from: null, to: null, mode: "live", phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, progText: "" },
   quiz: null };
-function go(tab) { if (RR.on) rrStop(false); if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } const vv = document.getElementById("lvVids"); if (vv) document.body.appendChild(vv); document.body.classList.remove("lsmode"); S.tab = tab; S.reader = null; render(); scrollTo(0, 0); if (typeof LIVE !== "undefined") LIVE.vids(); }
+function go(tab) { if (RR.on) rrStop(false); if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } const vv = document.getElementById("lvVids"); if (vv) document.body.appendChild(vv); document.body.classList.remove("lsmode"); document.body.classList.add("enter"); clearTimeout(window.__enT); window.__enT = setTimeout(() => document.body.classList.remove("enter"), 700); S.tab = tab; S.reader = null; render(); scrollTo(0, 0); if (typeof LIVE !== "undefined") LIVE.vids(); }
 function openReader(p, view) { stopRec(true); document.body.classList.remove("lsmode"); { const vv = document.getElementById("lvVids"); if (vv) document.body.appendChild(vv); } S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); if (S.rview === "mushaf") LIVE.page(+p); LIVE.vids(); }
 /* تعرّف على الآية في الرئيسية نفسها */
 const FND = { st: "idle", k: null, heard: "", sr: null };
