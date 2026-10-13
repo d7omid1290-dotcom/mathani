@@ -1141,6 +1141,7 @@ html,body,*{scrollbar-width:none}
 .cont .cbtns .btn{height:44px!important;padding:0 12px!important}.cont .cwird .hrow .hic{width:38px;height:38px}.cont .cwird .hrow b{font-size:.98rem}.cont .cwird .wbtn{padding:6px 14px}
 .dkb.dkw{grid-column:1/-1}.dkq{font-size:.85rem;font-weight:600;color:var(--gold);margin-bottom:8px}
 .dkqt{font-family:var(--mushaf);font-size:1.3rem;line-height:2.1;color:#141414;max-height:52vh;overflow:auto}.dke{font-size:.9em}
+.dkpair{grid-template-columns:repeat(3,1fr);gap:8px}.dkpair .dkb{flex-direction:column;gap:4px;padding:10px 4px;font-size:.82rem}
 </style>
 </head>
 <body>
@@ -3351,7 +3352,7 @@ function salah() {
       <div class="pbar"><i style="width:${pc.toFixed(1)}%"></i></div>
       <div class="psub"><span>متبقٍّ على الأذان</span><span id="pleft">${leftTxt(n.at - now)}</span></div>
     </section>
-    <div class="dkpair"><button class="dkb" data-dk="morning">${PIC.sunrise}<span>أذكار الصباح</span></button><button class="dkb" data-dk="evening">${PIC.isha}<span>أذكار المساء</span></button><button class="dkb dkw" data-dk="afterSalah">${PIC.dhuhr}<span>أذكار بعد الصلاة</span></button></div>
+    <div class="dkpair"><button class="dkb" data-dk="morning">${PIC.sunrise}<span>أذكار الصباح</span></button><button class="dkb" data-dk="afterSalah">${PIC.dhuhr}<span>أذكار الصلاة</span></button><button class="dkb" data-dk="evening">${PIC.isha}<span>أذكار المساء</span></button></div>
     <div class="pl2">${PRAY.map(([k, nm]) => { const past = t[k] <= now && n.k !== k, cur = n.k === k, sr = k === "sunrise";
       return `<div class="pr2 ${cur ? "cur" : ""} ${past ? "past" : ""}"><span class="pi">${PIC[k]}</span><b class="grow">${nm}${cur ? ` <em>القادمة</em>` : ""}</b><span class="pt">${fmtT(t[k])}</span>
         ${sr ? `<span class="pb0"></span>` : `<button class="pb2" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? HICON.spk : HICON.mute}</button>`}</div>`; }).join("")}</div>`;
