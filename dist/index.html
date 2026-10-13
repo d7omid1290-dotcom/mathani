@@ -1823,11 +1823,10 @@ function halaqa() {
       <div class="hqstats"><span><b>${AR(todayN)}</b><small>تسميع اليوم</small></span><span><b>${AR(mast)}</b><small>أوجه متقنة</small></span></div>
     </div></header><div class="hqs">
     <button class="hq hqw" id="hqWird"><span class="hqi">${HICON.sprout}</span><span class="grow">${wline}</span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>
-    <div class="hqrow"><button class="hqs2" id="hqProg">${HICON.stack}<b>تقدّمي</b></button><button class="hqs2" id="hqGarden"><span>🌿</span><b>بستاني</b><small>${AR(pl)} غرسة</small></button></div>
     ${c("hqTas", ICON.mic, "التسميع", "وردك أو سورة تختارها، على المصحف", "main")}
     ${c("hqTeach", ICON.listen, "المصحف المعلّم", "استمع للشيخ وردّد بعده آيةً آية")}
     ${c("hqLive", ICON.users, "الحلقة المباشرة", "مع معلمك أو زملائك", "gold")}</div>`;
-  $("#hqWird").onclick = () => go(w && w.setup ? "wird" : "wirdSetup"); $("#hqProg").onclick = () => go("progress"); $("#hqGarden").onclick = () => go("garden");
+  $("#hqWird").onclick = () => go(w && w.setup ? "wird" : "wirdSetup");
   $("#hqBadge").onclick = () => { openSheet(`<h3>طريقة التحفيز</h3><p class="tiny muted" style="margin:0 0 12px">اختر ما يظهر لك في أعلى «حلقتي»</p>
     <button class="item" data-mv="streak" aria-pressed="${ST.motiv !== "garden"}"><span style="font-size:26px">🔥</span><span class="grow"><b>الستريك</b><div class="tiny muted">عدد الأيام المتتالية التي أتممت فيها وردك</div></span></button>
     <button class="item" data-mv="garden" aria-pressed="${ST.motiv === "garden"}"><span style="font-size:26px">🌳</span><span class="grow"><b>البستان</b><div class="tiny muted">كل يوم تتم فيه وردك تُغرس شجرة في بستانك</div></span></button>`);
