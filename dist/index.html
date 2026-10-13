@@ -1218,7 +1218,7 @@ body.rrec .rtop,body.rrec .rbot{display:none}
 .bmc[aria-pressed="true"]{border-color:#fff;outline:2px solid #14231E}
 .bmdot svg{width:22px;height:22px}
 .bmb svg{width:22px;height:22px}
-.cbtns.cb3{display:grid;grid-template-columns:1.1fr 1.15fr .9fr;gap:8px}.cb3 .btn{padding-inline:6px;gap:5px;white-space:nowrap}.cb3 .ffind{font-size:.92rem}
+.cbtns.cb3{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cb3 .btn{padding-inline:6px;gap:5px;white-space:nowrap}.cb3 .ffind{font-size:.92rem}
 .ffind{background:linear-gradient(135deg,#B8862E,#D9AE55);color:#fff}.ffind.on{animation:fpulse2 1.4s ease-in-out infinite}
 #findBox .fres{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:14px 16px;border-radius:18px;border:0;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;font:inherit;text-align:start;cursor:pointer}
 #findBox .fres small{display:block;color:#F3E3B5;font-size:12px}#findBox .fres b{display:block;font-size:17px;margin-top:2px}
@@ -1883,9 +1883,9 @@ function home() {
       <button class="hpray" id="salahGo">${HICON.moon}<span>${np.n}</span><b>${fmtT(np.at)}</b><small>${leftTxt(np.at - Date.now())}</small></button>
     </div></header>
     <section class="cont">
-      <div class="ctop"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
+      <div class="ctop" data-read="${last}" role="button" style="cursor:pointer"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
       <div class="cbar"><span class="wprog"><i style="width:${pct}%"></i></span><span class="tiny muted">${mastered ? `${AR(mastered)} من ${AR(jp.length)} أوجه متقنة في الجزء` : `${AR(jp.length)} وجهاً في هذا الجزء`}</span></div>
-      <div class="cbtns cb3"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn ffind ${FND.st === "listen" ? "on" : ""}" id="findGo">${ICON.wave}${FND.st === "listen" ? "أستمع…" : "أين الآية؟"}</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
+      <div class="cbtns cb3"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn ffind ${FND.st === "listen" ? "on" : ""}" id="findGo">${ICON.wave}${FND.st === "listen" ? "أستمع…" : "أين الآية؟"}</button></div>
       <div id="findBox">${findUI()}</div>
       <div class="cwird">${wirdMini()}</div>
     </section>
