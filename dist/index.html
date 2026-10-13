@@ -1128,6 +1128,7 @@ html,body,*{scrollbar-width:none}
 .dkic{background:var(--gold-soft)!important;color:var(--gold)!important}
 .dkpair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .dkb{display:flex;align-items:center;gap:8px;justify-content:center;padding:12px;border:0;border-radius:18px;background:var(--surface);box-shadow:var(--sh);font:inherit;font-weight:600;color:var(--ink);cursor:pointer}.dkb svg{width:20px;height:20px;color:var(--gold)}
+.pqib{position:absolute;top:14px;left:14px;width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);display:grid;place-items:center;cursor:pointer;padding:8px}.pqib svg{width:26px;height:26px}[dir="ltr"] .pqib{left:auto;right:14px}
 </style>
 </head>
 <body>
@@ -3668,7 +3669,7 @@ function salah() {
   const ticks = ["N", "E", "S", "W"].map((d, i) => `<span class="qd q${i}">${d}</span>`).join("");
   $("#view").innerHTML = bar("مواقيت الصلاة", hij, true) + `
     <section class="ph">
-      <button class="ploc" id="pLoc">${HICON.pin}<span>${esc(c.loc.name)}</span>${PIC.chevD}</button>
+      <button class="pqib" id="pQib" aria-label="القبلة">${PIC.kaaba}</button><button class="ploc" id="pLoc">${HICON.pin}<span>${esc(c.loc.name)}</span>${PIC.chevD}</button>
       <div class="phx"><span class="pic2">${PIC[n.k]}</span><div><small>الصلاة القادمة</small><b>${n.n}</b></div><span class="pat">${fmtT(n.at)}</span></div>
       <div class="pcd" id="pcd" dir="ltr">${cdTxt(n.at - now)}</div>
       <div class="pbar"><i style="width:${pc.toFixed(1)}%"></i></div>
@@ -3677,27 +3678,18 @@ function salah() {
     <div class="dkpair"><button class="dkb" data-dk="morning">${PIC.sunrise}<span>أذكار الصباح</span></button><button class="dkb" data-dk="evening">${PIC.isha}<span>أذكار المساء</span></button></div>
     <div class="pl2">${PRAY.map(([k, nm]) => { const past = t[k] <= now && n.k !== k, cur = n.k === k, sr = k === "sunrise";
       return `<div class="pr2 ${cur ? "cur" : ""} ${past ? "past" : ""}"><span class="pi">${PIC[k]}</span><b class="grow">${nm}${cur ? ` <em>القادمة</em>` : ""}</b><span class="pt">${fmtT(t[k])}</span>
-        ${sr ? `<span class="pb0"></span>` : `<button class="pb2" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? HICON.bell : PIC.bellOff}</button>`}</div>`; }).join("")}</div>
-    <div class="card prow2"><span class="pi g">${HICON.spk}</span><span class="grow"><b>صوت الأذان</b><span class="tiny muted">أذان المسجد النبوي</span><div class="tiny muted" id="pNote">${adhanState()}</div></span><button class="btn sm" id="pTest" data-adhan>استمع</button></div>
-    <div class="sec2"><h2>القبلة</h2></div>
-    <div class="card qc2"><div class="dial" id="dial"><div class="rose" id="rose">${ticks}<div class="kaaba" style="transform:rotate(${q.bearing}deg)"><i></i><b>${PIC.kaaba}</b></div></div><div class="phone"></div></div>
-      <div class="qtxt"><b dir="ltr">${AR(Math.round(q.bearing))}°</b><span class="small muted">من الشمال باتجاه عقارب الساعة</span><span class="tiny muted">${FM("المسافة إلى مكة المكرمة: {0} كم", q.km)}</span></div>
-      <div class="tiny muted" id="qhint" style="margin-top:8px">ضع الجوال مسطحاً، ثم اضغط «شغّل البوصلة» ولفّ حتى يشير السهم إلى الكعبة.</div>
-      <button class="btn block" id="qStart" style="margin-top:12px">شغّل البوصلة</button></div>
-    <div class="sec2"><h2>طريقة الحساب</h2></div>
-    <div class="card"><select id="pMethod" class="wsel" style="margin-top:0">${Object.entries(PT.METHODS).map(([k, m]) => `<option value="${k}" ${c.method === k ? "selected" : ""}>${m.n}</option>`).join("")}</select>
-      <div class="seg" style="margin-top:10px"><button data-asr="1" aria-pressed="${c.asr === 1}">العصر: الجمهور</button><button data-asr="2" aria-pressed="${c.asr === 2}">العصر: الحنفي</button></div>
-      <div class="tiny muted" style="margin-top:10px">المواقيت محسوبة فلكياً على جهازك بحسب موقعك وطريقة الحساب، وقد تختلف دقائق عن تقويم بلدك الرسمي.</div></div>`;
+        ${sr ? `<span class="pb0"></span>` : `<button class="pb2" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? HICON.bell : PIC.bellOff}</button>`}</div>`; }).join("")}</div>`;
   $("#back").onclick = () => go("home");
   clearInterval(window.__pcd); window.__pcd = setInterval(() => { const e = $("#pcd"); if (!e) return clearInterval(window.__pcd); const m = nextPrayer(); if (m.k !== n.k) return salah(); e.textContent = cdTxt(m.at - Date.now()); }, 1000);
   $("#pLoc").onclick = () => { openSheet(`<h3>الموقع</h3><button class="btn primary block" id="pGeo">${HICON.pin}<span>حدّد موقعي</span></button><div class="small muted" style="margin:14px 0 6px">أو اختر مدينة</div><div class="langs">${CITIES.map(([nm], i) => `<button class="item" data-city="${i}">${nm}</button>`).join("")}</div>`);
     $("#pGeo").onclick = () => { $("#pGeo").textContent = "…"; geoLocate(ok => { closeSheet(); if (!ok) alert(tr("تعذّر تحديد موقعك. اسمح للمتصفح بالوصول إلى الموقع، أو اختر مدينة.")); salah(); }); };
     document.querySelectorAll("[data-city]").forEach(b => b.onclick = () => { const [nm, la, lo] = CITIES[+b.dataset.city]; c.loc = { name: nm, lat: la, lng: lo, auto: false }; save(); closeSheet(); salah(); }); };
   document.querySelectorAll("[data-bell]").forEach(b => b.onclick = () => { c.alerts[b.dataset.bell] = !c.alerts[b.dataset.bell]; save(); askNotify(); salah(); });
-  $("#pTest").onclick = () => { askNotify(); adhanOn() ? stopAdhan() : playAdhan(nextPrayer().n); }; adhanUI();
-  $("#pMethod").onchange = e => { c.method = e.target.value; save(); salah(); };
-  document.querySelectorAll("[data-asr]").forEach(b => b.onclick = () => { c.asr = +b.dataset.asr; save(); salah(); });
-  $("#qStart").onclick = () => compass(q.bearing);
+  $("#pQib").onclick = () => { const ticks = ["N", "E", "S", "W"].map((d, i) => `<span class="qd q${i}">${d}</span>`).join("");
+    openSheet(`<h3>القبلة</h3><div class="qc2"><div class="dial" id="dial"><div class="rose" id="rose">${ticks}<div class="kaaba" style="transform:rotate(${q.bearing}deg)"><i></i><b>${PIC.kaaba}</b></div></div><div class="phone"></div></div>
+      <div class="qtxt"><b dir="ltr">${AR(Math.round(q.bearing))}°</b><span class="small muted">من الشمال باتجاه عقارب الساعة</span><span class="tiny muted">${FM("المسافة إلى مكة المكرمة: {0} كم", q.km)}</span></div>
+      <div class="tiny muted" id="qhint" style="margin-top:8px">ضع الجوال مسطحاً ولفّ حتى يشير السهم إلى الكعبة.</div></div>`);
+    compass(q.bearing); };
   document.querySelectorAll("[data-dk]").forEach(b => b.onclick = () => openAdhkar(b.dataset.dk));
 }
 /* البوصلة: اتجاه الجهاز من مستشعر الاتجاه، فيدور قرص الاتجاهات والسهم يشير إلى الكعبة */
