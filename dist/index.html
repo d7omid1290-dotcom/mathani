@@ -1110,6 +1110,7 @@ html,body,*{scrollbar-width:none}
 .pulse{animation:tpul 1.2s ease-in-out infinite}@keyframes tpul{50%{opacity:.3;transform:scale(.7)}}
 .tbtns{display:flex;gap:8px;margin-top:14px}.tbtns .btn{flex:1}
 .tnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
+.cont .cwird{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}.cont .cwird .hrow{margin:0;box-shadow:none;background:transparent;padding:10px 0 0;border-radius:0}
 </style>
 </head>
 <body>
@@ -1691,8 +1692,8 @@ function home() {
       <div class="ctop"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
       <div class="cbar"><span class="wprog"><i style="width:${pct}%"></i></span><span class="tiny muted">${mastered ? `${AR(mastered)} من ${AR(jp.length)} أوجه متقنة في الجزء` : `${AR(jp.length)} وجهاً في هذا الجزء`}</span></div>
       <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
+      <div class="cwird">${wirdMini()}</div>
     </section>
-    ${wirdMini()}
     <button class="hrow" id="teachGo"><span class="hic">${ICON.listen}</span><span class="grow"><small>استمع وردّد آيةً آية</small><b>المصحف المعلّم</b></span><span class="muted">${chev}</span></button>
     <button class="hrow" id="liveGo"><span class="hic">${ICON.users}</span><span class="grow"><small>مع معلمك أو زملائك</small><b>الحلقة المباشرة</b></span><span class="muted">${chev}</span></button>`;
   $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start(); $("#teachGo").onclick = () => go("teacher");
