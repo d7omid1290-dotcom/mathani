@@ -1147,6 +1147,12 @@ html,body,*{scrollbar-width:none}
 .mtsw button[aria-pressed="true"]{background:#fff;color:var(--green)}
 .hlive{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px auto 8px;padding:10px 18px;border-radius:999px;border:1px solid var(--line,rgba(0,0,0,.08));background:transparent;color:var(--muted,#5E5A50);font:inherit;font-size:14px}
 .hlive svg{width:18px;height:18px}
+.htiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 16px 8px}
+.htile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:start;padding:16px;border-radius:22px;border:0;background:var(--card,#fff);box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(11,42,33,.06);font:inherit;color:inherit;cursor:pointer}
+.htile b{font-size:15px;margin-top:6px}.htile small{font-size:12px;color:var(--muted,#5E5A50)}
+.hti{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff}
+.hti svg{width:22px;height:22px}
+.htile+.htile .hti{background:linear-gradient(135deg,#B8862E,#D9AE55)}
 </style>
 </head>
 <body>
@@ -1394,8 +1400,11 @@ function home() {
       <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
       <div class="cwird">${wirdMini()}</div>
     </section>
-    <button class="hlive" id="liveGo">${ICON.users}<span>الحلقة المباشرة</span></button>`;
-  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start();
+    <div class="htiles">
+      <button class="htile" id="teachGo"><span class="hti">${ICON.listen}</span><b>المصحف المعلّم</b><small>استمع وردّد آيةً آية</small></button>
+      <button class="htile" id="liveGo"><span class="hti">${ICON.users}</span><b>الحلقة المباشرة</b><small>مع معلمك أو زملائك</small></button>
+    </div>`;
+  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start(); $("#view #teachGo").onclick = () => go("teacher");
   bindWirdHome();
   bindAll();
 }
