@@ -1188,9 +1188,17 @@ html,body,*{scrollbar-width:none}
 .hqname{gap:10px;padding:6px 8px 6px 14px;border-color:rgba(217,174,85,.4);background:rgba(0,0,0,.12)}
 .hqname .hqnl{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.1)}
 .hqname b{font-size:16px;color:#F3E3B5}.hqname svg{width:16px;height:16px;color:rgba(243,227,181,.8)}
-.hfind{display:flex;align-items:center;gap:12px;width:calc(100% - 32px);margin:14px 16px 0;padding:14px 16px;border-radius:22px;border:1px dashed rgba(14,90,67,.35);background:var(--soft,#E6F0EB);color:#0E5A43;font:inherit;text-align:start;cursor:pointer}
-.hfind .hqi{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff}
-.hfind b{display:block;font-size:15px}.hfind small{display:block;font-size:12px;color:var(--muted)}
+.hfind{margin:16px 16px 0;border-radius:26px;background:linear-gradient(135deg,#0B3F30,#13775A);color:#fff;box-shadow:0 12px 30px rgba(11,63,48,.25);overflow:hidden}
+.frow{display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:0;background:none;color:inherit;font:inherit;text-align:start;cursor:pointer}
+.frow b{display:block;font-size:18px}.frow small{display:block;margin-top:4px;font-size:12.5px;color:rgba(255,255,255,.78)}
+.fic{position:relative;display:grid;place-items:center;width:64px;height:64px;flex:none;border-radius:50%;background:linear-gradient(135deg,#D9AE55,#F3D88E);color:#0B3F30;box-shadow:0 0 0 6px rgba(255,255,255,.1)}
+.fic svg{width:32px;height:32px}
+.fic.on::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #F3D88E;animation:fpulse 1.4s ease-out infinite}
+@keyframes fpulse{from{transform:scale(1);opacity:1}to{transform:scale(1.35);opacity:0}}
+.fres{padding:18px}.fres small{color:#F3D88E;font-weight:700;font-size:12px}.fres b{display:block;font-size:18px;margin-top:2px}
+.fay{font-family:"Amiri Quran",serif;font-size:20px;line-height:2;margin-top:8px;color:#fff;max-height:7.5em;overflow:hidden}
+.fbt{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}.fbt .btn{min-height:46px}.fbt .btn:not(.primary){background:rgba(255,255,255,.12);color:#fff}
+.fbt .btn.primary{background:#F3D88E;color:#0B3F30}
 .hqfire{position:absolute;left:4px;top:-14px;width:84px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;filter:drop-shadow(0 6px 16px rgba(232,100,31,.4))}
 .hqfire svg{position:absolute;inset:0;width:100%;height:100%}
 .hqfire b{position:relative;font-size:28px;line-height:1;color:#7A2A05}
@@ -1705,8 +1713,36 @@ const accChip = a => `<span class="chip ${a >= .9 ? "" : a >= .7 ? "mid" : "low"
 const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
   T: { page: 3, from: null, to: null, mode: "live", phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, progText: "" },
   quiz: null };
-function go(tab) { document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
+function go(tab) { if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
 function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); if (S.rview === "mushaf") LIVE.page(+p); }
+/* تعرّف على الآية في الرئيسية نفسها */
+const FND = { st: "idle", k: null, heard: "", sr: null };
+function findUI() {
+  const big = `<span class="fic ${FND.st === "listen" ? "on" : ""}">${ICON.wave}</span>`;
+  if (FND.st === "found") { const v = V(FND.k);
+    return `<div class="fres"><small>تعرّفتُ على الآية</small><b>سورة ${DATA.surahs[v.s]}، الآية ${AR(v.a)}</b><div class="fay">${esc(UTH.verses[FND.k] ? UTH.verses[FND.k].join(" ") : v.t)}</div>
+      <div class="fbt"><button class="btn primary" id="fRead">${ICON.book}افتحها</button><button class="btn" id="fAgain">${ICON.wave}أعد</button></div></div>`; }
+  const sub = FND.st === "listen" ? (FND.heard ? `«${esc(FND.heard.slice(-60))}»` : "أستمع إليك… اقرأ آية أو أكثر") : FND.st === "miss" ? "لم أتعرّف عليها، اقرأ آية كاملة ثم جرّب مرة أخرى" : FND.st === "nosr" ? "التعرّف على الصوت غير متاح في هذا المتصفح (جرّب Chrome)" : "اضغط واقرأ من أي موضع، ويخبرك مثاني بالسورة والآية";
+  return `<button class="frow" id="findGo">${big}<span class="grow"><b>${FND.st === "listen" ? "أستمع…" : "تعرّف على الآية"}</b><small>${sub}</small></span></button>`;
+}
+function drawFind() { const b = $("#findBox"); if (b) { b.innerHTML = findUI(); bindFind(); } }
+function stopFind() { if (FND.sr) { try { FND.sr.stop(); } catch (e) {} FND.sr = null; } }
+function bindFind() {
+  const g = $("#findGo"); if (g) g.onclick = () => FND.st === "listen" ? (stopFind(), FND.st = "idle", drawFind()) : startFind();
+  const r = $("#fRead"); if (r) r.onclick = () => { stopFind(); const k = FND.k; FND.st = "idle"; openReader(V(k).p, "mushaf"); };
+  const a = $("#fAgain"); if (a) a.onclick = startFind;
+}
+function startFind() {
+  if (!SR) { FND.st = "nosr"; return drawFind(); }
+  stopFind(); FND.st = "listen"; FND.heard = ""; FND.k = null; drawFind(); locIdx();
+  const sr = FND.sr = new SR(); sr.lang = "ar-SA"; sr.continuous = true; sr.interimResults = true;
+  sr.onresult = e => { let t = ""; for (const r of e.results) t += r[0].transcript + " "; FND.heard = t.trim();
+    const w = M.norm(FND.heard); if (w.length >= 3) { const r = M.locate(w, locIdx(), DATA, ST.last || 1); if (r) { FND.k = r.k; FND.st = "found"; stopFind(); return drawFind(); } }
+    if (w.length >= 25) { FND.st = "miss"; stopFind(); } drawFind(); };
+  sr.onerror = () => { if (FND.st === "listen") { FND.st = "miss"; drawFind(); } };
+  sr.onend = () => { if (FND.st === "listen") { FND.st = FND.heard ? "miss" : "idle"; drawFind(); } };
+  try { sr.start(); } catch (e) { FND.st = "nosr"; drawFind(); }
+}
 function findAyah() { S.T.mode = "live"; openTasmee(ST.last || 1); S.T.forceLoc = true; F = null; tasmee(); setTimeout(() => { if (S.tab === "tasmee" && $("#fmic") && !REC) startFollow(); }, 60); }
 function openTasmee(p) {
   stopRec(true); resetT(); S.T.noLoc = false; S.T.forceLoc = false; S.T.page = +p; S.T.surah = null; S.T.from = null; S.T.to = null; S.tab = "tasmee"; S.reader = null; render(); scrollTo(0, 0);
@@ -1825,12 +1861,12 @@ function home() {
       <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
       <div class="cwird">${wirdMini()}</div>
     </section>
-    <button class="hfind" id="findGo"><span class="hqi">${ICON.wave}</span><span class="grow"><b>تعرّف على الآية</b><small>اقرأ من أي موضع، ويفتح لك مثاني مكانك ويتابعك</small></span></button>
+    <div class="hfind" id="findBox">${findUI()}</div>
     <div class="htiles">
       <button class="htile" id="teachGo"><span class="hti">${ICON.listen}</span><b>المصحف المعلّم</b><small>استمع وردّد آيةً آية</small></button>
       <button class="htile" id="liveGo"><span class="hti">${ICON.users}</span><b>الحلقة المباشرة</b><small>مع معلمك أو زملائك</small></button>
     </div>`;
-  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => pickLive(); $("#findGo").onclick = findAyah; $("#view #teachGo").onclick = () => pickTeach();
+  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => pickLive(); bindFind(); $("#view #teachGo").onclick = () => pickTeach();
   bindWirdHome();
   bindAll();
 }
