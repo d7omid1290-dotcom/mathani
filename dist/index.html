@@ -3681,7 +3681,7 @@ function salah() {
     <div class="dkpair"><button class="dkb" data-dk="morning">${PIC.sunrise}<span>أذكار الصباح</span></button><button class="dkb" data-dk="evening">${PIC.isha}<span>أذكار المساء</span></button></div>
     <div class="pl2">${PRAY.map(([k, nm]) => { const past = t[k] <= now && n.k !== k, cur = n.k === k, sr = k === "sunrise";
       return `<div class="pr2 ${cur ? "cur" : ""} ${past ? "past" : ""}"><span class="pi">${PIC[k]}</span><b class="grow">${nm}${cur ? ` <em>القادمة</em>` : ""}</b><span class="pt">${fmtT(t[k])}</span>
-        ${sr ? `<span class="pb0"></span>` : `<button class="pb2" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? HICON.bell : PIC.bellOff}</button>`}</div>`; }).join("")}</div>`;
+        ${sr ? `<span class="pb0"></span>` : `<button class="pb2" data-bell="${k}" aria-pressed="${!!c.alerts[k]}" aria-label="تنبيه الأذان">${c.alerts[k] ? HICON.spk : HICON.mute}</button>`}</div>`; }).join("")}</div>`;
   $("#back").onclick = () => go("home");
   clearInterval(window.__pcd); window.__pcd = setInterval(() => { const e = $("#pcd"); if (!e) return clearInterval(window.__pcd); const m = nextPrayer(); if (m.k !== n.k) return salah(); e.textContent = cdTxt(m.at - Date.now()); }, 1000);
   $("#pLoc").onclick = () => { openSheet(`<h3>الموقع</h3><button class="btn primary block" id="pGeo">${HICON.pin}<span>حدّد موقعي</span></button><div class="small muted" style="margin:14px 0 6px">أو اختر مدينة</div><div class="langs">${CITIES.map(([nm], i) => `<button class="item" data-city="${i}">${nm}</button>`).join("")}</div>`);
