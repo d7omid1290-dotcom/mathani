@@ -1238,6 +1238,13 @@ button.hqfire{border:0;background:none;cursor:pointer;font:inherit;padding:0}
 .hqrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .hqs2{display:flex;align-items:center;gap:10px;padding:16px;border-radius:20px;border:0;background:var(--surface,#fff);box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(11,42,33,.06);font:inherit;color:inherit;cursor:pointer;text-align:start;flex-wrap:wrap}
 .hqs2 svg{width:22px;height:22px;color:#0E5A43}.hqs2 span{font-size:22px}.hqs2 b{font-size:15px}.hqs2 small{width:100%;font-size:12px;color:var(--muted)}
+.lvch{position:relative;font-size:18px}.lvch i{position:absolute;top:-4px;left:-4px;min-width:18px;height:18px;border-radius:9px;background:#C0392B;color:#fff;font-size:11px;font-style:normal;display:grid;place-items:center}
+.chlist{max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 10px}
+.chm{align-self:flex-start;max-width:85%;padding:8px 12px;border-radius:16px 16px 16px 4px;background:var(--surface-2,#EEF3F0)}.chm b{display:block;font-size:12px;color:#0E5A43}.chm span{display:block;font-size:14px;line-height:1.6}.chm small{font-size:10.5px;color:var(--muted)}
+.chm.me{align-self:flex-end;border-radius:16px 16px 4px 16px;background:#DCEFE6}.chm.hostm b{color:#B8862E}
+.chin{display:flex;gap:8px}.chin input{flex:1;padding:12px 14px;border-radius:14px;border:1px solid var(--line);font:inherit;background:var(--surface);color:inherit}
+.lhcard{padding:16px;border-radius:20px;background:linear-gradient(135deg,#0B3F30,#13775A);color:#fff;margin-bottom:12px}.lhcard small{display:block;font-size:12px;color:rgba(255,255,255,.75)}.lhcard b{display:block;font-size:18px;margin:2px 0 8px}
+.lhlink{font-size:11.5px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.2);word-break:break-all;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -1468,7 +1475,23 @@ function wirdTas() { // يسمّع ورد الحفظ مباشرة
   goTas(pg);
 }
 const pickTeach = () => pickSurah("المصحف المعلّم: اختر السورة", n => { teachStop(); TCH.k = `${n}:1`; ST.teachK = TCH.k; TCH.phase = "idle"; save(); go("teacher"); });
-const pickLive = () => pickSurah("الحلقة المباشرة: اختر السورة", n => { ST.last = surahPages(n)[0]; save(); LIVE.start(); });
+const pickLive = () => liveHub();
+const newHid = () => "mathani-" + Array.from(crypto.getRandomValues(new Uint8Array(8)), b => (b % 36).toString(36)).join("");
+function liveHub() {
+  const M = ST.myHalaqa, J = ST.joined;
+  const rowB = (id, ic, t, sub, cls = "") => `<button class="item ${cls}" id="${id}"><span class="hqi sm">${ic}</span><span class="grow"><b>${t}</b>${sub ? `<div class="tiny muted">${sub}</div>` : ""}</span></button>`;
+  openSheet(`<h3>الحلقة المباشرة</h3>
+    ${M ? `<div class="lhcard"><small>حلقتك كمعلم</small><b>${esc(M.name)}</b><div class="lhlink" dir="ltr">${esc(location.origin + location.pathname)}?room=${esc(M.id)}</div><small>رابط ثابت لا يتغيّر، شاركه مرة واحدة مع طلابك</small></div>
+      ${rowB("lhStart", ICON.mic, "ابدأ الحصة الآن", "يدخل الطلاب من الرابط نفسه")}${rowB("lhShare", ICON.share, "شارك رابط الحلقة", "")}${rowB("lhChat", "💬", "الدردشة", `${AR(((ST.chat || {})[M.id] || []).length)} رسالة`)}` : ""}
+    ${J ? `${rowB("lhJoin", ICON.users, `ادخل ${esc(J.name || "حلقتك")}`, "الحلقة التي انضممت إليها")}` : ""}
+    ${!M ? rowB("lhNew", ICON.plus || "➕", "أنا معلم: أنشئ حلقة", "تنشئها مرة واحدة ويصير لها رابط ثابت") : ""}
+    ${!J && !M ? `<p class="tiny muted" style="margin-top:10px">طالب؟ اطلب من معلمك رابط الحلقة وافتحه مرة واحدة، وتظهر لك هنا دائماً.</p>` : ""}`);
+  const on = (id, f) => { const e = $(id); if (e) e.onclick = () => { closeSheet(); f(); }; };
+  on("#lhStart", () => LIVE.start(ST.myHalaqa)); on("#lhShare", () => LIVE.shareSheet(ST.myHalaqa.id, ST.myHalaqa.name)); on("#lhChat", () => { LIVE.state.hname = ST.myHalaqa.name; LIVE.chatSheet(); });
+  on("#lhJoin", () => LIVE.join(ST.joined.id, ST.joined.name));
+  on("#lhNew", () => { openSheet(`<h3>أنشئ حلقتك</h3><input class="psq" id="lhN" maxlength="40" placeholder="اسم الحلقة، مثلاً: حلقة الفجر" value="${esc(ST.halaqa || "")}"><button class="btn primary block" id="lhMk">أنشئ الحلقة</button>`);
+    $("#lhMk").onclick = () => { const n = $("#lhN").value.trim() || "حلقتي"; ST.myHalaqa = { id: newHid(), name: n, at: Date.now() }; ST.halaqa = ST.halaqa || n; save(); closeSheet(); LIVE.shareSheet(ST.myHalaqa.id, n); }; });
+}
 function halaqa() {
   const c = (id, ic, t, sub, cls = "") => `<button class="hq ${cls}" id="${id}"><span class="hqi">${ic}</span><span class="grow"><b>${t}</b><small>${sub}</small></span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`;
   const w = ST.wird, wd = w && w.setup ? WD.day(WD.today()) : null;
@@ -3091,7 +3114,17 @@ document.documentElement.style.setProperty("--fs", ST.fs || 1);
 const LIVE = (() => {
   const L = { peer: null, host: false, room: null, stream: null, calls: [], conns: [], muted: false, status: "", remote: 0, syncing: false };
   const PEER_JS = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
-  const link = () => location.origin + location.pathname + "?room=" + encodeURIComponent(L.room);
+  const link = (id, n) => location.origin + location.pathname + "?room=" + encodeURIComponent(id || L.room) + ((n || L.hname) ? "&n=" + encodeURIComponent(n || L.hname) : "");
+  const CH = id => (ST.chat = ST.chat || {}, ST.chat[id] = ST.chat[id] || []);
+  function addMsg(id, m) { const c = CH(id); if (c.some(x => x.id === m.id)) return; c.push(m); ST.chat[id] = c.slice(-200); save(); L.unread = (L.unread || 0) + (m.me ? 0 : 1); if ($("#chList")) { L.unread = 0; drawChat(); } bar(); }
+  function chatSend(t) { t = (t || "").trim(); if (!t || !L.room) return; const m = { t: "chat", id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), n: ST.name || (L.host ? "المعلم" : "طالب"), host: L.host, m: t.slice(0, 500), at: Date.now() };
+    L.conns.forEach(c => c.open && c.send(m)); addMsg(L.room, { ...m, me: true }); }
+  function drawChat() { const el = $("#chList"); if (!el) return; const c = CH(L.room || (ST.myHalaqa && ST.myHalaqa.id) || (ST.joined && ST.joined.id));
+    el.innerHTML = c.length ? c.map(m => `<div class="chm ${m.me ? "me" : ""} ${m.host ? "hostm" : ""}"><b>${esc(m.n)}${m.host ? " · المعلم" : ""}</b><span>${esc(m.m)}</span><small>${new Date(m.at).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}</small></div>`).join("") : `<p class="tiny muted" style="text-align:center">لا رسائل بعد. اكتب أول رسالة لحلقتك.</p>`;
+    el.scrollTop = el.scrollHeight; }
+  function chatSheet() { L.unread = 0; bar();
+    openSheet(`<h3>دردشة ${esc(L.hname || "الحلقة")}</h3><div class="chlist" id="chList"></div>${L.peer ? `<div class="chin"><input id="chIn" maxlength="500" placeholder="اكتب رسالة للحلقة"><button class="btn primary" id="chGo">إرسال</button></div>` : `<p class="tiny muted">الدردشة تعمل أثناء الحصة المباشرة، وهذه رسائلها المحفوظة على جهازك.</p>`}`);
+    drawChat(); const i = $("#chIn"); if (i) { const go = () => { chatSend(i.value); i.value = ""; i.focus(); }; $("#chGo").onclick = go; i.onkeydown = e => { if (e.key === "Enter") go(); }; } }
   const loadLib = () => window.Peer ? Promise.resolve() : new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = PEER_JS; sc.onload = ok; sc.onerror = () => no(new Error("lib")); document.head.appendChild(sc); });
   const newPeer = id => { const o = window.MATHANI_PEER || {}; return id ? new Peer(id, o) : new Peer(o); };
   const rid = () => "mathani-" + Array.from(crypto.getRandomValues(new Uint8Array(5)), b => (b % 36).toString(36)).join("");
@@ -3100,10 +3133,11 @@ const LIVE = (() => {
     if (!L.peer) { el.hidden = true; el.innerHTML = ""; return; }
     el.hidden = false;
     el.innerHTML = `<span class="dot ${L.remote ? "on" : ""}"></span><div class="grow"><b>حلقة مباشرة</b><small>${esc(L.status)}</small></div>
+      <button id="lvChat" aria-label="الدردشة" class="lvch">💬${L.unread ? `<i>${AR(L.unread)}</i>` : ""}</button>
       ${L.host ? `<button id="lvShare" aria-label="شارك رابط الحلقة">${ICON.share}</button>` : ""}
       <button id="lvMute" aria-pressed="${L.muted}" aria-label="${L.muted ? "شغّل الميكروفون" : "اكتم الميكروفون"}">${L.muted ? ICON.micoff : ICON.mic}</button>
       <button id="lvEnd" class="end2" aria-label="أنهِ الحلقة">إنهاء</button>`;
-    if (L.host) $("#lvShare").onclick = shareSheet;
+    if (L.host) $("#lvShare").onclick = shareSheet; $("#lvChat").onclick = chatSheet;
     $("#lvMute").onclick = () => { L.muted = !L.muted; L.stream && L.stream.getAudioTracks().forEach(t => t.enabled = !L.muted); bar(); };
     $("#lvEnd").onclick = () => end(true);
   }
@@ -3118,8 +3152,10 @@ const LIVE = (() => {
   }
   function wire(conn) {
     L.conns.push(conn);
-    conn.on("open", () => { if (L.host && S.reader && S.rview === "mushaf") conn.send({ t: "page", p: S.reader }); });
+    conn.on("open", () => { if (L.host) { conn.send({ t: "hello", n: L.hname }); if (S.reader && S.rview === "mushaf") conn.send({ t: "page", p: S.reader }); } });
     conn.on("data", m => {
+      if (m && m.t === "chat") { if (L.host) L.conns.forEach(c => c !== conn && c.open && c.send(m)); addMsg(L.room, { ...m, me: false }); return; }
+      if (m && m.t === "hello" && !L.host) { L.hname = m.n; if (ST.joined && ST.joined.id === L.room) { ST.joined.name = m.n; save(); } bar(); return; }
       if (!m || m.t !== "page") return;
       if (L.host) L.conns.forEach(c => c !== conn && c.open && c.send(m));
       if (!(S.reader === m.p && S.rview === "mushaf")) { L.syncing = true; openReader(m.p, "mushaf"); L.syncing = false; }
@@ -3134,12 +3170,13 @@ const LIVE = (() => {
     const msg = e && e.message === "mic" ? "لا يمكن الوصول إلى الميكروفون. افتح مثاني في Chrome أو Safari واسمح بالميكروفون."
       : e && e.name === "NotAllowedError" ? "لم يُسمح بالميكروفون. اسمح به من إعدادات المتصفح ثم حاول مرة أخرى."
       : e && e.message === "lib" ? "تعذر تحميل أداة الاتصال. تأكد من الإنترنت ثم حاول مرة أخرى."
-      : e && e.type === "peer-unavailable" ? "الحلقة غير موجودة أو انتهت. اطلب من المعلم رابطاً جديداً."
+      : e && e.type === "peer-unavailable" ? "الحصة لم تبدأ بعد، المعلم غير متصل الآن. ادخل من الرابط نفسه وقت الحصة."
+      : e && e.type === "unavailable-id" ? "هذه الحلقة مفتوحة الآن من جهاز آخر."
       : "تعذر الاتصال. تأكد من الإنترنت ثم حاول مرة أخرى.";
     end(false); openSheet(`<h3>الحلقة المباشرة</h3><div class="alert">${msg}</div>`);
   }
-  function shareSheet() {
-    const u = link(), txt = `${tr("انضم إلى حلقتي في مثاني:")} ${u}`;
+  function shareSheet(id, n) {
+    const u = link(typeof id === "string" ? id : null, n), txt = `${tr("انضم إلى حلقتي في مثاني:")} ${u}`;
     openSheet(`<h3>شارك رابط الحلقة</h3><p class="small muted" style="margin-top:0">من يفتح الرابط يدخل الحلقة مباشرة، ويرى الوجه الذي تفتحه.</p>
       <input type="text" id="lvLink" readonly value="${esc(u)}" dir="ltr">
       <div class="two"><button class="btn primary" id="lvCopy">نسخ الرابط</button><a class="btn" id="lvWa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">واتساب</a></div>
@@ -3147,13 +3184,14 @@ const LIVE = (() => {
     $("#lvCopy").onclick = async () => { try { await navigator.clipboard.writeText(u); } catch (e) { $("#lvLink").select(); document.execCommand("copy"); } $("#lvCopy").textContent = "نُسخ ✓"; };
     if (navigator.share) $("#lvNative").onclick = () => navigator.share({ title: tr("حلقة مثاني"), text: txt, url: u }).catch(() => {});
   }
-  async function start() {
+  async function start(fixed) {
     if (L.peer) return shareSheet();
     try {
       setStatus("جارٍ التجهيز…");
       L.stream = await mic(); await loadLib();
-      L.host = true; L.room = rid(); L.peer = newPeer(L.room); bar();
-      L.peer.on("open", () => { count(); shareSheet(); });
+      const H = typeof fixed === "object" && fixed ? fixed : null;
+      L.host = true; L.room = H ? H.id : rid(); L.hname = H ? H.name : ""; L.peer = newPeer(L.room); bar();
+      L.peer.on("open", () => { count(); if (!H) shareSheet(); });
       L.peer.on("call", call => { call.answer(L.stream); playRemote(call); });
       L.peer.on("connection", wire);
       L.peer.on("disconnected", () => { try { L.peer.reconnect(); } catch (e) {} });
@@ -3161,8 +3199,8 @@ const LIVE = (() => {
       openReader(ST.last || 1, "mushaf");
     } catch (e) { fail(e); }
   }
-  async function join(room) {
-    try {
+  async function join(room, n) {
+    try { if (n) L.hname = n;
       L.stream = await mic(); await loadLib();
       L.host = false; L.room = room; L.peer = newPeer(); setStatus("جارٍ الاتصال…");
       L.peer.on("open", () => { playRemote(L.peer.call(room, L.stream)); wire(L.peer.connect(room, { reliable: true })); });
@@ -3174,19 +3212,20 @@ const LIVE = (() => {
     if (L.peer) { try { L.peer.destroy(); } catch (e) {} }
     if (L.stream) L.stream.getTracks().forEach(t => t.stop());
     document.querySelectorAll("audio[id^='au-']").forEach(a => a.remove());
-    Object.assign(L, { peer: null, stream: null, calls: [], conns: [], muted: false, remote: 0, room: null });
+    Object.assign(L, { peer: null, stream: null, calls: [], conns: [], muted: false, remote: 0, room: null, unread: 0 });
     if (user && location.search.includes("room=")) history.replaceState(null, "", location.pathname);
     bar();
   }
   function page(p) { if (!L.peer || L.syncing) return; L.conns.forEach(c => c.open && c.send({ t: "page", p })); }
   function boot() {
-    const room = new URLSearchParams(location.search).get("room"); if (!room || !/^mathani-[a-z0-9]{3,20}$/.test(room)) return;
-    openSheet(`<div class="empty" style="padding:10px 0 4px">${ICON.users}<h3 style="margin:6px 0">دعوة إلى حلقة مباشرة</h3>
+    const q = new URLSearchParams(location.search), room = q.get("room"), hn = (q.get("n") || "").slice(0, 40); if (!room || !/^mathani-[a-z0-9]{3,20}$/.test(room)) return;
+    if (!(ST.myHalaqa && ST.myHalaqa.id === room)) { ST.joined = { id: room, name: hn || (ST.joined && ST.joined.id === room ? ST.joined.name : "حلقتي") }; save(); }
+    openSheet(`<div class="empty" style="padding:10px 0 4px">${ICON.users}<h3 style="margin:6px 0">${hn ? esc(hn) : "دعوة إلى حلقة مباشرة"}</h3>
       <p class="small muted" style="margin:0">ستسمع معلمك ويسمعك، وتقرآن من الوجه نفسه.</p></div>
       <button class="btn primary block" id="lvJoin">${ICON.mic}انضم الآن</button>`);
-    $("#lvJoin").onclick = () => { closeSheet(); join(room); };
+    $("#lvJoin").onclick = () => { closeSheet(); join(room, hn); };
   }
-  return { start, join, end, page, boot, state: L };
+  return { start, join, end, page, boot, state: L, shareSheet, chatSheet };
 })();
 
 
