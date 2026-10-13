@@ -870,6 +870,8 @@ b,strong,.qc b{font-weight:700}
 .hbin{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px}
 .hbtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .hlogo{font-family:var(--logo);font-weight:700;font-size:1.5rem;color:#F1D79A;line-height:1}
+.thbtn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:inherit;display:inline-grid;place-items:center;margin-inline-start:10px;vertical-align:middle}.thbtn svg{width:18px;height:18px}
+.thseg{display:grid!important;grid-template-columns:repeat(3,1fr)}.thseg button{display:flex;align-items:center;justify-content:center;gap:6px}.thseg button svg{width:16px;height:16px}
 .hdate{font-size:.78rem;opacity:.8}
 .hgreet{font-family:var(--kufi);font-weight:700;font-size:1.65rem;line-height:1.35}
 .hmotto{font-size:.85rem;opacity:.75}
@@ -1233,6 +1235,8 @@ body.rrec .rtop,body.rrec .rbot{display:none}
 .day .end{font-size:16px;color:#B8862E}
 .dtf{margin-top:8px;font-size:14px;line-height:1.9;color:var(--ink,#14231E);padding:10px 12px;border-radius:14px;background:rgba(14,90,67,.05)}
 .dft{display:flex;align-items:center;justify-content:space-between;margin-top:10px}.dsrc{font-size:11.5px;color:var(--muted)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .daily.mo{background:linear-gradient(160deg,#2A2414,#122019 60%)}:root:not([data-theme="light"]) .daily.ev{background:linear-gradient(160deg,#16243A,#122019 60%)}:root:not([data-theme="light"]) .daily{background:#122019}:root:not([data-theme="light"]) .dhd b{color:#EEF3F0}:root:not([data-theme="light"]) .day{color:#E8F1EC}:root:not([data-theme="light"]) .dtf{color:#D7E3DD;background:rgba(255,255,255,.05)}:root:not([data-theme="light"]) .dic{background:#3A2F14}:root:not([data-theme="light"]) .ev .dic{background:#1E3550;color:#9CC0F5}}
+:root[data-theme="dark"] .daily.mo{background:linear-gradient(160deg,#2A2414,#122019 60%)}:root[data-theme="dark"] .daily.ev{background:linear-gradient(160deg,#16243A,#122019 60%)}:root[data-theme="dark"] .daily{background:#122019}:root[data-theme="dark"] .dhd b{color:#EEF3F0}:root[data-theme="dark"] .day{color:#E8F1EC}:root[data-theme="dark"] .dtf{color:#D7E3DD;background:rgba(255,255,255,.05)}:root[data-theme="dark"] .dic{background:#3A2F14}:root[data-theme="dark"] .ev .dic{background:#1E3550;color:#9CC0F5}
 .hpray{gap:10px;margin-top:16px;padding:10px 16px;font-size:.95rem}
 .hpray svg{width:19px;height:19px}.hpray b{font-size:1.05rem}.hpray small{font-size:.8rem}
 button.hqfire{border:0;background:none;cursor:pointer;font:inherit;padding:0}
@@ -1690,6 +1694,8 @@ const LI = {
   chat: I('<path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.1A8 8 0 1 1 20 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01" stroke-width="2.6"/>'),
   screen: I('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M9.5 10l2.5-2.5L14.5 10M12 7.5V13"/>'),
   users: I('<circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.6.6 2.7 2.2 3 4.7"/>'),
+  sun: I('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>'),
+  moon: I('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'),
   room: I('<path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/>'),
   hand: I('<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4a1.5 1.5 0 0 1 3 0v6.5M14 10.5V5.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-.6a6 6 0 0 1-4.6-2.2L3.6 15a1.5 1.5 0 0 1 2.3-1.9L8 15.3"/>')
 };
@@ -2024,7 +2030,7 @@ function home() {
   const np = nextPrayer(), chev = ICON.chev.replace("<svg", '<svg width="18" height="18"');
   $("#view").innerHTML = `
     <header class="hband"><div class="hbin">
-      <div class="hbtop"><span class="hlogo">مثاني</span><span class="hdate">${hijri}</span></div>
+      <div class="hbtop"><span class="hlogo">مثاني</span><span class="hdate">${hijri}<button class="thbtn" id="thBtn" aria-label="${isDark() ? "الوضع النهاري" : "الوضع الليلي"}">${isDark() ? LI.sun : LI.moon}</button></span></div>
       <div class="hgreet">${greet}${ST.name ? `، ${esc(ST.name)}` : ""}</div>
       <div class="hmotto">احفظ ما تفهم، وافهم ما تحفظ</div>
       <button class="hpray" id="salahGo">${HICON.moon}<span>${np.n}</span><b>${fmtT(np.at)}</b><small>${leftTxt(np.at - Date.now())}</small></button>
@@ -2037,7 +2043,7 @@ function home() {
       <div class="cwird">${wirdMini()}</div>
     </section>
     ${dailyCard()}`;
-  $("#salahGo").onclick = () => go("salah"); bindFind();
+  $("#thBtn").onclick = () => setTheme(isDark() ? "light" : "dark"); $("#salahGo").onclick = () => go("salah"); bindFind();
   bindWirdHome();
   bindAll();
 }
@@ -3505,10 +3511,15 @@ function review() {
 }
 
 /* ---------- حسابي ---------- */
+/* الوضع الليلي والنهاري: تلقائي مع الجهاز، أو يختاره المستخدم */
+const isDark = () => ST.theme === "dark" || (ST.theme !== "light" && !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches));
+function applyTheme() { const r = document.documentElement; if (ST.theme === "dark" || ST.theme === "light") r.dataset.theme = ST.theme; else delete r.dataset.theme; }
+function setTheme(t) { ST.theme = t; save(); applyTheme(); render(); }
 async function profile() {
   $("#view").innerHTML = bar("حسابي") + `
     <button class="card row langrow" id="langBtn"><span class="grow"><b>اللغة</b> ${LG !== "en" ? `<span class="tiny muted" data-noi18n>Language</span>` : ""}<div class="small muted" data-noi18n>${LANGS.find(x => x[0] === LG)[1]}</div></span>${ICON.chev}</button>
     <div class="card"><label class="tiny muted" for="name">اسمك</label><input type="text" id="name" placeholder="يظهر في الرئيسية" value="${esc(ST.name)}" style="margin-top:6px"></div>
+    <div class="card"><div class="tiny muted" style="margin-bottom:8px">المظهر</div><div class="seg thseg" role="group">${[["light", "نهاري", LI.sun], ["dark", "ليلي", LI.moon], ["auto", "تلقائي", ""]].map(([k, t, ic]) => `<button data-th="${k}" aria-pressed="${(ST.theme || "auto") === k}">${ic}${t}</button>`).join("")}</div></div>
     <div class="sec"><h2>تسجيلاتي</h2></div><div id="recs"><div class="info">جارٍ التحميل…</div></div>
     <div class="sec"><h2>مراجعة المحتوى</h2><span class="badge draft">للمتخصص الشرعي</span></div>
     <div class="card"><div class="small muted">موضوع الوجه والفوائد ومقاصد السورة مسوداتٌ تظهر بشارة «بانتظار المراجعة» حتى يعتمدها المتخصص بعد مطابقتها بالمختصر في التفسير.</div>
@@ -3518,7 +3529,7 @@ async function profile() {
     <div class="card small">${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">رسم صفحات المصحف: النص العثماني لمجمع الملك فهد لطباعة المصحف الشريف (Uthmanic Hafs)، بخط DigitalKhatt Madina</div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></div>
     <div class="sec"><h2>بياناتي</h2></div>
     <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
-  $("#langBtn").onclick = langSheet;
+  $("#langBtn").onclick = langSheet; document.querySelectorAll("[data-th]").forEach(b => b.onclick = () => setTheme(b.dataset.th));
   $("#name").onchange = e => { ST.name = e.target.value.trim(); save(); };
   $("#openReview").onclick = reviewSheet;
   document.querySelectorAll("[data-diag]").forEach(b => b.onclick = diagSheet);
@@ -4445,7 +4456,7 @@ function listenAsk() {
 }
 function stopAsk() { if (AS.rec) { const r = AS.rec; AS.rec = null; try { r.stop(); } catch (e) {} } const m = $("#aMic"); if (m) m.classList.remove("on"); const i = $("#aIn"); if (i) i.placeholder = tr("اكتب سؤالك…"); }
 
-TR.start(); render(); setTimeout(() => { if (S.tab === "home") wirdMorning(); }, 900);
+applyTheme(); TR.start(); render(); setTimeout(() => { if (S.tab === "home") wirdMorning(); }, 900);
 LIVE.boot();
 </script>
 </body>
