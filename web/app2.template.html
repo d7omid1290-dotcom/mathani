@@ -1168,6 +1168,15 @@ html,body,*{scrollbar-width:none}
 .fsteps{display:flex;justify-content:space-between;gap:6px;margin:4px 0 12px}
 .fsteps span{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);text-align:center;background:var(--surface,#fff);border-radius:16px;padding:10px 4px;box-shadow:var(--sh)}
 .fsteps i{font-style:normal;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;font-size:12px}
+.tslim{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:calc(var(--top) + 14px) 2px 6px}
+.tchip.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.psq{width:100%;box-sizing:border-box;margin:4px 0 10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font:inherit;color:inherit}
+.hqs{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.hq{display:flex;align-items:center;gap:14px;text-align:start;padding:20px 18px;border-radius:24px;border:0;background:var(--surface,#fff);box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 28px rgba(11,42,33,.07);font:inherit;color:inherit;cursor:pointer}
+.hq b{display:block;font-size:17px}.hq small{display:block;margin-top:4px;font-size:13px;color:var(--muted)}
+.hqi{display:grid;place-items:center;width:52px;height:52px;border-radius:18px;background:var(--soft,#E6F0EB);color:#0E5A43;flex:none}.hqi svg{width:26px;height:26px}
+.hq.main .hqi{background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff}
+.hq.gold .hqi{background:linear-gradient(135deg,#B8862E,#D9AE55);color:#fff}
 </style>
 </head>
 <body>
@@ -1348,15 +1357,37 @@ function resetT() { F = null; if (S.T.url) { /* يبقى الرابط صالحا
 function render() {
   setTimeout(() => { highlight(); drawMP(); }, 0);
   if (!(S.reader && S.rview === "mushaf")) { document.body.classList.remove("immersive"); document.body.style.background = ""; }
-  $("#tabs").innerHTML = [["home", "الرئيسية", "home"], ["mushaf", "المصحف", "book"], ["tasmee", "سمّع", "mic"], ["salah", "الصلاة", "dome"], ["profile", "حسابي", "user"]]
-    .map(([id, t, ic]) => { const cur = !S.reader && (S.tab === id || (id === "mushaf" && S.tab === "tafsir") || (id === "salah" && S.tab === "adhkar")) ? 'aria-current="page"' : "";
-      return id === "tasmee" && !(S.tab === "tasmee" && !S.reader)
+  $("#tabs").innerHTML = [["home", "الرئيسية", "home"], ["mushaf", "المصحف", "book"], ["tasmee", "حلقتي", "mic"], ["salah", "الصلاة", "dome"], ["profile", "حسابي", "user"]]
+    .map(([id, t, ic]) => { const cur = !S.reader && (S.tab === id || (id === "mushaf" && S.tab === "tafsir") || (id === "salah" && S.tab === "adhkar") || (id === "tasmee" && ["halaqa", "teacher"].includes(S.tab))) ? 'aria-current="page"' : "";
+      return id === "tasmee" && !(["tasmee", "halaqa", "teacher"].includes(S.tab) && !S.reader)
       ? `<button class="fab" data-tab="${id}" ${cur}><span class="c">${ICON[ic]}</span>${t}</button>`
       : `<button data-tab="${id}" ${cur}>${ICON[ic] || HICON[ic]}${t}</button>`; }).join("");
   if (S.reader) return reader();
-  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher, adhkar })[S.tab]();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher, adhkar, halaqa })[S.tab]();
 }
-$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.tab); });
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.tab === "tasmee" && S.reader) { const p = S.reader; S.T.mode = "live"; openTasmee(p); setTimeout(() => { if (S.tab === "tasmee" && $("#fmic")) startFollow(); }, 60); return; } // من صفحة المصحف: يبدأ التسميع على نفس الوجه
+  if (b.dataset.tab === "tasmee") return go("halaqa");
+  go(b.dataset.tab); });
+/* حلقتي: التسميع والمصحف المعلّم والحلقة المباشرة */
+const pickTas = () => pickSurah("سمّع من سورة", n => { S.T.mode = "live"; openTasmee(surahPages(n)[0]); setTimeout(() => { if (S.tab === "tasmee" && $("#fmic")) startFollow(); }, 60); });
+const pickTeach = () => pickSurah("المصحف المعلّم: اختر السورة", n => { teachStop(); TCH.k = `${n}:1`; ST.teachK = TCH.k; TCH.phase = "idle"; save(); go("teacher"); });
+const pickLive = () => pickSurah("الحلقة المباشرة: اختر السورة", n => { ST.last = surahPages(n)[0]; save(); LIVE.start(); });
+function halaqa() {
+  const c = (id, ic, t, sub, cls = "") => `<button class="hq ${cls}" id="${id}"><span class="hqi">${ic}</span><span class="grow"><b>${t}</b><small>${sub}</small></span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`;
+  $("#view").innerHTML = bar("حلقتي", "اختر ما تريد، ثم اختر السورة") + `<div class="hqs">
+    ${c("hqTas", ICON.mic, "التسميع", "سمّع من حفظك على صفحة المصحف", "main")}
+    ${c("hqTeach", ICON.listen, "المصحف المعلّم", "استمع للشيخ وردّد بعده آيةً آية")}
+    ${c("hqLive", ICON.users, "الحلقة المباشرة", "مع معلمك أو زملائك", "gold")}</div>`;
+  $("#hqTas").onclick = pickTas; $("#hqTeach").onclick = pickTeach; $("#hqLive").onclick = pickLive;
+}
+/* اختيار السورة قبل التسميع والمعلّم والحلقة */
+function pickSurah(title, cb) {
+  const list = q => SURAHS.filter(n => !q || DATA.surahs[n].includes(q) || String(n) === q).map(n => `<button class="item" data-ps="${n}"><span class="pg">${AR(n)}</span><span class="grow">سورة ${DATA.surahs[n]}</span></button>`).join("");
+  openSheet(`<h3>${title}</h3><input type="search" id="psq" class="psq" placeholder="ابحث باسم السورة"><div class="langs" id="psl">${list("")}</div>`);
+  const bind = () => document.querySelectorAll("[data-ps]").forEach(b => b.onclick = () => { closeSheet(); cb(+b.dataset.ps); });
+  $("#psq").oninput = e => { $("#psl").innerHTML = list(e.target.value.trim()); bind(); }; bind();
+}
 function bar(title, sub, back, action) {
   return `<header class="bar">${back ? `<button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>` : ""}
     <h1>${title}${sub ? `<small>${sub}</small>` : ""}</h1>${action || ""}</header>`;
@@ -1419,7 +1450,7 @@ function home() {
       <button class="htile" id="teachGo"><span class="hti">${ICON.listen}</span><b>المصحف المعلّم</b><small>استمع وردّد آيةً آية</small></button>
       <button class="htile" id="liveGo"><span class="hti">${ICON.users}</span><b>الحلقة المباشرة</b><small>مع معلمك أو زملائك</small></button>
     </div>`;
-  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start(); $("#view #teachGo").onclick = () => go("teacher");
+  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => pickLive(); $("#view #teachGo").onclick = () => pickTeach();
   bindWirdHome();
   bindAll();
 }
@@ -2246,7 +2277,7 @@ function teacher() {
     </div>
     <div class="tnav"><button class="tround" id="tPrev" aria-label="الآية السابقة" ${idx === 0 ? "disabled" : ""}>‹</button><span class="tprog"><i style="width:${(idx + 1) / total * 100}%"></i></span><button class="tround" id="tNext" aria-label="الآية التالية" ${idx >= total - 1 ? "disabled" : ""}>›</button></div>
     <div class="tiny muted" style="text-align:center;margin-top:10px">التلاوة من EveryAyah، والتعرف على الصوت من متصفحك (الأفضل Chrome).</div>`;
-  $("#back").onclick = () => { teachStop(); go("home"); };
+  $("#back").onclick = () => { teachStop(); go("halaqa"); };
   const on = (id, f) => { const e = $(id); if (e) e.onclick = f; };
   on("#tGo", teachListen); on("#tAgain", teachListen); on("#tRetry", teachRepeat); on("#tSkipL", () => { if (TCH.a) TCH.a.pause(); teachRepeat(); });
   on("#tDone", () => teachStopRec(true)); on("#tPass", () => teachMove(1));
@@ -2318,15 +2349,17 @@ function tasmee() {
   if (T.phase === "result") return tResult();
   const keys = tKeys();
   const modes = [["live", "تسميع مباشر", ICON.wave], ["record", "تسجيل صوتي", ICON.mic], ["text", "بالكتابة", ICON.pen]];
-  $("#view").innerHTML = bar("التسميع", "سمّع من حفظك، ويكشف مثاني أخطاءك") + `
-    <div class="card target"><span class="pg">${AR(T.page)}</span>
+  $("#view").innerHTML = (T.mode === "live" ? `<div class="tslim"><button class="tchip" id="change" ${T.phase !== "ready" ? "disabled" : ""}>سورة ${pageSurah(T.page)}، الوجه ${AR(T.page)} ▾</button><button class="tchip ghost" id="tmodes" ${T.phase !== "ready" ? "disabled" : ""}>طرق أخرى</button></div>` : bar("التسميع", "سمّع من حفظك، ويكشف مثاني أخطاءك")) + `
+    <div class="card target" ${T.mode === "live" ? 'style="display:none"' : ""}><span class="pg">${AR(T.page)}</span>
       <div class="grow"><div style="font-weight:600">الوجه ${AR(T.page)}: سورة ${pageSurah(T.page)}</div>
         <div class="tiny muted">من ${ref(keys[0])} إلى ${ref(keys.at(-1))}، ${ayat(keys.length)}</div></div>
-      <button class="link" id="change" ${T.phase !== "ready" ? "disabled" : ""}>تغيير</button></div>
-    <div class="modes" role="group" aria-label="طريقة التسميع">${modes.map(([id, t, ic]) => `<button data-m="${id}" aria-pressed="${T.mode === id}" ${T.phase !== "ready" ? "disabled" : ""}>${ic}${t}</button>`).join("")}</div>
+      ${T.mode === "live" ? "" : `<button class="link" id="change" ${T.phase !== "ready" ? "disabled" : ""}>تغيير</button>`}</div>
+    <div class="modes" ${T.mode === "live" ? 'style="display:none"' : ""} role="group" aria-label="طريقة التسميع">${modes.map(([id, t, ic]) => `<button data-m="${id}" aria-pressed="${T.mode === id}" ${T.phase !== "ready" ? "disabled" : ""}>${ic}${t}</button>`).join("")}</div>
     <div class="${T.mode === "live" ? "" : "card studio"}" id="studio"></div>
-    <button class="hrow" id="teachGo" style="margin-top:14px"><span class="hic">${ICON.listen}</span><span class="grow"><small>استمع وردّد آيةً آية</small><b>المصحف المعلّم</b></span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`;
-  $("#change").onclick = rangeSheet; $("#teachGo").onclick = () => go("teacher");
+    <button class="hrow" id="teachGo" style="margin-top:14px" ${T.mode === "live" ? "hidden" : ""}><span class="hic">${ICON.listen}</span><span class="grow"><small>استمع وردّد آيةً آية</small><b>المصحف المعلّم</b></span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`;
+  $("#change").onclick = rangeSheet; $("#teachGo").onclick = () => pickTeach();
+  const tm = $("#tmodes"); if (tm) tm.onclick = () => { openSheet(`<h3>طريقة التسميع</h3>${modes.map(([id, t, ic]) => `<button class="item" data-m2="${id}">${ic}<span class="grow">${t}</span></button>`).join("")}<button class="item" data-m2="loc">${ICON.wave}<span class="grow">ابدأ من أي موضع${ST.autoLoc ? " ✓" : ""}</span></button><button class="item" data-m2="teach">${ICON.listen}<span class="grow">المصحف المعلّم</span></button>`);
+    document.querySelectorAll("[data-m2]").forEach(b => b.onclick = () => { const m = b.dataset.m2; closeSheet(); if (m === "teach") return $("#teachGo").click(); if (m === "loc") { ST.autoLoc = !ST.autoLoc; save(); F = null; return tasmee(); } if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } T.mode = m; F = null; resetT(); tasmee(); }); };
   document.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } T.mode = b.dataset.m; F = null; resetT(); tasmee(); });
   drawStudio();
 }
@@ -2491,17 +2524,14 @@ function drawFollow(box) {
   const on = !!REC && T.phase === "recording", loc = F.locating, heardAny = followHeard().H.length > 0;
   if (loc) setTimeout(locIdx, on ? 0 : 300); // يُبنى فهرس المصحف مسبقاً
   box.innerHTML = `
-    ${!on && !heardAny && !F.found ? `<label class="autoloc"><span><b>ابدأ من أي موضع</b><small>يتعرّف مثاني على الآية وينتقل إليها</small></span><input type="checkbox" role="switch" id="autoloc" ${loc ? "checked" : ""}></label>` : ""}
     <div id="floc">${F.found && Date.now() - F.foundAt < 6000 ? `<div class="toast green">${ICON.check.replace("<svg", '<svg width="20" height="20"')}<span>تعرّفتُ على موضعك: ${ref(F.found)}</span></div>` : F.locMiss && !F.found ? `<div class="toast gold"><span>لم أتعرّف على موضع القراءة، فأتابعك في الوجه المحدد.</span></div>` : ""}</div>
-    ${!on && !heardAny && !loc ? `<div class="fsteps"><span><i>١</i>اضغط الميكروفون</span><span><i>٢</i>اقرأ من حفظك</span><span><i>٣</i>تظهر الكلمات الصحيحة</span></div>` : ""}
     <div class="fstat" ${loc ? "hidden" : ""}><div class="prog"><i id="fprog" style="width:0"></i></div><span class="tiny muted" id="fcount"></span></div>
     <div id="ftoast"></div>
     ${loc ? `<div class="card locwait" id="flocw">${ICON.wave}<b>${on ? "أستمع إليك…" : "اقرأ من أي موضع"}</b><span class="tiny muted">${on ? "ابدأ القراءة من أي آية، وسأتعرّف على موضعك وأنتقل إليه." : "اضغط الميكروفون وابدأ من أي آية في القرآن."}</span></div>` : ""}
     <div class="page fpage" ${loc ? "hidden" : ""}><div class="page-in"><div class="page-in2" id="fpage">${F.html}</div></div></div>
     <div class="heard" id="fheard">${on ? "" : loc ? "" : "اضغط الميكروفون واقرأ من حفظك؛ كل كلمة صحيحة تنكشف في مكانها."}</div>
     ${T.err ? `<div class="alert">${T.err}<div style="margin-top:8px"><button class="link" style="color:var(--err);text-decoration:underline" data-diag>افحص سبب المشكلة</button></div></div>` : ""}
-    <details style="margin-top:10px"><summary class="tiny muted" style="cursor:pointer">لا يعمل الميكروفون؟ جرّب بالكتابة</summary>
-      <div class="typein"><input type="text" id="ftype" placeholder="اكتب من حفظك، كلمة بعد كلمة" value="${esc(F.typed)}"></div></details>
+    <input type="hidden" id="ftype" value="">
     <div style="height:110px"></div>
     <div class="ctrl">
       <button class="side" id="fhint">${ICON.bulb}اكشف كلمة</button>
@@ -2511,7 +2541,7 @@ function drawFollow(box) {
   $("#fmic").onclick = () => on ? stopFollow(false) : startFollow();
   $("#fhint").onclick = () => { if (F.locating) return; const f = M.follow(F.E, followHeard().H, followHeard().nFinal, F.forced); if (f.pos < F.E.length) { F.forced.add(f.pos); updateFollow(); } };
   $("#fend").onclick = () => stopFollow(true);
-  const al = $("#autoloc"); if (al) al.onchange = () => { ST.autoLoc = al.checked; save(); F.locating = al.checked; drawStudio(); };
+  const al = null; if (al) al.onchange = () => { ST.autoLoc = al.checked; save(); F.locating = al.checked; drawStudio(); };
   if (F.found) setTimeout(() => { const e = $("#floc"); if (e && F && Date.now() - F.foundAt >= 5900) e.innerHTML = ""; }, 6000);
   $("#ftype").oninput = e => { F.typed = e.target.value; updateFollow(); };
   updateFollow(true);
