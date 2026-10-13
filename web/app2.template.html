@@ -1142,6 +1142,9 @@ html,body,*{scrollbar-width:none}
 .dkb.dkw{grid-column:1/-1}.dkq{font-size:.85rem;font-weight:600;color:var(--gold);margin-bottom:8px}
 .dkqt{font-family:var(--mushaf);font-size:1.3rem;line-height:2.1;color:#141414;max-height:52vh;overflow:auto}.dke{font-size:.9em}
 .dkpair{grid-template-columns:repeat(3,1fr);gap:8px}.dkpair .dkb{flex-direction:column;gap:4px;padding:10px 4px;font-size:.82rem}
+.mtsw{display:inline-flex;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:3px;gap:2px;margin-bottom:10px}
+.mtsw button{border:0;background:transparent;color:rgba(255,255,255,.8);font:inherit;font-weight:600;font-size:.92rem;padding:7px 18px;border-radius:999px;cursor:pointer}
+.mtsw button[aria-pressed="true"]{background:#fff;color:var(--green)}
 </style>
 </head>
 <body>
@@ -1322,10 +1325,11 @@ function resetT() { F = null; if (S.T.url) { /* يبقى الرابط صالحا
 function render() {
   setTimeout(() => { highlight(); drawMP(); }, 0);
   if (!(S.reader && S.rview === "mushaf")) { document.body.classList.remove("immersive"); document.body.style.background = ""; }
-  $("#tabs").innerHTML = [["home", "الرئيسية", "home"], ["mushaf", "المصحف", "book"], ["tasmee", "سمّع", "mic"], ["tafsir", "التفسير", "tafsir"], ["profile", "حسابي", "user"]]
-    .map(([id, t, ic]) => id === "tasmee" && !(S.tab === "tasmee" && !S.reader)
-      ? `<button class="fab" data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}><span class="c">${ICON[ic]}</span>${t}</button>`
-      : `<button data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}>${ICON[ic]}${t}</button>`).join("");
+  $("#tabs").innerHTML = [["home", "الرئيسية", "home"], ["mushaf", "المصحف", "book"], ["tasmee", "سمّع", "mic"], ["salah", "الصلاة", "dome"], ["profile", "حسابي", "user"]]
+    .map(([id, t, ic]) => { const cur = !S.reader && (S.tab === id || (id === "mushaf" && S.tab === "tafsir") || (id === "salah" && S.tab === "adhkar")) ? 'aria-current="page"' : "";
+      return id === "tasmee" && !(S.tab === "tasmee" && !S.reader)
+      ? `<button class="fab" data-tab="${id}" ${cur}><span class="c">${ICON[ic]}</span>${t}</button>`
+      : `<button data-tab="${id}" ${cur}>${ICON[ic] || HICON[ic]}${t}</button>`; }).join("");
   if (S.reader) return reader();
   ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher, adhkar })[S.tab]();
 }
@@ -1426,13 +1430,15 @@ function pageItem(p, sub, tas = true) {
 }
 
 /* ---------- المصحف ---------- */
+const mtSwitch = cur => `<div class="mtsw" role="group"><button data-mt="mushaf" aria-pressed="${cur === "mushaf"}">المصحف</button><button data-mt="tafsir" aria-pressed="${cur === "tafsir"}">التفسير</button></div>`;
+function bindMt() { document.querySelectorAll("[data-mt]").forEach(b => b.onclick = () => { S.tab = b.dataset.mt; render(); scrollTo(0, 0); }); }
 function mushaf() {
   S.mview = S.mview || "surah";
   const done = Object.keys(ST.pages).length;
   const lp = ST.last || 3;
   $("#view").innerHTML = `
     <header class="tband mband"><div class="tbin">
-      <div class="tbk">المصحف</div>
+      ${mtSwitch("mushaf")}
       <div class="mbt">مصحف المدينة برواية حفص</div>
       <div class="mbs">${AR(SURAHS.length)} سورة، ${AR(30)} جزءاً، ${AR(PAGES.length)} وجهاً</div>
       <button class="mcont" data-read="${lp}">${ICON.book}<span>تابع القراءة</span><b>سورة ${pageSurah(lp)}، الوجه ${AR(lp)}</b></button>
@@ -1461,7 +1467,7 @@ function mushaf() {
     $("#q").oninput = e => { S.q = e.target.value; draw(); };
     draw();
   }
-  bindAll();
+  bindMt(); bindAll();
 }
 
 /* ---------- عن السورة: بيانات السورة وروابطها في الموسوعة القرآنية ---------- */
@@ -2713,7 +2719,7 @@ function tafsirTab() {
   const p = S.tp = S.tp || ST.last || 3, src = ST.tsrc || "muyassar";
   $("#view").innerHTML = `
     <header class="tband"><div class="tbin">
-      <div class="tbk">التفسير</div>
+      ${mtSwitch("tafsir")}
       <div class="tbrow">
         <button class="tbnav" id="tpPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
         <button class="tbpick" id="tpPick"><b>سورة ${pageSurah(p)}</b><small>الوجه ${AR(p)}، الآيات ${pageRange(p)}، الجزء ${JUZ_NAMES[juzOf(p)]} ▾</small></button>
@@ -2731,7 +2737,7 @@ function tafsirTab() {
   $("#tpNext").onclick = $("#tpNext2").onclick = () => goP(p + 1);
   $("#tpPick").onclick = surahPicker;
   document.querySelectorAll("[data-ts]").forEach(b => b.onclick = () => { ST.tsrc = b.dataset.ts; save(); tafsirTab(); });
-  fillTafsir(p, src);
+  bindMt(); fillTafsir(p, src);
 }
 function surahPicker() {
   openSheet(`<h3>اختر السورة</h3><input class="search" id="sq" type="search" placeholder="ابحث باسم السورة أو رقمها" style="margin:10px 0"><div id="sl2"></div>`);
