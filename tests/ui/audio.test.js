@@ -30,7 +30,7 @@ const txt = s => $(s) ? $(s).textContent.replace(/\s+/g, " ").trim() : "∅";
   click($("#mpSet")); console.log("reciters listed:", d.querySelectorAll("[data-rec]").length);
   const q = $("#rq"); q.value = "الحصري"; q.dispatchEvent(new w.Event("input")); console.log("search الحصري:", [...d.querySelectorAll("[data-rec] b")].map(b => b.textContent + (b.nextElementSibling?.classList.contains("tag") ? "(" + b.nextElementSibling.textContent + ")" : "")).join(" | "));
   click(d.querySelector('[data-rec="Husary_Muallim_128kbps"]')); console.log("switched:", srcs.at(-1).replace("https://everyayah.com/data/", ""));
-  click(d.querySelector('[data-rep="0"]')); click(d.querySelector('[data-rate="0.75"]')); console.log("rep∞/rate:", w.eval("ST.rep+'/'+ST.rate"), "| playbackRate:", w.eval("P.el.playbackRate")); click($("#closeSheet"));
+  click(d.querySelector('[data-rep="0"]')); console.log("rep∞:", w.eval("ST.rep"), "| no speed options:", !d.querySelector("[data-rate]"), "| playbackRate:", w.eval("P.el.playbackRate")); click($("#closeSheet"));
   // من ورقة الآية
   w.eval("ayahSheet('2:255')"); click($("#ayPlay")); console.log("from ayah sheet:", txt("#mp .who small"), "| page:", txt(".rtop .t small"));
   click($("#mpPP")); console.log("paused:", w.eval("P.playing"), "| icon:", $("#mpPP").getAttribute("aria-label"));

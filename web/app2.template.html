@@ -1098,6 +1098,18 @@ html,body,*{scrollbar-width:none}
 .seg{display:flex;background:var(--surface-2);border-radius:14px;padding:4px;gap:4px}
 .seg button{flex:1;border:0;background:transparent;border-radius:10px;padding:9px 6px;font:inherit;font-size:.85rem;font-weight:600;color:var(--muted);cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* المصحف المعلّم */
+.tcard{background:var(--surface);border-radius:24px;padding:16px 16px 18px;box-shadow:var(--sh)}
+.thd{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:10px}
+.tay{font-family:var(--mushaf);font-size:1.75rem;line-height:2.3;text-align:center;color:#141414}
+.tay .tw.bad{color:var(--err);background:color-mix(in srgb,var(--err) 12%,transparent);border-radius:6px}.tay .tw.ok{color:var(--green)}
+.tend{font-size:.9em}
+.tst{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;font-weight:600;font-size:.92rem;color:var(--muted);text-align:center}
+.tst.ok{color:var(--green)}.tst.bad{color:var(--err);font-weight:500}.tst svg{width:18px;height:18px}
+.tst .dot{width:10px;height:10px;border-radius:50%;flex:none}.dot.g{background:var(--green)}.dot.r{background:var(--err)}
+.pulse{animation:tpul 1.2s ease-in-out infinite}@keyframes tpul{50%{opacity:.3;transform:scale(.7)}}
+.tbtns{display:flex;gap:8px;margin-top:14px}.tbtns .btn{flex:1}
+.tnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
 </style>
 </head>
 <body>
@@ -1282,7 +1294,7 @@ function render() {
       ? `<button class="fab" data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}><span class="c">${ICON[ic]}</span>${t}</button>`
       : `<button data-tab="${id}" ${S.tab === id && !S.reader ? 'aria-current="page"' : ""}>${ICON[ic]}${t}</button>`).join("");
   if (S.reader) return reader();
-  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant })[S.tab]();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher })[S.tab]();
 }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.tab); });
 function bar(title, sub, back, action) {
@@ -1343,8 +1355,9 @@ function home() {
       <div class="cbtns"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn" data-read="${last}">${ICON.book}اقرأ</button></div>
     </section>
     ${wirdMini()}
+    <button class="hrow" id="teachGo"><span class="hic">${ICON.listen}</span><span class="grow"><small>استمع وردّد آيةً آية</small><b>المصحف المعلّم</b></span><span class="muted">${chev}</span></button>
     <button class="hrow" id="liveGo"><span class="hic">${ICON.users}</span><span class="grow"><small>مع معلمك أو زملائك</small><b>الحلقة المباشرة</b></span><span class="muted">${chev}</span></button>`;
-  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start();
+  $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => LIVE.start(); $("#teachGo").onclick = () => go("teacher");
   bindWirdHome();
   bindAll();
 }
@@ -1554,7 +1567,7 @@ function playFrom(k) {
 function loadAndPlay() {
   const a = audioEl(), v = V(P.k);
   a.src = P.bsm ? audioUrl(1, 1) : audioUrl(v.s, v.a);
-  a.playbackRate = ST.rate || 1;
+  a.playbackRate = 1;
   const pr = a.play(); P.playing = true;
   if (pr && pr.catch) pr.catch(() => { if (!P.err) { P.playing = false; drawMP(); } });
   highlight(); followPage(); drawMP(); preloadNext();
@@ -1573,7 +1586,7 @@ function onAyahEnd() {
     P.cnt = 0; P.k = ALLK[i + 1]; const v = V(P.k); P.bsm = v.a === 1 && v.s !== 1 && v.s !== 9; loadAndPlay();
   };
   // وقت للترديد بعد كل آية (بقدر مدتها) لمن يحفظ
-  if (ST.gap && P.el && P.el.duration) { P.playing = true; drawMP("ردّد الآية…"); P.gapT = setTimeout(go2, P.el.duration * 1000 / (ST.rate || 1)); }
+  if (ST.gap && P.el && P.el.duration) { P.playing = true; drawMP("ردّد الآية…"); P.gapT = setTimeout(go2, P.el.duration * 1000); }
   else go2();
 }
 function togglePlay() {
@@ -1607,19 +1620,16 @@ function drawMP(note) {
   $("#mpX").onclick = stopAudio; $("#mpSet").onclick = listenSheet;
 }
 function listenSheet() {
-  const rep = ST.rep == null ? 1 : ST.rep, rate = ST.rate || 1;
+  const rep = ST.rep == null ? 1 : ST.rep;
   openSheet(`<h3>إعدادات السماع</h3>
     <div class="small muted" style="margin:12px 0 6px">تكرار كل آية</div>
     <div class="chips">${[[1, "مرة"], [2, "مرتان"], [3, "٣ مرات"], [5, "٥ مرات"], [10, "١٠ مرات"], [0, "بلا توقف"]].map(([v, t]) => `<button data-rep="${v}" aria-pressed="${rep === v}">${t}</button>`).join("")}</div>
-    <div class="small muted" style="margin:14px 0 6px">سرعة التلاوة</div>
-    <div class="chips">${[0.75, 1, 1.25, 1.5].map(v => `<button data-rate="${v}" aria-pressed="${rate === v}">${AR(v)}×</button>`).join("")}</div>
     <div class="card row" style="margin-top:14px;padding:12px 14px"><div class="grow"><b>وقت للترديد</b><div class="tiny muted">بعد كل آية يتوقف بقدر مدتها لتردّدها</div></div>
       <button class="switch" role="switch" aria-checked="${!!ST.gap}" id="gapSw" aria-label="وقت للترديد"></button></div>
     <div class="small muted" style="margin:16px 0 6px">القارئ</div>
     <input class="search" id="rq" type="search" placeholder="ابحث عن قارئ" style="margin:0 0 10px"><div id="rlist"></div>
     <div class="src">أسماء القرّاء من الموسوعة القرآنية، والتلاوات آيةً آية من EveryAyah.</div>`);
   document.querySelectorAll("[data-rep]").forEach(b => b.onclick = () => { ST.rep = +b.dataset.rep; save(); P.cnt = 0; listenSheet(); drawMP(); });
-  document.querySelectorAll("[data-rate]").forEach(b => b.onclick = () => { ST.rate = +b.dataset.rate; save(); if (P.el) P.el.playbackRate = ST.rate; listenSheet(); });
   $("#gapSw").onclick = () => { ST.gap = !ST.gap; save(); $("#gapSw").setAttribute("aria-checked", ST.gap); };
   const draw = () => { const q = M.norm($("#rq").value || "").join(" ");
     $("#rlist").innerHTML = RECITERS.filter(r => !q || M.norm(r[1]).join(" ").includes(q)).map(r => `<button class="rcl" data-rec="${r[0]}" aria-pressed="${recOf()[0] === r[0]}">
@@ -2084,6 +2094,103 @@ function answer(ok, k, extra) {
     <button class="btn primary block" id="nq">${Q.i + 1 < Q.qs.length ? "السؤال التالي" : "عرض النتيجة"}</button>`;
   $("#nq").onclick = () => { Q.i++; Q.answered = false; Q.picked = []; drawQuiz(); };
 }
+
+
+/* ---------- المصحف المعلّم: يسمع الطالب الآية من القارئ، ثم يردّدها فتُقارَن بالنص، فإن صحّت انتقل للتالية ---------- */
+const TCH = { k: null, phase: "idle", heard: "", score: 0, miss: [], tries: 0, sr: null, mr: null, chunks: [], recUrl: "", a: null, err: "" };
+const TREC = () => RECITERS.find(r => r[0] === (ST.trec || "Husary_Muallim_128kbps")) || RECITERS[0];
+function teachStart() { const pg = ST.last || 1; return (ST.teachK && DATA.verses[ST.teachK]) ? ST.teachK : DATA.pages[pg][0]; }
+function lcsMatch(want, got) { // أي كلمات المطلوب وردت بالترتيب في المسموع
+  const n = want.length, m = got.length, d = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) d[i][j] = want[i] === got[j] ? d[i + 1][j + 1] + 1 : Math.max(d[i + 1][j], d[i][j + 1]);
+  const ok = new Array(n).fill(false); let i = 0, j = 0;
+  while (i < n && j < m) { if (want[i] === got[j]) { ok[i] = true; i++; j++; } else if (d[i + 1][j] >= d[i][j + 1]) i++; else j++; }
+  return ok;
+}
+function teacher() {
+  if (!TCH.k) TCH.k = teachStart();
+  const k = TCH.k, v = V(k), words = (UTH.verses[k] || M.norm(v.t)), surahN = DATA.surahs[v.s];
+  const idx = KIDX[k], total = ALLK.length;
+  const wHTML = words.map((w, i) => `<span class="tw ${TCH.phase === "result" ? (TCH.miss.includes(i) ? "bad" : "ok") : ""}">${esc(w)}</span>`).join(" ");
+  const ph = TCH.phase;
+  const status = ph === "listen" ? `<div class="tst"><span class="dot pulse g"></span>استمع للقارئ…</div>`
+    : ph === "repeat" ? `<div class="tst"><span class="dot pulse r"></span>ردّد الآية الآن… ثم اضغط «انتهيت»</div>`
+    : ph === "result" ? (TCH.score >= 0.85 ? `<div class="tst ok">${ICON.check || ""}أحسنت! قراءة صحيحة، ننتقل للآية التالية…</div>`
+      : `<div class="tst bad">قاربت. الكلمات بالأحمر لم تُسمع بوضوح. أعد الاستماع ثم ردّد مرة أخرى.</div>`)
+    : `<div class="tst">اضغط «ابدأ» لتسمع الآية ثم تردّدها.</div>`;
+  $("#view").innerHTML = bar("المصحف المعلّم", `بصوت ${TREC()[1]}`, true) + `
+    <div class="tcard">
+      <div class="thd"><span>سورة ${surahN}</span><span>الآية ${AR(v.a)}</span></div>
+      <div class="tay" dir="rtl">${wHTML} <span class="tend">۝${AR(v.a)}</span></div>
+      ${status}
+      ${TCH.err ? `<div class="err">${TCH.err}</div>` : ""}
+      ${ph === "result" && TCH.heard ? `<div class="tiny muted" style="margin-top:8px">سمعتُ: «${esc(TCH.heard)}»</div>` : ""}
+      ${TCH.recUrl && ph === "result" ? `<button class="link" id="tMine" style="margin-top:6px">${ICON_PLAY.replace("<svg", '<svg width="14" height="14"')} استمع لتسجيلك</button>` : ""}
+    </div>
+    <div class="tbtns">
+      ${ph === "repeat" ? `<button class="btn primary block" id="tDone">انتهيت</button>`
+        : ph === "listen" ? `<button class="btn block" id="tSkipL">ردّد الآن</button>`
+        : ph === "result" && TCH.score < 0.85 ? `<button class="btn primary" id="tAgain">أعد الاستماع</button><button class="btn" id="tRetry">ردّد مرة أخرى</button>`
+        : ph === "result" ? "" : `<button class="btn primary block" id="tGo">ابدأ</button>`}
+    </div>
+    <div class="tnav"><button class="btn" id="tPrev" ${idx === 0 ? "disabled" : ""}>السابقة</button><button class="link" id="tPick">اختر سورة</button><button class="btn" id="tNext" ${idx >= total - 1 ? "disabled" : ""}>التالية</button></div>
+    <div class="tiny muted" style="text-align:center;margin-top:10px">التلاوة من EveryAyah، والتعرف على الصوت من متصفحك (الأفضل Chrome).</div>`;
+  $("#back").onclick = () => { teachStop(); go("home"); };
+  const on = (id, f) => { const e = $(id); if (e) e.onclick = f; };
+  on("#tGo", teachListen); on("#tAgain", teachListen); on("#tRetry", teachRepeat); on("#tSkipL", () => { if (TCH.a) TCH.a.pause(); teachRepeat(); });
+  on("#tDone", () => teachStopRec(true)); on("#tPass", () => teachMove(1));
+  on("#tPrev", () => teachMove(-1)); on("#tNext", () => teachMove(1));
+  on("#tMine", () => { try { new Audio(TCH.recUrl).play(); } catch (e) {} });
+  on("#tPick", () => { openSheet(`<h3>ابدأ من سورة</h3><div class="langs">${SURAHS.map(n => `<button class="item" data-ts="${n}">${AR(n)}. ${DATA.surahs[n]}</button>`).join("")}</div>`);
+    document.querySelectorAll("[data-ts]").forEach(b => b.onclick = () => { teachStop(); TCH.k = `${b.dataset.ts}:1`; ST.teachK = TCH.k; save(); TCH.phase = "idle"; closeSheet(); teacher(); }); });
+}
+function teachMove(d) {
+  teachStop(); const i = KIDX[TCH.k] + d; if (i < 0 || i >= ALLK.length) return;
+  TCH.k = ALLK[i]; ST.teachK = TCH.k; save(); TCH.phase = "idle"; TCH.heard = ""; TCH.recUrl = ""; TCH.tries = 0; teacher();
+  if (d > 0) teachListen();
+}
+function teachListen() {
+  teachStop(); TCH.err = ""; const v = V(TCH.k);
+  const a = TCH.a = TCH.a || new Audio(); a.playbackRate = 1;
+  a.src = `${AUDIO_BASE}${TREC()[0]}/${pad3(v.s)}${pad3(v.a)}.mp3`;
+  a.onended = () => { if (TCH.phase === "listen") teachRepeat(); };
+  a.onerror = () => { TCH.err = "تعذّر تحميل التلاوة. تحقق من الاتصال."; TCH.phase = "idle"; teacher(); };
+  TCH.phase = "listen"; teacher();
+  const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+}
+function teachRepeat() {
+  TCH.phase = "repeat"; TCH.heard = ""; TCH.err = ""; TCH.chunks = []; TCH.recUrl = ""; teacher();
+  // تسجيل صوت الطالب ليستمع إليه
+  if (navigator.mediaDevices && window.MediaRecorder) navigator.mediaDevices.getUserMedia({ audio: true }).then(st => {
+    if (TCH.phase !== "repeat") return st.getTracks().forEach(t => t.stop());
+    const mr = TCH.mr = new MediaRecorder(st); mr.ondataavailable = e => TCH.chunks.push(e.data);
+    mr.onstop = () => { st.getTracks().forEach(t => t.stop()); if (TCH.chunks.length) { TCH.recUrl = URL.createObjectURL(new Blob(TCH.chunks, { type: mr.mimeType })); if (TCH.phase === "result") teacher(); } };
+    mr.start();
+  }).catch(() => {});
+  if (!SR) { TCH.err = "التعرف على الصوت يحتاج متصفح Chrome. سجّل ترديدك ثم اضغط «انتهيت» وقيّم نفسك."; teacher(); return; }
+  const sr = TCH.sr = new SR(); sr.lang = "ar-SA"; sr.continuous = true; sr.interimResults = true; const fin = [];
+  sr.onresult = e => { fin.length = 0; let it = ""; for (let i = 0; i < e.results.length; i++) { const t = e.results[i][0].transcript.trim(); if (e.results[i].isFinal) fin.push(t); else it += " " + t; }
+    TCH.heard = (fin.join(" ") + it).trim();
+    const want = M.norm(V(TCH.k).t), ok = lcsMatch(want, M.norm(TCH.heard));
+    if (ok.filter(Boolean).length / want.length >= 0.95) teachStopRec(true); };
+  sr.onerror = e => { if (e.error === "not-allowed" || e.error === "service-not-allowed") { TCH.err = "لم يُسمح باستخدام الميكروفون."; teachStopRec(false); } };
+  sr.onend = () => { if (TCH.sr === sr && TCH.phase === "repeat") try { sr.start(); } catch (e) {} };
+  try { sr.start(); } catch (e) {}
+}
+function teachStopRec(evalNow) {
+  const sr = TCH.sr; TCH.sr = null; if (sr) try { sr.stop(); } catch (e) {}
+  if (TCH.mr && TCH.mr.state !== "inactive") try { TCH.mr.stop(); } catch (e) {}
+  if (!evalNow) { TCH.phase = "idle"; return teacher(); }
+  const want = M.norm(V(TCH.k).t), ok = lcsMatch(want, M.norm(TCH.heard || ""));
+  TCH.score = SR ? ok.filter(Boolean).length / Math.max(1, want.length) : 0;
+  const disp = UTH.verses[TCH.k] || want; // كلمات العرض بنفس فهارس النص المبسط
+  TCH.miss = ok.map((x, i) => x ? -1 : i).filter(i => i >= 0 && i < disp.length);
+  TCH.phase = "result"; TCH.tries++;
+  if (!SR) { teacher(); const b = $(".tbtns"); if (b) { b.innerHTML = `<button class="btn primary" id="tOk">قرأتها صحيحة</button><button class="btn" id="tAgain2">أعد الاستماع</button>`; $("#tOk").onclick = () => teachMove(1); $("#tAgain2").onclick = teachListen; } return; }
+  teacher();
+  if (TCH.score >= 0.85) setTimeout(() => { if (TCH.phase === "result" && TCH.score >= 0.85) teachMove(1); }, 1400);
+}
+function teachStop() { if (TCH.a) try { TCH.a.pause(); } catch (e) {} if (TCH.sr || (TCH.mr && TCH.mr.state !== "inactive")) { const ph = TCH.phase; teachStopRec(false); TCH.phase = ph; } }
 
 /* ---------- استوديو التسميع ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
