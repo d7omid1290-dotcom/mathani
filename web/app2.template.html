@@ -1412,10 +1412,10 @@ function findUI() {
   if (FND.st === "found") { const v = V(FND.k);
     return `<button class="fres" id="fRead"><span class="grow"><small>تعرّفتُ على الآية، اضغط للدخول</small><b>سورة ${DATA.surahs[v.s]}، الآية ${AR(v.a)}</b></span><span class="fgo">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`; }
   if (FND.st === "idle") return "";
-  const t = FND.st === "listen" ? (FND.heard ? `سمعتُ: «${esc(FND.heard.slice(-50))}»` : "أستمع إليك… اقرأ آية أو أكثر") : FND.st === "miss" ? "لم أتعرّف عليها، اقرأ آية كاملة ثم اضغط «أين الآية؟» مرة أخرى" : "التعرّف على الصوت غير متاح في هذا المتصفح (جرّب Chrome)";
+  const t = FND.st === "listen" ? (FND.heard ? `سمعتُ: «${esc(FND.heard.slice(-50))}»` : "أستمع إليك… اقرأ آية أو أكثر") : FND.st === "miss" ? "لم أتعرّف عليها، اقرأ آية كاملة ثم اضغط «انتقل للآية» مرة أخرى" : "التعرّف على الصوت غير متاح في هذا المتصفح (جرّب Chrome)";
   return `<div class="fmsg">${t}</div>`;
 }
-function drawFind() { const b = $("#findBox"); if (b) { b.innerHTML = findUI(); bindFind(); } const g = $("#findGo"); if (g) { g.classList.toggle("on", FND.st === "listen"); g.innerHTML = ICON.wave + (FND.st === "listen" ? "أستمع…" : "أين الآية؟"); } }
+function drawFind() { const b = $("#findBox"); if (b) { b.innerHTML = findUI(); bindFind(); } const g = $("#findGo"); if (g) { g.classList.toggle("on", FND.st === "listen"); g.innerHTML = ICON.wave + (FND.st === "listen" ? "أستمع…" : "انتقل للآية"); } }
 function stopFind() { if (FND.sr) { try { FND.sr.stop(); } catch (e) {} FND.sr = null; } }
 function bindFind() {
   const g = $("#findGo"); if (g) g.onclick = () => FND.st === "listen" ? (stopFind(), FND.st = "idle", drawFind()) : startFind();
@@ -1547,7 +1547,7 @@ function home() {
     <section class="cont">
       <div class="ctop" data-read="${last}" role="button" style="cursor:pointer"><span class="cpg">${AR(last)}</span><div class="grow"><small>آخر موضع</small><div class="ct">سورة ${pageSurah(last)}</div><div class="cs">الوجه ${AR(last)}، الآيات ${pageRange(last)}</div></div></div>
       <div class="cbar"><span class="wprog"><i style="width:${pct}%"></i></span><span class="tiny muted">${mastered ? `${AR(mastered)} من ${AR(jp.length)} أوجه متقنة في الجزء` : `${AR(jp.length)} وجهاً في هذا الجزء`}</span></div>
-      <div class="cbtns cb3"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn ffind ${FND.st === "listen" ? "on" : ""}" id="findGo">${ICON.wave}${FND.st === "listen" ? "أستمع…" : "أين الآية؟"}</button></div>
+      <div class="cbtns cb3"><button class="btn primary" data-tas="${last}">${ICON.mic}سمّع</button><button class="btn ffind ${FND.st === "listen" ? "on" : ""}" id="findGo">${ICON.wave}${FND.st === "listen" ? "أستمع…" : "انتقل للآية"}</button></div>
       <div id="findBox">${findUI()}</div>
       <div class="cwird">${wirdMini()}</div>
     </section>
