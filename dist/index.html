@@ -1223,6 +1223,16 @@ body.rrec .rtop,body.rrec .rbot{display:none}
 #findBox .fres{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:14px 16px;border-radius:18px;border:0;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;font:inherit;text-align:start;cursor:pointer}
 #findBox .fres small{display:block;color:#F3E3B5;font-size:12px}#findBox .fres b{display:block;font-size:17px;margin-top:2px}
 #findBox .fmsg{margin-top:10px;font-size:13px;color:var(--muted);text-align:center}
+.daily{margin:16px 16px 8px;padding:18px;border-radius:24px;background:var(--surface,#fff);box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 28px rgba(11,42,33,.06);position:relative;overflow:hidden}
+.daily.mo{background:linear-gradient(160deg,#FFF8E8,#FFFFFF 60%)}.daily.ev{background:linear-gradient(160deg,#EAF1F7,#FFFFFF 60%)}
+.dhd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.dhd b{font-size:16px}.dhd small{margin-inline-start:auto;font-size:12px;color:var(--muted)}
+.dic{display:grid;place-items:center;width:34px;height:34px;border-radius:12px;font-size:18px;background:#FCE9B8;color:#B8862E}.ev .dic{background:#D9E6F2;color:#2E5E8C}.dic svg{width:18px;height:18px}
+.day{font-family:"Amiri Quran",serif;font-size:21px;line-height:2.1;margin-top:12px;color:#0E3B2E;text-align:center}
+.day .end{font-size:16px;color:#B8862E}
+.dtf{margin-top:8px;font-size:14px;line-height:1.9;color:var(--ink,#14231E);padding:10px 12px;border-radius:14px;background:rgba(14,90,67,.05)}
+.dft{display:flex;align-items:center;justify-content:space-between;margin-top:10px}.dsrc{font-size:11.5px;color:var(--muted)}
+.hpray{align-self:stretch;justify-content:flex-start;gap:12px;margin-top:18px;padding:14px 18px;border-radius:20px;font-size:1.05rem}
+.hpray svg{width:22px;height:22px}.hpray b{font-size:1.25rem}.hpray small{font-size:.85rem;margin-inline-start:auto}
 </style>
 </head>
 <body>
@@ -1882,7 +1892,8 @@ function home() {
     <div class="htiles">
       <button class="htile" id="teachGo"><span class="hti">${ICON.listen}</span><b>المصحف المعلّم</b><small>استمع وردّد آيةً آية</small></button>
       <button class="htile" id="liveGo"><span class="hti">${ICON.users}</span><b>الحلقة المباشرة</b><small>مع معلمك أو زملائك</small></button>
-    </div>`;
+    </div>
+    ${dailyCard()}`;
   $("#salahGo").onclick = () => go("salah"); $("#liveGo").onclick = () => pickLive(); bindFind(); $("#view #teachGo").onclick = () => pickTeach();
   bindWirdHome();
   bindAll();
@@ -2252,6 +2263,20 @@ function kashidaJustify(L, W) {
 const DOTS = I('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
 const readTheme = () => ST.rt || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia");
 const RT_BG = { sepia: "#FFFFFF", light: "#FFFDF8", night: "#0F1412" };
+/* إشراقة صباحية / فائدة مسائية: آية مع التفسير الميسر (منسوب لمصدره، لا يولّد التطبيق شيئاً) */
+function dailyKey() {
+  const ev = new Date().getHours() >= 12, day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
+  let i = ((day * 2 + (ev ? 1 : 0)) * 2654435761 >>> 0) % ALLK.length;
+  for (let n = 0; n < ALLK.length; n++, i = (i + 1) % ALLK.length) { const v = V(ALLK[i]); if (v.tf && v.tf.length >= 70 && v.tf.length <= 240 && v.t.length <= 160) return { k: ALLK[i], ev }; }
+  return { k: ALLK[0], ev };
+}
+function dailyCard() {
+  const { k, ev } = dailyKey(), v = V(k), txt = UTH.verses[k] ? UTH.verses[k].join(" ") : v.t;
+  return `<section class="daily ${ev ? "ev" : "mo"}"><div class="dhd"><span class="dic">${ev ? HICON.moon : "☀"}</span><b>${ev ? "فائدة مسائية" : "إشراقة صباحية"}</b><small>سورة ${DATA.surahs[v.s]}، الآية ${AR(v.a)}</small></div>
+    <div class="day">${esc(txt)} <span class="end">${AR(v.a)}</span></div>
+    <div class="dtf">${esc(v.tf)}</div>
+    <div class="dft"><span class="dsrc">التفسير الميسر، مجمع الملك فهد</span><button class="link" data-read="${v.p}">اقرأ في المصحف</button></div></section>`;
+}
 /* الفواصل: يسمّيها الطالب ويختار لونها */
 const BMC = ["#C0392B", "#E67E22", "#D4A82A", "#1E8E5A", "#2E86C1", "#8E44AD"];
 const BMI = on => `<svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>`;
