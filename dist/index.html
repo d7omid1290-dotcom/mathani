@@ -1188,22 +1188,31 @@ html,body,*{scrollbar-width:none}
 .hqname{gap:10px;padding:6px 8px 6px 14px;border-color:rgba(217,174,85,.4);background:rgba(0,0,0,.12)}
 .hqname .hqnl{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.1)}
 .hqname b{font-size:16px;color:#F3E3B5}.hqname svg{width:16px;height:16px;color:rgba(243,227,181,.8)}
-.hfind{margin:16px 16px 0;border-radius:26px;background:linear-gradient(135deg,#0B3F30,#13775A);color:#fff;box-shadow:0 12px 30px rgba(11,63,48,.25);overflow:hidden}
+.hfind{margin:16px 16px 0;border-radius:26px;background:var(--soft,#E6F0EB);border:1.5px dashed rgba(14,90,67,.35);color:#0E5A43;overflow:hidden}
 .frow{display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:0;background:none;color:inherit;font:inherit;text-align:start;cursor:pointer}
-.frow b{display:block;font-size:18px}.frow small{display:block;margin-top:4px;font-size:12.5px;color:rgba(255,255,255,.78)}
-.fic{position:relative;display:grid;place-items:center;width:64px;height:64px;flex:none;border-radius:50%;background:linear-gradient(135deg,#D9AE55,#F3D88E);color:#0B3F30;box-shadow:0 0 0 6px rgba(255,255,255,.1)}
+.frow{padding:20px}.frow b{display:block;font-size:19px}.frow small{display:block;margin-top:4px;font-size:13px;color:var(--muted)}
+.fic{position:relative;display:grid;place-items:center;width:64px;height:64px;flex:none;border-radius:20px;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;box-shadow:0 8px 20px rgba(14,90,67,.25)}
 .fic svg{width:32px;height:32px}
-.fic.on::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #F3D88E;animation:fpulse 1.4s ease-out infinite}
+.fic.on::after{content:"";position:absolute;inset:-6px;border-radius:24px;border:2px solid #169A72;animation:fpulse 1.4s ease-out infinite}
 @keyframes fpulse{from{transform:scale(1);opacity:1}to{transform:scale(1.35);opacity:0}}
-.fres{padding:18px}.fres small{color:#F3D88E;font-weight:700;font-size:12px}.fres b{display:block;font-size:18px;margin-top:2px}
-.fay{font-family:"Amiri Quran",serif;font-size:20px;line-height:2;margin-top:8px;color:#fff;max-height:7.5em;overflow:hidden}
-.fbt{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}.fbt .btn{min-height:46px}.fbt .btn:not(.primary){background:rgba(255,255,255,.12);color:#fff}
-.fbt .btn.primary{background:#F3D88E;color:#0B3F30}
-.hqfire{position:absolute;left:4px;top:-14px;width:84px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;filter:drop-shadow(0 6px 16px rgba(232,100,31,.4))}
-.hqfire svg{position:absolute;inset:0;width:100%;height:100%}
-.hqfire b{position:relative;font-size:28px;line-height:1;color:#7A2A05}
-.hqfire small{position:relative;font-size:11px;color:#7A2A05;font-weight:700}
+.fres{padding:18px}.fres small{color:#B8862E;font-weight:700;font-size:12px}.fres b{display:block;font-size:18px;margin-top:2px}
+.fay{font-family:"Amiri Quran",serif;font-size:20px;line-height:2;margin-top:8px;color:var(--ink,#14231E);max-height:7.5em;overflow:hidden}
+.fbt{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}.fbt .btn{min-height:46px}.fbt .btn:not(.primary){background:#fff;color:#0E5A43}
 
+.hqfire{position:absolute;left:0;top:4px;display:flex;align-items:center;gap:4px;padding:6px 12px 6px 10px;border-radius:999px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.12)}
+.hqfire .fe{font-size:26px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.hqfire b{font-size:20px;color:#fff;line-height:1}
+.hqfire:not(.on) .fe{filter:grayscale(.6);opacity:.8}
+
+.rd .lines.hide .a.rrcur{filter:blur(6px);background:rgba(22,154,114,.18);border-radius:6px}
+.rd .lines.hide .a.rrbad{background:rgba(200,50,50,.22)}
+.rd .lines.hide .a.rrskip{color:#C0392B}
+.rrbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bottom) + 14px);z-index:30;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;width:calc(100% - 32px);max-width:420px;padding:10px 14px;border-radius:26px;background:rgba(255,255,255,.96);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.rrc{font-size:13px;color:var(--muted);text-align:center}.rrc b{font-size:17px;color:#0E5A43}
+.rrmic{width:62px;height:62px;border-radius:50%;border:0;background:linear-gradient(135deg,#C0392B,#E25B4B);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 6px rgba(226,91,75,.18);animation:fpulse2 1.6s ease-in-out infinite}
+.rrmic svg{width:26px;height:26px}@keyframes fpulse2{50%{box-shadow:0 0 0 12px rgba(226,91,75,.08)}}
+.rrh{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:#0E5A43;font:inherit;font-size:12px;font-weight:700}.rrh svg{width:22px;height:22px}
+body.rrec .rtop,body.rrec .rbot{display:none}
 </style>
 </head>
 <body>
@@ -1713,7 +1722,7 @@ const accChip = a => `<span class="chip ${a >= .9 ? "" : a >= .7 ? "mid" : "low"
 const S = { tab: "home", reader: null, rview: "mushaf", hide: false,
   T: { page: 3, from: null, to: null, mode: "live", phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, progText: "" },
   quiz: null };
-function go(tab) { if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
+function go(tab) { if (RR.on) rrStop(false); if (typeof stopFind === "function") { stopFind(); FND.st = "idle"; } document.body.classList.remove("immersive"); document.body.style.background = ""; stopRec(true); if (REC && REC.sr) { try { REC.sr.stop(); } catch (e) {} REC = null; } S.tab = tab; S.reader = null; render(); scrollTo(0, 0); }
 function openReader(p, view) { stopRec(true); S.reader = +p; if (view === "quiz" || view === "tadabbur" || view === "meaning" || view === "mushaf") S.rview = view; ST.last = +p; save(); S.rview = view || "mushaf"; S.hide = false; S.quiz = null; render(); scrollTo(0, 0); if (S.rview === "mushaf") LIVE.page(+p); }
 /* تعرّف على الآية في الرئيسية نفسها */
 const FND = { st: "idle", k: null, heard: "", sr: null };
@@ -1761,17 +1770,17 @@ function render() {
   ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher, adhkar, halaqa })[S.tab]();
 }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.tab === "tasmee" && S.reader) { const p = S.reader; S.T.mode = "live"; openTasmee(p); setTimeout(() => { if (S.tab === "tasmee" && $("#fmic")) startFollow(); }, 60); return; } // من صفحة المصحف: يبدأ التسميع على نفس الوجه
+  if (b.dataset.tab === "tasmee" && S.reader && S.rview === "mushaf") { rrStart(S.reader); return; } // من صفحة المصحف: يبدأ التسميع على نفس الوجه
   if (b.dataset.tab === "tasmee") return go("halaqa");
   go(b.dataset.tab); });
 /* حلقتي: التسميع والمصحف المعلّم والحلقة المباشرة */
-const goTas = (pg, from, to) => { S.T.mode = "live"; openTasmee(pg); if (from) { S.T.noLoc = true; S.T.from = from; S.T.to = to; tasmee(); } setTimeout(() => { if (S.tab === "tasmee" && $("#fmic") && !REC) startFollow(); }, 60); };
+const goTas = pg => { S.autoRec = pg; openReader(pg, "mushaf"); };
 const pickTas = () => pickSurah("سمّع من سورة", n => goTas(surahPages(n)[0]));
 function wirdTas() { // يسمّع ورد الحفظ مباشرة
   const w = ST.wird; if (!w || !w.setup) return go("wirdSetup");
   const d = WD.day(WD.today()); if (!d || !d.plan || !d.plan.h || !d.plan.h.length) return go("wird");
   const p = d.plan, left = p.h.filter(q => !d.ok.includes(q)), pg = V(left[0] || p.h[0]).p, on = p.h.filter(q => V(q).p === pg);
-  goTas(pg, on[0], on.at(-1));
+  goTas(pg);
 }
 const pickTeach = () => pickSurah("المصحف المعلّم: اختر السورة", n => { teachStop(); TCH.k = `${n}:1`; ST.teachK = TCH.k; TCH.phase = "idle"; save(); go("teacher"); });
 const pickLive = () => pickSurah("الحلقة المباشرة: اختر السورة", n => { ST.last = surahPages(n)[0]; save(); LIVE.start(); });
@@ -1783,7 +1792,7 @@ function halaqa() {
   const todayN = ST.sessions.filter(x => x.at >= t0).length, mast = Object.values(ST.pages).filter(r => r && r.errors === 0).length;
   const hname = ST.halaqa || "حلقتي";
   $("#view").innerHTML = `<header class="hband hqh"><div class="hbin">
-      <div class="hqfire ${st.cur ? "on" : ""}" title="أيام متتالية"><svg viewBox="0 0 64 76"><defs><linearGradient id="fg1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E4571B"/><stop offset=".6" stop-color="#F59A2E"/><stop offset="1" stop-color="#FFC857"/></linearGradient><linearGradient id="fg2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFB13B"/><stop offset="1" stop-color="#FFE29A"/></linearGradient></defs><path fill="url(#fg1)" d="M33 2c3 13 13 19 19 29 4 7 6 14 6 20a26 26 0 0 1-52 0c0-10 5-18 11-24 0 7 3 12 8 14-3-12 2-27 8-39z"/><path fill="url(#fg2)" opacity=".9" d="M32 34c6 6 12 11 12 20a12 12 0 0 1-24 0c0-6 4-11 7-14 1 4 3 6 5 6-1-5-1-8 0-12z"/></svg><b>${AR(st.cur || 0)}</b><small>يوم</small></div>
+      <div class="hqfire ${st.cur ? "on" : ""}" title="أيام متتالية"><span class="fe">🔥</span><b>${AR(st.cur || 0)}</b></div>
       <div class="hgreet">أهلاً${ST.name ? `، ${esc(ST.name)}` : ""}</div>
       <button class="hqname" id="hqName"><span class="hqnl">حلقة</span><b>${esc(hname)}</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
       <div class="hqstats"><span><b>${AR(todayN)}</b><small>تسميع اليوم</small></span><span><b>${AR(mast)}</b><small>أوجه متقنة</small></span></div>
@@ -2235,6 +2244,38 @@ function kashidaJustify(L, W) {
 const DOTS = I('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
 const readTheme = () => ST.rt || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia");
 const RT_BG = { sepia: "#FFFFFF", light: "#FFFDF8", night: "#0F1412" };
+/* التسميع داخل المصحف الأساسي: الكلمات مخفية وتنكشف مع القراءة */
+const RR = { on: false, p: 0, E: [], base: "", fin: "", int: "", sr: null, f: null };
+function rrStart(p) {
+  if (!SR) { document.body.classList.remove("immersive"); return openTasmee(p); }
+  rrStop(false); S.hide = true; S.ui = false; RR.on = true; RR.p = p; RR.base = RR.fin = RR.int = ""; RR.f = null; pageReader(p);
+  RR.E = [...document.querySelectorAll("#lines .a")].map(e => M.norm(mt(e.dataset.k)[+e.dataset.i] || "")[0] || "");
+  const sr = RR.sr = new SR(); sr.lang = "ar-SA"; sr.continuous = true; sr.interimResults = true;
+  sr.onresult = e => { let f = "", it = ""; for (const r of e.results) (r.isFinal ? (f += r[0].transcript + " ") : (it += r[0].transcript + " ")); RR.fin = f; RR.int = it; rrUpdate(); };
+  sr.onend = () => { if (RR.on && RR.sr === sr) { RR.base += " " + RR.fin; RR.fin = RR.int = ""; try { sr.start(); } catch (e) {} } };
+  sr.onerror = e => { if (e.error === "not-allowed" || e.error === "service-not-allowed") { rrStop(false); S.hide = false; pageReader(RR.p); } };
+  try { sr.start(); } catch (e) {}
+  rrUpdate();
+}
+function rrStop(save) {
+  const was = RR.on; RR.on = false; if (RR.sr) { const sr = RR.sr; RR.sr = null; try { sr.stop(); } catch (e) {} }
+  if (save && was && RR.f) { const ok = RR.f.st.filter(x => x === 1).length, errs = RR.f.wrong.size + RR.f.st.filter(x => x === 2).length; if (ok) record(RR.p, errs, [], ok / RR.E.length, "tasmee"); }
+  const b = $("#rrbar"); if (b) b.remove(); document.body.classList.remove("rrec");
+}
+function rrBind() {
+  if (!$("#rrbar")) $("#view").insertAdjacentHTML("beforeend", `<div class="rrbar" id="rrbar"><span class="rrc" id="rrc"></span><button class="rrmic" id="rrStop" aria-label="أوقف التسميع">${ICON.stop || "■"}</button><button class="rrh" id="rrEnd">${ICON.check}أنهِ</button></div>`);
+  document.body.classList.add("rrec");
+  $("#rrStop").onclick = () => { rrStop(true); S.hide = false; pageReader(RR.p); };
+  $("#rrEnd").onclick = () => { rrStop(true); S.hide = false; pageReader(RR.p); };
+}
+function rrUpdate() {
+  if (!RR.on) return; rrBind();
+  const fin = M.norm(RR.base + " " + RR.fin), H = fin.concat(M.norm(RR.int));
+  const f = RR.f = M.follow(RR.E, H, fin.length, new Set()), els = document.querySelectorAll("#lines .a");
+  els.forEach((el, i) => { const st = f.st[i]; el.classList.toggle("shown", st === 1 || st === 2); el.classList.toggle("rrskip", st === 2); el.classList.toggle("rrcur", i === f.pos); el.classList.toggle("rrbad", i === f.pos && f.lastWrong === i); });
+  const ok = f.st.filter(x => x).length, c = $("#rrc"); if (c) c.innerHTML = `<b>${AR(ok)}</b> / ${AR(RR.E.length)}`;
+  if (f.pos >= RR.E.length) { rrStop(true); S.hide = false; pageReader(RR.p); }
+}
 function pageReader(p, dir) {
   const keys = DATA.pages[p];
   document.body.classList.add("immersive"); document.body.style.background = RT_BG[readTheme()];
@@ -2261,7 +2302,9 @@ function pageReader(p, dir) {
   $("#more").onclick = () => moreSheet(p);
   $("#pgPrev").onclick = () => turn(p, -1);
   $("#pgNext").onclick = () => turn(p, 1);
-  $("#rTas").onclick = () => { document.body.classList.remove("immersive"); openTasmee(p); };
+  $("#rTas").onclick = () => rrStart(p);
+  if (RR.on && RR.p === p) rrBind(); else if (RR.on) rrStop(false);
+  if (S.autoRec === p) { S.autoRec = null; setTimeout(() => rrStart(p), 80); }
   $("#rPlay").onclick = () => playFrom(P.on && P.k && V(P.k).p === p ? P.k : DATA.pages[p][0]);
   highlight(); drawMP();
   // لمسة: إظهار الأدوات أو إخفاؤها. ضغطة مطوّلة على الآية: معناها ومتشابهها
