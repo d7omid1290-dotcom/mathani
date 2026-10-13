@@ -1245,6 +1245,15 @@ button.hqfire{border:0;background:none;cursor:pointer;font:inherit;padding:0}
 .chin{display:flex;gap:8px}.chin input{flex:1;padding:12px 14px;border-radius:14px;border:1px solid var(--line);font:inherit;background:var(--surface);color:inherit}
 .lhcard{padding:16px;border-radius:20px;background:linear-gradient(135deg,#0B3F30,#13775A);color:#fff;margin-bottom:12px}.lhcard small{display:block;font-size:12px;color:rgba(255,255,255,.75)}.lhcard b{display:block;font-size:18px;margin:2px 0 8px}
 .lhlink{font-size:11.5px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.2);word-break:break-all;margin-bottom:6px}
+.lsc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-top:24px;padding:28px 18px;border-radius:28px;background:var(--surface,#fff);box-shadow:0 10px 28px rgba(11,42,33,.07)}
+.lsring{display:grid;place-items:center;width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff;margin-bottom:12px;box-shadow:0 0 0 10px rgba(22,154,114,.12)}
+.lsring svg{width:44px;height:44px}.lsring.on{animation:fpulse2 1.8s ease-in-out infinite}
+.lsc b{font-size:22px}.lsc small{font-size:14px;color:var(--muted)}.lsc p{margin:14px 0 0;font-size:14px;color:var(--muted)}
+.lsh{margin:20px 4px 10px;font-size:15px}
+.lsr{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.lsp{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:18px;background:var(--surface,#fff);box-shadow:0 4px 14px rgba(11,42,33,.05)}
+.lsp span{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#DCEFE6;color:#0E5A43;font-weight:700;font-size:18px}
+.lsp.host span{background:linear-gradient(135deg,#B8862E,#D9AE55);color:#fff}.lsp b{font-size:13px;text-align:center}.lsp small{font-size:11px;color:#B8862E}
 </style>
 </head>
 <body>
@@ -1792,12 +1801,12 @@ function render() {
   setTimeout(() => { highlight(); drawMP(); }, 0);
   if (!(S.reader && S.rview === "mushaf")) { document.body.classList.remove("immersive"); document.body.style.background = ""; }
   $("#tabs").innerHTML = [["home", "الرئيسية", "home"], ["mushaf", "المصحف", "book"], ["tasmee", "حلقتي", "halaqa"], ["salah", "الصلاة", "dome"], ["profile", "حسابي", "user"]]
-    .map(([id, t, ic]) => { const cur = !S.reader && (S.tab === id || (id === "mushaf" && S.tab === "tafsir") || (id === "salah" && S.tab === "adhkar") || (id === "tasmee" && ["halaqa", "teacher"].includes(S.tab))) ? 'aria-current="page"' : "";
+    .map(([id, t, ic]) => { const cur = !S.reader && (S.tab === id || (id === "mushaf" && S.tab === "tafsir") || (id === "salah" && S.tab === "adhkar") || (id === "tasmee" && ["halaqa", "teacher", "liveStu"].includes(S.tab))) ? 'aria-current="page"' : "";
       return id === "tasmee" && !(["tasmee", "halaqa", "teacher"].includes(S.tab) && !S.reader)
       ? `<button class="fab" data-tab="${id}" ${cur}><span class="c">${ICON[ic]}</span>${t}</button>`
       : `<button data-tab="${id}" ${cur}>${ICON[ic] || HICON[ic]}${t}</button>`; }).join("");
   if (S.reader) return reader();
-  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher, adhkar, halaqa })[S.tab]();
+  ({ home, mushaf, tasmee, review, profile, tafsir: tafsirTab, wird, wirdSetup, progress, garden, salah, assistant, teacher, adhkar, halaqa, liveStu })[S.tab]();
 }
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.tab === "tasmee" && S.reader && S.rview === "mushaf") { rrStart(S.reader); return; } // من صفحة المصحف: يبدأ التسميع على نفس الوجه
@@ -1860,6 +1869,20 @@ function halaqa() {
     $("#hqSave").onclick = () => { ST.halaqa = $("#hqIn").value.trim(); save(); closeSheet(); halaqa(); }; };
   $("#hqTas").onclick = () => { openSheet(`<h3>التسميع</h3><button class="item" id="tsW"><span class="hqi sm">${HICON.sprout}</span><span class="grow"><b>وردي اليوم</b><div class="tiny muted">${wsub}</div></span></button><button class="item" id="tsS"><span class="hqi sm">${ICON.book}</span><span class="grow"><b>اختر سورة</b><div class="tiny muted">من قائمة السور</div></span></button>`);
     $("#tsW").onclick = () => { closeSheet(); wirdTas(); }; $("#tsS").onclick = () => { closeSheet(); setTimeout(pickTas, 50); }; }; $("#hqTeach").onclick = pickTeach; $("#hqLive").onclick = pickLive;
+}
+/* شاشة الطالب في الحلقة المباشرة: بلا مصحف، يسمّع من حفظه */
+function liveStu() {
+  const L = LIVE.state, p = L.cur;
+  if (!L.peer) return go("halaqa");
+  $("#view").innerHTML = bar(esc(L.hname || "الحلقة المباشرة"), L.remote ? "متصل بالمعلم" : "جارٍ الاتصال…", true) + `
+    <div class="lsc"><div class="lsring ${L.remote ? "on" : ""}">${ICON.mic}</div>
+      <b>${p ? `سورة ${pageSurah(p)}` : "بانتظار المعلم"}</b>
+      <small>${p ? `الوجه ${AR(p)}، الآيات ${pageRange(p)}` : "سيظهر هنا الموضع الذي يختاره المعلم"}</small>
+      <p>سمّع من حفظك، والمعلم يسمعك ويتابعك على المصحف.</p></div>
+    <h4 class="lsh">في الحلقة الآن${L.roster ? ` (${AR(L.roster.length)})` : ""}</h4>
+    <div class="lsr">${(L.roster || []).map(r => `<div class="lsp ${r.host ? "host" : ""}"><span>${esc((r.n || "؟").trim().replace(/^(الشيخ|الأستاذ|ال)\s*/, "").charAt(0) || "؟")}</span><b>${esc(r.n)}</b>${r.host ? "<small>المعلم</small>" : ""}</div>`).join("") || `<p class="tiny muted">تظهر هنا أسماء زملائك عند دخولهم.</p>`}</div>
+    <div class="two" style="margin-top:16px"><button class="btn" id="lsChat">💬 الدردشة</button><button class="btn" id="lsEnd" style="color:var(--err)">مغادرة الحلقة</button></div>`;
+  $("#back").onclick = () => go("halaqa"); $("#lsChat").onclick = () => LIVE.chatSheet(); $("#lsEnd").onclick = () => LIVE.end(true);
 }
 /* اختيار السورة قبل التسميع والمعلّم والحلقة */
 function pickSurah(title, cb) {
@@ -3490,17 +3513,21 @@ const LIVE = (() => {
     call.on("close", gone); call.on("error", gone);
     L.calls.push(call);
   }
+  function roster() { const list = [{ n: ST.name || "المعلم", host: true }].concat(L.conns.filter(c => c.open && c._n).map(c => ({ n: c._n }))); L.roster = list; L.conns.forEach(c => c.open && c.send({ t: "roster", list })); bar(); }
   function wire(conn) {
     L.conns.push(conn);
-    conn.on("open", () => { if (L.host) { conn.send({ t: "hello", n: L.hname }); if (S.reader && S.rview === "mushaf") conn.send({ t: "page", p: S.reader }); } });
+    conn.on("open", () => { if (!L.host) conn.send({ t: "hi", n: ST.name || "طالب" }); if (L.host) { conn.send({ t: "hello", n: L.hname }); if (S.reader && S.rview === "mushaf") conn.send({ t: "page", p: S.reader }); } });
     conn.on("data", m => {
       if (m && m.t === "chat") { if (L.host) L.conns.forEach(c => c !== conn && c.open && c.send(m)); addMsg(L.room, { ...m, me: false }); return; }
+      if (m && m.t === "hi" && L.host) { conn._n = (m.n || "طالب").slice(0, 30); roster(); return; }
+      if (m && m.t === "roster" && !L.host) { L.roster = m.list; if (S.tab === "liveStu") liveStu(); return; }
       if (m && m.t === "hello" && !L.host) { L.hname = m.n; if (ST.joined && ST.joined.id === L.room) { ST.joined.name = m.n; save(); } bar(); return; }
       if (!m || m.t !== "page") return;
       if (L.host) L.conns.forEach(c => c !== conn && c.open && c.send(m));
+      if (!L.host) { L.cur = m.p; if (S.tab === "liveStu" && !S.reader) liveStu(); else go("liveStu"); return; } // الطالب يسمّع من حفظه بلا مصحف
       if (!(S.reader === m.p && S.rview === "mushaf")) { L.syncing = true; openReader(m.p, "mushaf"); L.syncing = false; }
     });
-    conn.on("close", () => { L.conns = L.conns.filter(c => c !== conn); });
+    conn.on("close", () => { L.conns = L.conns.filter(c => c !== conn); if (L.host) roster(); });
   }
   async function mic() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("mic");
@@ -3543,7 +3570,7 @@ const LIVE = (() => {
     try { if (n) L.hname = n;
       L.stream = await mic(); await loadLib();
       L.host = false; L.room = room; L.peer = newPeer(); setStatus("جارٍ الاتصال…");
-      L.peer.on("open", () => { playRemote(L.peer.call(room, L.stream)); wire(L.peer.connect(room, { reliable: true })); });
+      L.peer.on("open", () => { playRemote(L.peer.call(room, L.stream)); wire(L.peer.connect(room, { reliable: true })); go("liveStu"); });
       L.peer.on("error", fail);
     } catch (e) { fail(e); }
   }
@@ -3554,7 +3581,7 @@ const LIVE = (() => {
     document.querySelectorAll("audio[id^='au-']").forEach(a => a.remove());
     Object.assign(L, { peer: null, stream: null, calls: [], conns: [], muted: false, remote: 0, room: null, unread: 0 });
     if (user && location.search.includes("room=")) history.replaceState(null, "", location.pathname);
-    bar();
+    bar(); if (S.tab === "liveStu") go("halaqa");
   }
   function page(p) { if (!L.peer || L.syncing) return; L.conns.forEach(c => c.open && c.send({ t: "page", p })); }
   function boot() {
