@@ -1485,10 +1485,12 @@ function liveHub() {
       ${rowB("lhStart", ICON.mic, "ابدأ الحصة الآن", "يدخل الطلاب من الرابط نفسه")}${rowB("lhShare", ICON.share, "شارك رابط الحلقة", "")}${rowB("lhChat", "💬", "الدردشة", `${AR(((ST.chat || {})[M.id] || []).length)} رسالة`)}` : ""}
     ${J ? `${rowB("lhJoin", ICON.users, `ادخل ${esc(J.name || "حلقتك")}`, "الحلقة التي انضممت إليها")}` : ""}
     ${!M ? rowB("lhNew", ICON.plus || "➕", "أنا معلم: أنشئ حلقة", "تنشئها مرة واحدة ويصير لها رابط ثابت") : ""}
+    ${rowB("lhOnce", "⚡", "حلقة لمرة واحدة", "رابط مؤقت ينتهي بانتهاء الحصة")}
     ${!J && !M ? `<p class="tiny muted" style="margin-top:10px">طالب؟ اطلب من معلمك رابط الحلقة وافتحه مرة واحدة، وتظهر لك هنا دائماً.</p>` : ""}`);
   const on = (id, f) => { const e = $(id); if (e) e.onclick = () => { closeSheet(); f(); }; };
   on("#lhStart", () => LIVE.start(ST.myHalaqa)); on("#lhShare", () => LIVE.shareSheet(ST.myHalaqa.id, ST.myHalaqa.name)); on("#lhChat", () => { LIVE.state.hname = ST.myHalaqa.name; LIVE.chatSheet(); });
   on("#lhJoin", () => LIVE.join(ST.joined.id, ST.joined.name));
+  on("#lhOnce", () => pickSurah("حلقة لمرة واحدة: اختر السورة", n => { ST.last = surahPages(n)[0]; save(); LIVE.start(); }));
   on("#lhNew", () => { openSheet(`<h3>أنشئ حلقتك</h3><input class="psq" id="lhN" maxlength="40" placeholder="اسم الحلقة، مثلاً: حلقة الفجر" value="${esc(ST.halaqa || "")}"><button class="btn primary block" id="lhMk">أنشئ الحلقة</button>`);
     $("#lhMk").onclick = () => { const n = $("#lhN").value.trim() || "حلقتي"; ST.myHalaqa = { id: newHid(), name: n, at: Date.now() }; ST.halaqa = ST.halaqa || n; save(); closeSheet(); LIVE.shareSheet(ST.myHalaqa.id, n); }; });
 }
