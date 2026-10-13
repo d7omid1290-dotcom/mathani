@@ -1177,6 +1177,7 @@ html,body,*{scrollbar-width:none}
 .hqi{display:grid;place-items:center;width:52px;height:52px;border-radius:18px;background:var(--soft,#E6F0EB);color:#0E5A43;flex:none}.hqi svg{width:26px;height:26px}
 .hq.main .hqi{background:linear-gradient(135deg,#0E5A43,#169A72);color:#fff}
 .hq.gold .hqi{background:linear-gradient(135deg,#B8862E,#D9AE55);color:#fff}
+.hqi.sm{width:40px;height:40px;border-radius:13px}.hqi.sm svg{width:20px;height:20px}
 </style>
 </head>
 <body>
@@ -1708,16 +1709,25 @@ $("#tabs").addEventListener("click", e => { const b = e.target.closest("button")
   if (b.dataset.tab === "tasmee") return go("halaqa");
   go(b.dataset.tab); });
 /* حلقتي: التسميع والمصحف المعلّم والحلقة المباشرة */
-const pickTas = () => pickSurah("سمّع من سورة", n => { S.T.mode = "live"; openTasmee(surahPages(n)[0]); setTimeout(() => { if (S.tab === "tasmee" && $("#fmic")) startFollow(); }, 60); });
+const pickTas = () => pickSurah("سمّع من سورة", n => openReader(surahPages(n)[0], "mushaf"));
+function wirdTas() { // يسمّع ورد الحفظ مباشرة
+  const w = ST.wird; if (!w || !w.setup) return go("wirdSetup");
+  const d = WD.day(WD.today()); if (!d || !d.plan || !d.plan.h || !d.plan.h.length) return go("wird");
+  const p = d.plan, left = p.h.filter(q => !d.ok.includes(q)), pg = V(left[0] || p.h[0]).p;
+  openReader(pg, "mushaf");
+}
 const pickTeach = () => pickSurah("المصحف المعلّم: اختر السورة", n => { teachStop(); TCH.k = `${n}:1`; ST.teachK = TCH.k; TCH.phase = "idle"; save(); go("teacher"); });
 const pickLive = () => pickSurah("الحلقة المباشرة: اختر السورة", n => { ST.last = surahPages(n)[0]; save(); LIVE.start(); });
 function halaqa() {
   const c = (id, ic, t, sub, cls = "") => `<button class="hq ${cls}" id="${id}"><span class="hqi">${ic}</span><span class="grow"><b>${t}</b><small>${sub}</small></span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`;
-  $("#view").innerHTML = bar("حلقتي", "اختر ما تريد، ثم اختر السورة") + `<div class="hqs">
-    ${c("hqTas", ICON.mic, "التسميع", "سمّع من حفظك على صفحة المصحف", "main")}
+  const w = ST.wird, wd = w && w.setup ? WD.day(WD.today()) : null;
+  const wsub = !(w && w.setup) ? "حدّد وردك أولاً" : wd && wd.plan && wd.plan.h && wd.plan.h.length ? `${sName(wd.plan.h[0])}، من الآية ${AR(V(wd.plan.h[0]).a)} إلى ${AR(V(wd.plan.h.at(-1)).a)}` : "لا ورد حفظ اليوم";
+  $("#view").innerHTML = bar("حلقتي", "سمّع وردك، أو اختر سورة") + `<div class="hqs">
+    ${c("hqTas", ICON.mic, "التسميع", "وردك أو سورة تختارها، على المصحف", "main")}
     ${c("hqTeach", ICON.listen, "المصحف المعلّم", "استمع للشيخ وردّد بعده آيةً آية")}
     ${c("hqLive", ICON.users, "الحلقة المباشرة", "مع معلمك أو زملائك", "gold")}</div>`;
-  $("#hqTas").onclick = pickTas; $("#hqTeach").onclick = pickTeach; $("#hqLive").onclick = pickLive;
+  $("#hqTas").onclick = () => { openSheet(`<h3>التسميع</h3><button class="item" id="tsW"><span class="hqi sm">${HICON.sprout}</span><span class="grow"><b>وردي اليوم</b><div class="tiny muted">${wsub}</div></span></button><button class="item" id="tsS"><span class="hqi sm">${ICON.book}</span><span class="grow"><b>اختر سورة</b><div class="tiny muted">من قائمة السور</div></span></button>`);
+    $("#tsW").onclick = () => { closeSheet(); wirdTas(); }; $("#tsS").onclick = () => { closeSheet(); setTimeout(pickTas, 50); }; }; $("#hqTeach").onclick = pickTeach; $("#hqLive").onclick = pickLive;
 }
 /* اختيار السورة قبل التسميع والمعلّم والحلقة */
 function pickSurah(title, cb) {
