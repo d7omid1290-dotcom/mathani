@@ -1291,6 +1291,20 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 #live button.lvch svg{width:19px;height:19px}#live button.lvch i.hd{background:#D9AE55;color:#1A1405}
 .lsdock button.end{width:auto;padding:0 20px;border-radius:99px;background:#E25B4B;font-size:15px;font-weight:700}
 .lsdock button i{position:absolute;top:-2px;inset-inline-end:-2px;min-width:18px;height:18px;border-radius:9px;background:#E25B4B;font-size:11px;font-style:normal;display:grid;place-items:center}
+
+/* ترتيب صفحة المصحف: إطار مزدوج رفيع، ترويسة منسقة، ورقم الوجه في دائرة */
+.rd[data-rt="sepia"]{--rpaper:#FFFDF7;--fr:#CDB98F;--frs:#F4ECDA}
+.rd[data-rt="light"]{--fr:#A9C3B7;--frs:#EAF2EE}
+.rd[data-rt="night"]{--fr:#3B4A43;--frs:#18201D}
+.rd{padding-inline:10px}
+.rd .frame{border:1px solid var(--fr);border-radius:6px;box-shadow:inset 0 0 0 3px var(--rpaper),inset 0 0 0 4px color-mix(in srgb,var(--fr) 70%,transparent);padding:2px 10px 0}
+.rd .rh{position:relative;align-items:center;padding:9px 4px 7px;margin:0 2px 2px;border-bottom:1px solid color-mix(in srgb,var(--fr) 65%,transparent)}
+.rd .rh span{font-family:var(--naskh);font-size:.8rem;color:var(--rmut)}
+.rd .rh span:first-child{color:var(--rink);font-weight:700}
+.rd .rh::after{content:"";position:absolute;left:50%;bottom:-4px;width:7px;height:7px;background:var(--fr);transform:translateX(-50%) rotate(45deg);border:2px solid var(--rpaper)}
+.rd .rf{padding:4px 0 6px;position:relative}
+.rd .rf::before{content:"";position:absolute;top:50%;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--fr) 70%,transparent) 30%,transparent 46%,transparent 54%,color-mix(in srgb,var(--fr) 70%,transparent) 70%,transparent)}
+.rd .rf span,.rd[data-rt="light"] .rf span{position:relative;display:inline-grid;place-items:center;min-width:2.3em;height:2.3em;padding:0 .4em;border-radius:50%;border:1px solid var(--fr);background:var(--frs);color:var(--rink);font-size:.78rem;font-weight:600}
 </style>
 </head>
 <body>
@@ -2410,8 +2424,8 @@ function kashidaJustify(L, W) {
 
 /* ---------- المصحف وجهاً وجهاً ---------- */
 const DOTS = I('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
-const readTheme = () => ST.rt || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia");
-const RT_BG = { sepia: "#FFFFFF", light: "#FFFDF8", night: "#0F1412" };
+const readTheme = () => ST.rt || (isDark() ? "night" : "sepia");
+const RT_BG = { sepia: "#FFFDF7", light: "#FFFDF8", night: "#0F1412" };
 /* إشراقة صباحية / فائدة مسائية: آية مع التفسير الميسر (منسوب لمصدره، لا يولّد التطبيق شيئاً) */
 function dailyKey() {
   const ev = new Date().getHours() >= 12, day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
