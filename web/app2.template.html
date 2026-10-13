@@ -2136,10 +2136,10 @@ const DK = { set: "morning", i: 0, left: 0 };
 const dkNow = () => { const h = new Date().getHours(); return h >= 15 || h < 3 ? "evening" : "morning"; };
 const dkDone = set => ST.dkDone && ST.dkDone[set] === WD.today();
 function adhkarRow() {
-  const set = dkNow(), A = ADHKAR[set], done = dkDone(set), chev = ICON.chev.replace("<svg", '<svg width="18" height="18"');
-  return `<button class="hrow" id="dkGo"><span class="hic dkic">${set === "morning" ? PIC.sunrise : PIC.isha}</span><span class="grow"><small>${done ? "أتممتها اليوم، تقبّل الله" : `${AR(A.items.length)} ذكراً`}</small><b>${A.title}</b></span>${done ? `<span class="muted">${chev}</span>` : `<span class="wbtn">ابدأ</span>`}</button>`;
+  const chev = ICON.chev.replace("<svg", '<svg width="18" height="18"'), n = nextPrayer();
+  return `<button class="hrow" id="dkGo"><span class="hic dkic">${PIC[n.k] || PIC.dhuhr}</span><span class="grow"><small>المواقيت، والقبلة، وأذكار الصباح والمساء وبعد الصلاة</small><b>الصلاة والأذكار</b></span><span class="muted">${chev}</span></button>`;
 }
-function bindAdhkarRow() { const b = $("#dkGo"); if (b) b.onclick = () => openAdhkar(dkNow()); }
+function bindAdhkarRow() { const b = $("#dkGo"); if (b) b.onclick = () => go("salah"); }
 function openAdhkar(set) { DK.set = set; DK.i = 0; DK.left = ADHKAR[set].items[0][1]; go("adhkar"); }
 function adhkar() {
   const A = ADHKAR[DK.set], n = A.items.length, other = DK.set === "morning" ? "evening" : "morning";
