@@ -1333,6 +1333,25 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
   .hband,.bar,.tband,.ph{animation:drift 60s linear infinite}
   @keyframes drift{from{background-position:0 0,0 0,0 0}to{background-position:-144px 72px,0 0,0 0}}
 }
+
+/* ترتيب ولمسات: قائمة السور، إحصاءات الحلقة، المسافات */
+#view{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+.slc{border-radius:20px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.slc .sl .no{position:relative;border-radius:0;background:var(--green-soft);clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
+.slc .sl.has .no{background:conic-gradient(var(--green) calc(var(--pc)*1%),var(--green-soft) 0);color:#fff}
+.slc .sl .nm{font-family:var(--quran,inherit);font-size:1.12rem}
+.slc .sl:active{background:var(--surface-2)}
+.hqstats{grid-template-columns:repeat(3,1fr)}
+.hqstats b{font-size:1.55rem;line-height:1.1;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.hqstats small{opacity:.8;font-size:.72rem}
+.hqfire .fe{font-size:1.05rem}
+.mcont{position:relative;overflow:hidden}
+.mcont::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);transform:translateX(-120%)}
+@media (prefers-reduced-motion:no-preference){.mcont::after{animation:shine 4.5s ease-in-out 1s infinite}}
+@keyframes shine{0%,70%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.card,.hq,.item{transition:transform .18s,box-shadow .18s}
+.hq{border-radius:20px}
+.hq .hqi{box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
 </style>
 </head>
 <body>
@@ -1607,7 +1626,7 @@ function halaqa() {
       ${ST.motiv === "garden" ? `<button class="hqfire" id="hqBadge" title="بستاني"><span class="fe">🌳</span><b>${AR(pl)}</b></button>` : `<button class="hqfire ${st.cur ? "on" : ""}" id="hqBadge" title="أيام متتالية"><span class="fe">🔥</span><b>${AR(st.cur || 0)}</b></button>`}
       <div class="hgreet">أهلاً${ST.name ? `، ${esc(ST.name)}` : ""}</div>
       <button class="hqname" id="hqName"><span class="hqnl">حلقة</span><b>${esc(hname)}</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
-      <div class="hqstats"><span><b>${AR(todayN)}</b><small>تسميع اليوم</small></span><span><b>${AR(mast)}</b><small>أوجه متقنة</small></span></div>
+      <div class="hqstats"><span><b>${todayN ? AR(todayN) : "—"}</b><small>تسميع اليوم</small></span><span><b>${mast ? AR(mast) : "—"}</b><small>أوجه متقنة</small></span><span><b>${w && w.setup ? AR(wpc) + "٪" : "—"}</b><small>من ورد اليوم</small></span></div>
     </div></header><div class="hqs">
     <button class="hq hqw" id="hqWird"><span class="hqi">${WIRD_I}</span><span class="grow">${wline}</span><span class="muted">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>
     ${c("hqTas", ICON.mic, "التسميع", "وردك أو سورة تختارها، على المصحف", "main")}
@@ -1812,7 +1831,8 @@ function mushaf() {
       const qd = q.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
       const list = SURAHS.filter(n => !q || (/^\d+$/.test(qd) ? String(n) === qd : qn && M.norm(DATA.surahs[n]).join(" ").includes(qn)));
       $("#slist").innerHTML = list.length ? `<div class="slc">` + list.map(n => { const I2 = DATA.surahInfo[n];
-        return `<button class="sl" data-read="${I2.page}"><span class="no">${AR(n)}</span><span class="grow"><div class="nm">${DATA.surahs[n]}</div>
+        const sp = surahPages(n), sd = sp.filter(x => ST.pages[x]).length, pc = Math.round(sd / sp.length * 100);
+        return `<button class="sl ${sd ? "has" : ""}" data-read="${I2.page}" style="--pc:${pc}"><span class="no">${AR(n)}</span><span class="grow"><div class="nm">${DATA.surahs[n]}</div>
           <div class="tiny muted">${I2.rev}، ${ayat(I2.n)}، الوجه ${AR(I2.page)}</div></span><span class="sinfo" data-sinfo="${n}" role="button" tabindex="0" aria-label="عن السورة"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg></span></button>`; }).join("") + `</div>` : `<div class="info">لا توجد سورة بهذا الاسم.</div>`;
       bindAll();
       document.querySelectorAll("[data-sinfo]").forEach(b => b.onclick = e => { e.stopPropagation(); surahSheet(+b.dataset.sinfo); });
