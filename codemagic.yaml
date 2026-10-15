@@ -1,0 +1,33 @@
+workflows:
+  ios-release:
+    name: مثاني على App Store
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: Mathani ASC Key
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.mathani.app
+      vars:
+        APP_STORE_APPLE_ID: 0000000000
+      node: 22
+    scripts:
+      - name: تثبيت الحزم
+        script: npm ci
+      - name: مزامنة الواجهة مع مشروع آيفون
+        script: npx cap sync ios
+      - name: إعداد التوقيع
+        script: xcode-project use-profiles
+      - name: رقم البناء
+        script: |
+          cd ios/App
+          agvtool new-version -all $(($BUILD_NUMBER + 1))
+      - name: بناء الحزمة
+        script: xcode-project build-ipa --project ios/App/App.xcodeproj --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
