@@ -1352,6 +1352,17 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .card,.hq,.item{transition:transform .18s,box-shadow .18s}
 .hq{border-radius:20px}
 .hq .hqi{box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+
+/* حسابي: بطاقة رأس وإحصاءات ومصادر منطوية */
+.pfh{display:flex;align-items:center;gap:14px;padding:18px;border-radius:22px;background:linear-gradient(135deg,var(--green),#0b3d2e);color:#fff;box-shadow:var(--shadow)}
+.pfh b{display:block;font-size:1.2rem}.pfh small{opacity:.8}
+.pfav{width:54px;height:54px;flex:none;display:grid;place-items:center;font-size:1.4rem;font-weight:800;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
+.pfst{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+.pfst span{display:flex;flex-direction:column;align-items:center;padding:12px 4px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.pfst b{font-size:1.35rem;color:var(--green);font-weight:800}.pfst small{font-size:.72rem;color:var(--muted)}
+.pfsrc summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;list-style:none}
+.pfsrc summary::-webkit-details-marker{display:none}
+.pfsrc[open] summary{margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -3579,7 +3590,11 @@ const isDark = () => ST.theme === "dark" || (ST.theme !== "light" && !!(window.m
 function applyTheme() { const r = document.documentElement; if (ST.theme === "dark" || ST.theme === "light") r.dataset.theme = ST.theme; else delete r.dataset.theme; }
 function setTheme(t) { ST.theme = t; save(); applyTheme(); render(); }
 async function profile() {
+  const P = profileData(), ini = esc(((ST.name || "").trim().charAt(0)) || "م");
   $("#view").innerHTML = bar("حسابي") + `
+    <div class="pfh"><span class="pfav">${ini}</span><div class="grow"><b>${esc(ST.name || "طالب القرآن")}</b><small>${esc(P.level)}</small></div></div>
+    <div class="pfst"><span><b>${P.mem ? AR(P.mem) : "—"}</b><small>محفوظ</small></span><span><b>${P.sessions ? AR(P.sessions) : "—"}</b><small>تسميع</small></span><span><b>${P.s.cur ? AR(P.s.cur) : "—"}</b><small>أيام متتالية</small></span></div>
+    <div class="sec"><h2>الإعدادات</h2></div>
     <button class="card row langrow" id="langBtn"><span class="grow"><b>اللغة</b> ${LG !== "en" ? `<span class="tiny muted" data-noi18n>Language</span>` : ""}<div class="small muted" data-noi18n>${LANGS.find(x => x[0] === LG)[1]}</div></span>${ICON.chev}</button>
     <div class="card"><label class="tiny muted" for="name">اسمك</label><input type="text" id="name" placeholder="يظهر في الرئيسية" value="${esc(ST.name)}" style="margin-top:6px"></div>
     <div class="card"><div class="tiny muted" style="margin-bottom:8px">المظهر</div><div class="seg thseg" role="group">${[["light", "نهاري", LI.sun], ["dark", "ليلي", LI.moon], ["auto", "تلقائي", ""]].map(([k, t, ic]) => `<button data-th="${k}" aria-pressed="${(ST.theme || "auto") === k}">${ic}${t}</button>`).join("")}</div></div>
@@ -3588,8 +3603,7 @@ async function profile() {
     <div class="card"><div class="small muted">موضوع الوجه والفوائد ومقاصد السورة مسوداتٌ تظهر بشارة «بانتظار المراجعة» حتى يعتمدها المتخصص بعد مطابقتها بالمختصر في التفسير.</div>
       <div class="row" style="margin-top:12px"><div class="grow"><b>${AR(Object.values(ST.approved).filter(Boolean).length)}</b> <span class="small muted">من ${AR(Object.keys(CONTENT.pages).length)} وجهاً معتمد</span></div><button class="btn" id="openReview">افتح المراجعة</button></div></div>
     <div class="sec"><h2>الميكروفون</h2></div><div class="card row"><div class="grow small muted">إذا لم يعمل التسجيل، افحص السبب.</div><button class="btn" data-diag>افحص الميكروفون</button></div>
-    <div class="sec"><h2>المصادر</h2></div>
-    <div class="card small">${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">رسم صفحات المصحف: النص العثماني لمجمع الملك فهد لطباعة المصحف الشريف (Uthmanic Hafs)، بخط DigitalKhatt Madina</div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></div>
+    <details class="card small pfsrc"><summary><b>المصادر</b><span class="tiny muted">${AR(Object.keys(DATA.sources).length + 2)}</span></summary>${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">رسم صفحات المصحف: النص العثماني لمجمع الملك فهد لطباعة المصحف الشريف (Uthmanic Hafs)، بخط DigitalKhatt Madina</div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div><div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></details>
     <div class="sec"><h2>بياناتي</h2></div>
     <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
   $("#langBtn").onclick = langSheet; document.querySelectorAll("[data-th]").forEach(b => b.onclick = () => setTheme(b.dataset.th));
