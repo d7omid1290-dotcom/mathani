@@ -1364,6 +1364,10 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .pfsrc summary::-webkit-details-marker{display:none}
 .pfsrc[open] summary{margin-bottom:8px}
 .ftyp{display:flex;gap:8px;margin-top:10px}.ftyp input{flex:1;min-width:0}
+.asgo{display:flex;align-items:center;gap:12px;width:calc(100% - 32px);margin:14px 16px 0;padding:14px 16px;border:0;border-radius:20px;background:linear-gradient(135deg,var(--green),#0b3d2e);color:#fff;text-align:start;font:inherit;box-shadow:var(--shadow);cursor:pointer}
+.asgo b{display:block;font-size:1.05rem}.asgo small{opacity:.8;font-size:.78rem}
+.asgo .asi{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.14)}
+.asgo .asi svg{width:22px;height:22px}
 </style>
 </head>
 <body>
@@ -2122,8 +2126,9 @@ function home() {
       <div id="findBox">${findUI()}</div>
       <div class="cwird">${wirdMini()}</div>
     </section>
+    <button class="asgo" id="asGo"><span class="asi">${ICON.chat || ICON.mic}</span><span class="grow"><b>المساعد القرآني</b><small>اسأله أو كلّمه صوتياً، يجيبك من المصادر المعتمدة</small></span>${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</button>
     ${dailyCard()}`;
-  $("#thBtn").onclick = () => setTheme(isDark() ? "light" : "dark"); $("#salahGo").onclick = () => go("salah"); bindFind();
+  $("#thBtn").onclick = () => setTheme(isDark() ? "light" : "dark"); $("#salahGo").onclick = () => go("salah"); $("#asGo").onclick = () => go("assistant"); bindFind();
   bindWirdHome();
   bindAll();
 }
