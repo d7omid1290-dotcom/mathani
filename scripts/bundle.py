@@ -24,6 +24,11 @@ FONTS = "".join([face("Amiri Quran", "amiri-quran-arabic-400-normal.woff2", 400,
     [face("DigitalKhatt Madina", "digitalkhatt-madina.woff2", 400, AR_RANGE)] +
     [face("Reem Kufi", "reem-kufi-arabic-700-normal.woff2", 700, AR_RANGE), face("Reem Kufi", "reem-kufi-latin-700-normal.woff2", 700, LAT_RANGE)])
 html = html.replace("<style>", "<style>" + FONTS, 1)
+# صوت المساعد البشري: تسجيلات محفوظة الحقوق لصاحبها، لا تُحفظ في المستودع (انظر PERMISSIONS.md).
+# تُضمَّن فقط عند البناء الخاص: VOICE_DIR=<مجلد المقاطع> python3 scripts/bundle.py، وإلا فالرد بصوت الجهاز.
+vd = os.environ.get("VOICE_DIR")
+VOICE = {os.path.basename(f)[:-4]: "data:audio/mpeg;base64," + base64.b64encode(open(f, "rb").read()).decode() for f in sorted(glob.glob(f"{vd}/*.mp3"))} if vd else {}
+html = html.replace("/*VOICE*/", json.dumps(VOICE))
 html = html.replace("/*SFRAME*/", base64.b64encode(open(f"{root}/web/img/surah-frame.svg", "rb").read()).decode())
 os.makedirs(f"{root}/dist/dorar", exist_ok=True)
 for f in dorar_files: shutil.copy(f, f"{root}/dist/dorar/")

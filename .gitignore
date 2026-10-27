@@ -12,3 +12,6 @@ scripts/__pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+# صوت عبدالرحمن (المساعد): محفوظ الحقوق، لا يُرفع إلى المستودع العام
+web/voice/

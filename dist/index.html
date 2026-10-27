@@ -180,6 +180,7 @@ button{cursor:pointer}
 .tgroup{background:var(--sky-soft);border-inline-start:4px solid var(--sky);border-radius:14px;padding:12px 14px;margin:14px 0 10px;line-height:1.95}
 .tgroup .lbl{font-size:.72rem;font-weight:700;color:var(--green);display:block;margin-bottom:4px}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.nfc .row{padding:8px 0;border-bottom:1px solid var(--line)}.nfc .row:last-of-type{border-bottom:0}.nfc>.tiny{margin-top:6px}
 .switch{width:48px;height:28px;border-radius:999px;border:0;background:var(--line);position:relative;flex:none}
 .switch::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);transition:inset-inline-start .2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .switch[aria-checked="true"]{background:var(--green)} .switch[aria-checked="true"]::after{inset-inline-start:23px}
@@ -369,6 +370,7 @@ input[type=text]{width:100%;background:var(--surface);border:1px solid var(--lin
 .aay{background:var(--bg);border-radius:14px;padding:10px 12px;margin-bottom:8px}.aay .ayah{font-size:1.3rem;line-height:2.1}
 .asrc{font-size:.75rem;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
 .aq{margin-top:10px;background:var(--gold-soft);color:var(--gold);border-radius:12px;padding:8px 10px;font-size:.9rem}
+.asugg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:8px 0}.asugg::-webkit-scrollbar{display:none}.asugg button{flex:none;white-space:nowrap}
 .aacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.aacts .btn{padding:8px 12px;font-size:.82rem}
 .aprof{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.aprof div{background:var(--bg);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column}.aprof span{font-size:.72rem;color:var(--muted)}.aprof b{font-size:.85rem}
 .abar{position:fixed;inset-inline:0;bottom:calc(84px + env(safe-area-inset-bottom));margin:0 auto;max-width:560px;padding:0 16px;display:flex;gap:8px;align-items:center;z-index:5}
@@ -3610,6 +3612,14 @@ async function profile() {
     <button class="card row langrow" id="langBtn"><span class="grow"><b>اللغة</b> ${LG !== "en" ? `<span class="tiny muted" data-noi18n>Language</span>` : ""}<div class="small muted" data-noi18n>${LANGS.find(x => x[0] === LG)[1]}</div></span>${ICON.chev}</button>
     <div class="card"><label class="tiny muted" for="name">اسمك</label><input type="text" id="name" placeholder="يظهر في الرئيسية" value="${esc(ST.name)}" style="margin-top:6px"></div>
     <div class="card"><div class="tiny muted" style="margin-bottom:8px">المظهر</div><div class="seg thseg" role="group">${[["light", "نهاري", LI.sun], ["dark", "ليلي", LI.moon], ["auto", "تلقائي", ""]].map(([k, t, ic]) => `<button data-th="${k}" aria-pressed="${(ST.theme || "auto") === k}">${ic}${t}</button>`).join("")}</div></div>
+    <div class="sec"><h2>الإشعارات</h2></div>
+    <div class="card nfc">
+      <div class="row"><span class="grow"><b>إشعارات الجهاز</b><div class="tiny muted">${{ granted: "مفعّلة", denied: "مرفوضة، فعّلها من إعدادات المتصفح", none: "غير مدعومة في هذا المتصفح" }[notifPerm()] || "غير مفعّلة"}</div></span>${notifPerm() === "default" ? `<button class="btn" id="nPerm">فعّل</button>` : ""}</div>
+      <div class="row"><span class="grow"><b>تذكير الورد اليومي</b></span><button class="switch" role="switch" aria-checked="${!!NOTIF().wird}" data-nt="wird" aria-label="تذكير الورد اليومي"></button></div>
+      <div class="row"><span class="grow"><b>تذكير المراجعة</b><div class="tiny muted">إذا كانت عندك أوجه حان وقت مراجعتها</div></span><button class="switch" role="switch" aria-checked="${!!NOTIF().review}" data-nt="review" aria-label="تذكير المراجعة"></button></div>
+      <div class="row"><span class="grow"><b>وقت التذكير</b></span><input type="time" id="nAt" value="${NOTIF().at}" style="width:auto"></div>
+      <div class="row"><span class="grow"><b>تنبيه الأذان</b><div class="tiny muted">تختار الصلوات من شاشة الصلاة</div></span><button class="btn" id="nAdhan">الصلاة</button></div>
+      <div class="tiny muted">تعمل التذكيرات ما دام التطبيق مفتوحاً.</div></div>
     <div class="sec"><h2>تسجيلاتي</h2></div><div id="recs"><div class="info">جارٍ التحميل…</div></div>
     <div class="sec"><h2>مراجعة المحتوى</h2><span class="badge draft">للمتخصص الشرعي</span></div>
     <div class="card"><div class="small muted">موضوع الوجه والفوائد ومقاصد السورة مسوداتٌ تظهر بشارة «بانتظار المراجعة» حتى يعتمدها المتخصص بعد مطابقتها بالمختصر في التفسير.</div>
@@ -3621,6 +3631,10 @@ async function profile() {
   $("#langBtn").onclick = langSheet; document.querySelectorAll("[data-th]").forEach(b => b.onclick = () => setTheme(b.dataset.th));
   $("#name").onchange = e => { ST.name = e.target.value.trim(); save(); };
   $("#openReview").onclick = reviewSheet;
+  if ($("#nPerm")) $("#nPerm").onclick = () => { try { Notification.requestPermission().then(profile); } catch (e) {} };
+  document.querySelectorAll("[data-nt]").forEach(b => b.onclick = () => { const n = NOTIF(), k = b.dataset.nt; n[k] = !n[k]; save(); b.setAttribute("aria-checked", n[k]); if (n[k]) askNotify(); });
+  $("#nAt").onchange = e => { if (e.target.value) { NOTIF().at = e.target.value; NOTIF().fired = ""; save(); } };
+  $("#nAdhan").onclick = () => go("salah");
   document.querySelectorAll("[data-diag]").forEach(b => b.onclick = diagSheet);
   const recs = (await DB.all()).sort((a, b) => b.at - a.at);
   $("#reset").onclick = async () => { if (!confirm(tr("سيُحذف سجل أخطائك ومراجعاتك وتسجيلاتك من هذا الجهاز."))) return;
@@ -4312,7 +4326,21 @@ function adhanTick() {
   }
   const pl = $("#pleft"); if (pl) { const n = nextPrayer(); pl.textContent = leftTxt(n.at - Date.now()); }
 }
-if (!/jsdom/.test(navigator.userAgent)) setInterval(adhanTick, 20000); // لا يُبقي اختبارات Node قيد التشغيل
+/* التذكيرات: الورد والمراجعة في الوقت الذي يختاره الحافظ، ما دام التطبيق مفتوحاً */
+const NOTIF = () => (ST.notif = ST.notif || { wird: false, review: false, at: "20:00" });
+function notifPerm() { const N = window.Notification; return N ? N.permission : "none"; }
+function remind(msg) { if (notifPerm() === "granted") { try { new Notification(tr("مثاني"), { body: msg }); return; } catch (e) {} } chime(); openSheet(`<div class="empty" style="padding:8px 0"><h3 style="margin:8px 0 4px">${esc(msg)}</h3></div>`); }
+function remindTick() {
+  const n = NOTIF(); if (!n.wird && !n.review) return;
+  const now = new Date(), [h, m] = n.at.split(":").map(Number), at = new Date(now); at.setHours(h, m, 0, 0);
+  const diff = now - at, dk = WD.today(); if (diff < 0 || diff >= 120000 || n.fired === dk) return;
+  n.fired = dk; save();
+  const due = Object.values(ST.pages).filter(r => r.due <= Date.now()).length, msgs = [];
+  if (n.wird && ST.wird && ST.wird.setup) msgs.push(tr("حان وقت وردك اليومي."));
+  if (n.review && due) msgs.push(FM("عندك {0} أوجه حان وقت مراجعتها.", due));
+  if (msgs.length) remind(msgs.join(" "));
+}
+if (!/jsdom/.test(navigator.userAgent)) setInterval(() => { adhanTick(); remindTick(); }, 20000); // لا يُبقي اختبارات Node قيد التشغيل
 
 /* التفسير الميسر مترجماً بحسب لغة الواجهة (يُحمَّل عند الحاجة إن توفّر ملفه) */
 let TFX = null;
@@ -4388,7 +4416,7 @@ function tadabburAyah() {
 function answer(q, forced) {
   const n = " " + nz(q) + " ", has = (...w) => w.some(x => n.includes(" " + nz(x)) || n.includes(nz(x) + " "));
   let mode = forced || AS.mode;
-  if (has("سمعني", "سمّعني", "اختبر حفظي")) mode = "tasmee";
+  if (has("سمعني", "سمّعني", "سمع لي", "سمّع لي", "اختبر حفظي")) mode = "tasmee";
   else if (has("راجعني", "مراجعة")) mode = "review";
   else if (has("وش اسوي", "ماذا افعل", "خطتي", "خطة", "ايش اسوي")) mode = "plan";
   else if (has("ملفي", "مستواي", "تقدمي")) mode = "profile";
@@ -4438,7 +4466,7 @@ function answer(q, forced) {
 }
 const MODE_HELLO = {
   learn: "اسألني عن معنى آية أو كلمة أو متشابهاتها. مثال: «ما معنى سورة الملك آية ٢».",
-  tasmee: "قل: «سمّعني سورة الملك»، وسأستمع إلى تلاوتك ثم أعطيك تقريراً بأخطائك.",
+  tasmee: "قل: «سمّع لي سورة الملك»، وسأستمع إلى تلاوتك ثم أعطيك تقريراً بأخطائك.",
   review: "سأختار لك ما تحتاج مراجعته من أخطائك السابقة ومستوى إتقانك.",
   tadabbur: "سأختار لك آية من وردك أو محفوظك، مع معناها وسؤال يعينك على التدبر.",
   plan: "سأبني لك خطة اليوم من وردك وأخطائك ومراجعتك ومواقيت الصلاة." };
@@ -4446,10 +4474,23 @@ let VOICE = null;
 function pickVoice() { try { const vs = speechSynthesis.getVoices().filter(x => /^ar/i.test(x.lang)); const sc = x => (/natural|neural|online|google|premium|enhanced/i.test(x.name) ? 4 : 0) + (/hamed|zariyah|maged|laila|majed|tarik|mariam/i.test(x.name) ? 2 : 0) + (/SA/i.test(x.lang) ? 1 : 0);
   VOICE = vs.sort((a, b) => sc(b) - sc(a))[0] || null; } catch (e) {} }
 if (window.speechSynthesis) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {} }
-function sayText(text) { const d = document.createElement("div"); d.innerHTML = String(text); d.querySelectorAll(".aay,.asrc,.aacts").forEach(x => x.remove()); return d.textContent.replace(/[\u064B-\u0652\u0670]/g, "").replace(/[🌿🤍📞🔊]/gu, "").replace(/([٠-٩0-9]+) س و([٠-٩0-9]+) د/g, "$1 ساعة و$2 دقيقة").replace(/([٠-٩0-9]+) د(?=[؛.،\s]|$)/g, "$1 دقيقة").replace(/\s+/g, " ").trim(); }
+function sayText(text) { const d = document.createElement("div"); d.innerHTML = String(text); d.querySelectorAll(".aay,.asrc,.aacts").forEach(x => x.remove()); return d.textContent.replace(/\([^)]*\)|﴿[^﴾]*﴾/g, " ").replace(/[\u064B-\u0652\u0670]/g, "").replace(/[🌿🤍📞🔊]/gu, "").replace(/([٠-٩0-9]+) س و([٠-٩0-9]+) د/g, "$1 ساعة و$2 دقيقة").replace(/([٠-٩0-9]+) د(?=[؛.،\s]|$)/g, "$1 دقيقة").replace(/\s+/g, " ").trim(); }
+// عبارات المساعد الثابتة بتسجيل بشري حقيقي (web/voice)، والباقي بصوت الجهاز
+const VOICE_CLIPS = {};
+const VOICE_TEXT = { hi: "السلام عليكم. أنا معك، تفضل بسؤالك.", learn: MODE_HELLO.learn, tasmee: MODE_HELLO.tasmee, review: MODE_HELLO.review, tadabbur: MODE_HELLO.tadabbur, plan: MODE_HELLO.plan,
+  surah: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها.", mulk: "سأستمع إليك من سورة الملك. ابدأ القراءة.", norec: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك." };
+const vkey = t => sayText(t).replace(/[^\u0621-\u064A]/g, "");
+const VOICE_BY = {}; for (const k in VOICE_TEXT) if (VOICE_CLIPS[k]) VOICE_BY[vkey(VOICE_TEXT[k])] = VOICE_CLIPS[k];
+let CLIP = null;
+function stopSay() { try { speechSynthesis.cancel(); } catch (e) {} if (CLIP) { const c = CLIP; CLIP = null; c.onended = c.onerror = null; c.pause(); } }
 function say(text, done, force) {
-  if ((!AS.speak && !force) || !window.speechSynthesis || !text) { if (done) done(); return; }
-  try { speechSynthesis.cancel(); if (!VOICE) pickVoice();
+  if ((!AS.speak && !force) || !text) { if (done) done(); return; }
+  stopSay();
+  const src = LG === "ar" && VOICE_BY[vkey(ST.name ? String(text).replace(` يا ${ST.name}`, "") : text)];
+  if (src) { const c = CLIP = new Audio(src), end = () => { if (CLIP === c) { CLIP = null; if (done) done(); } };
+    c.onended = end; c.onerror = end; c.play().catch(end); return; }
+  if (!window.speechSynthesis) { if (done) done(); return; }
+  try { if (!VOICE) pickVoice();
     const parts = sayText(text).slice(0, 600).split(/(?<=[.،؛:!؟?])\s+/).reduce((a, x) => { if (a.length && (a[a.length - 1] + " " + x).length < 160) a[a.length - 1] += " " + x; else a.push(x); return a; }, []).filter(Boolean);
     if (!parts.length) { if (done) done(); return; }
     let i = 0; const next = () => { if (i >= parts.length) { if (done) done(); return; } const u = new SpeechSynthesisUtterance(parts[i++]); u.lang = VOICE ? VOICE.lang : "ar-SA"; if (VOICE) u.voice = VOICE; u.rate = 1.02; u.pitch = 1;
@@ -4474,14 +4515,14 @@ function callUI() {
   o.innerHTML = `<div class="acav ${CALL.st}"><span>${ICON.mic}</span></div><b class="acn">المساعد القرآني</b><div class="acst">${tr(lab)}</div>
     ${CALL.q ? `<div class="acq" dir="auto">«${esc(CALL.q)}»</div>` : ""}${CALL.a ? `<div class="aca" dir="auto">${esc(CALL.a.slice(0, 260))}</div>` : ""}
     <div class="acbtns">${CALL.st === "speak" ? `<button class="btn ghost" id="acSkip">قاطعه وتحدث</button>` : ""}<button class="acend" id="acEnd" aria-label="إنهاء المكالمة">✕ إنهاء</button></div>`;
-  $("#acEnd").onclick = endCall; const sk = $("#acSkip"); if (sk) sk.onclick = () => { try { speechSynthesis.cancel(); } catch (e) {} callListen(); };
+  $("#acEnd").onclick = endCall; const sk = $("#acSkip"); if (sk) sk.onclick = () => { stopSay(); callListen(); };
 }
 function startCall() {
   if (!SR) { asPush("bot", "المكالمة الصوتية تحتاج متصفح Google Chrome أو Safari."); return; }
   stopAsk(); CALL.on = true; CALL.q = ""; CALL.a = ""; const hi = `السلام عليكم${ST.name ? ` يا ${ST.name}` : ""}. أنا معك، تفضل بسؤالك.`;
   CALL.st = "speak"; CALL.a = hi; callUI(); say(hi, callListen, true);
 }
-function endCall() { CALL.on = false; try { speechSynthesis.cancel(); } catch (e) {} if (CALL.rec) { const r = CALL.rec; CALL.rec = null; try { r.abort(); } catch (e) {} } callUI(); }
+function endCall() { CALL.on = false; stopSay(); if (CALL.rec) { const r = CALL.rec; CALL.rec = null; try { r.abort(); } catch (e) {} } callUI(); }
 function callListen() {
   if (!CALL.on) return; if (CALL.rec) { try { CALL.rec.abort(); } catch (e) {} }
   const r = new SR(); r.lang = "ar-SA"; r.interimResults = true; r.continuous = false; CALL.rec = r; CALL.st = "listen"; CALL.q = ""; callUI();
@@ -4513,17 +4554,19 @@ function drawMsgs() {
     if (t === "go") go(v); if (t === "read") openReader(+v, "mushaf"); if (t === "mut") ayahSheet(v); if (t === "ask") ask(v); });
   bindAll(); box.scrollTop = box.scrollHeight; setTimeout(() => { const l = box.lastElementChild; if (l) l.scrollIntoView({ block: "end", behavior: "smooth" }); }, 50);
 }
+const ASUGG = ["وش أسوي اليوم؟", "سمّع لي سورة الملك", "راجعني", "ما معنى سورة الملك آية ٢", "ما المتشابهات في سورة البقرة آية ٢", "ملفي"];
 function assistant() {
   if (!AS.msgs.length) asPush("bot", `السلام عليكم${ST.name ? ` يا ${esc(ST.name)}` : ""}، أنا رفيقك في رحلتك مع القرآن: أشرح لك من التفسير الميسر، وأسمّع لك، وأراجع معك أخطاءك، وأبني خطتك اليومية. اضغط الميكروفون وتحدث، أو اكتب سؤالك.`, [["وش أسوي اليوم؟", "ask:وش اسوي اليوم"], ["ملفي القرآني", "ask:ملفي"]]);
   $("#view").innerHTML = bar("المساعد القرآني", "رفيقك من الحفظ إلى الإتقان", true, `<button class="ibtn" id="aSpk" aria-label="الرد الصوتي">${AS.speak ? HICON.spk : HICON.mute}</button>`) + `
     <button class="acallbtn" id="aCall"><span class="aci">${HICON.phone}</span><b>مكالمة صوتية</b><span>تحدّث معه كأنك في مكالمة</span></button>
     <div class="amodes">${AMODES.map(([id, t, e]) => `<button data-am="${id}" aria-pressed="${AS.mode === id}"><span>${HICON[e]}</span>${t}</button>`).join("")}</div>
     <div class="amsgs" id="amsgs"></div>
+    <div class="chips asugg">${ASUGG.map(q => `<button data-sug="${q}">${q}</button>`).join("")}</div>
     <div class="abar"><input type="text" id="aIn" placeholder="اكتب سؤالك…"><button class="amic" id="aMic" aria-label="تحدث">${ICON.mic}</button><button class="asend" id="aSend" aria-label="أرسل">${ICON.back}</button></div>
     <div class="tiny muted acap">يجيب من مصادر معتمدة يذكرها مع كل جواب، ولا يُفتي ولا يفسّر من عنده.</div>`;
   drawMsgs();
   $("#back").onclick = () => { stopAsk(); endCall(); go("home"); };
-  $("#aSpk").onclick = () => { AS.speak = !AS.speak; try { speechSynthesis.cancel(); } catch (e) {} assistant(); };
+  $("#aSpk").onclick = () => { AS.speak = !AS.speak; stopSay(); assistant(); };
   document.querySelectorAll("[data-am]").forEach(b => b.onclick = () => { AS.mode = b.dataset.am; asPush("bot", MODE_HELLO[AS.mode]);
     if (AS.mode !== "learn" && AS.mode !== "tasmee") ask("", AS.mode); else say(MODE_HELLO[AS.mode]);
     document.querySelectorAll("[data-am]").forEach(x => x.setAttribute("aria-pressed", x.dataset.am === AS.mode)); });
@@ -4531,10 +4574,11 @@ function assistant() {
   $("#aSend").onclick = send; $("#aIn").onkeydown = e => { if (e.key === "Enter") send(); };
   $("#aMic").onclick = () => AS.rec ? stopAsk() : listenAsk();
   $("#aCall").onclick = startCall;
+  document.querySelectorAll("[data-sug]").forEach(b => b.onclick = () => ask(b.dataset.sug));
 }
 function listenAsk() {
   if (!SR) { asPush("bot", "التحدث بالصوت يحتاج متصفح Google Chrome أو Safari. يمكنك الكتابة الآن."); return; }
-  try { speechSynthesis.cancel(); } catch (e) {}
+  stopSay();
   const r = new SR(); r.lang = "ar-SA"; r.interimResults = true; r.continuous = false; AS.rec = r;
   $("#aMic").classList.add("on"); $("#aIn").placeholder = tr("أستمع إليك…");
   let fin = "";
