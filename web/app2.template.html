@@ -3957,7 +3957,8 @@ function playAdhan(nm) {
 }
 /* إعلان صوتي بعد النغمة: «حان الآن وقت صلاة …» بصوت الجهاز */
 function announce(nm) {
-  try { const S = window.speechSynthesis; if (LG === "ar" || !S || !window.SpeechSynthesisUtterance) return; // بالعربية النغمة فقط، بلا صوت آلي
+  if (LG === "ar") { setTimeout(() => say(nm ? `حان الآن وقت صلاة ${nm}` : "", null, true), 1900); return; } // بالعربية بالصوت البشري إن وُجد، وإلا فالنغمة فقط
+  try { const S = window.speechSynthesis; if (!S || !window.SpeechSynthesisUtterance) return;
     const txt = nm ? `حان الآن وقت صلاة ${nm}` : "حان الآن وقت الصلاة";
     const lang = LG === "en" ? "en" : LG === "ur" ? "ur" : "ar", say = LG === "ar" ? txt : tr(txt);
     let done = false; const go = () => { if (done) return; done = true; S.cancel(); const u = new SpeechSynthesisUtterance(say); const v = S.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith(lang));
@@ -4140,7 +4141,9 @@ function sayText(text) { const d = document.createElement("div"); d.innerHTML = 
 // عبارات المساعد الثابتة بتسجيل بشري حقيقي (web/voice)
 const VOICE_CLIPS = /*VOICE*/;
 const VOICE_TEXT = { hi: "السلام عليكم. أنا معك، تفضل بسؤالك.", learn: MODE_HELLO.learn, tasmee: MODE_HELLO.tasmee, review: MODE_HELLO.review, tadabbur: MODE_HELLO.tadabbur, plan: MODE_HELLO.plan,
-  surah: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها.", mulk: "سأستمع إليك من سورة الملك. ابدأ القراءة.", norec: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك." };
+  surah: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها.", mulk: "سأستمع إليك من سورة الملك. ابدأ القراءة.",
+  st_hello: "يا مرحباً ومسهلاً، حياك الله، سعدنا بسماع صوتك.",
+  pr_fajr: "حان الآن وقت صلاة الفجر", pr_dhuhr: "حان الآن وقت صلاة الظهر", pr_asr: "حان الآن وقت صلاة العصر", pr_maghrib: "حان الآن وقت صلاة المغرب", pr_isha: "حان الآن وقت صلاة العشاء", norec: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك." };
 const vkey = t => sayText(t).replace(/[^\u0621-\u064A]/g, "");
 const VOICE_BY = {}; for (const k in VOICE_TEXT) if (VOICE_CLIPS[k]) VOICE_BY[vkey(VOICE_TEXT[k])] = VOICE_CLIPS[k];
 let CLIP = null;
@@ -4165,7 +4168,7 @@ function say(text, done, force) {
 const CALL = { on: false, st: "", q: "", a: "", rec: null };
 function smallTalk(q) {
   const n = M.norm(q).join(" ");
-  if (/^(السلام|سلام|مرحبا|هلا|اهلا)/.test(n)) return { html: `وعليكم السلام ورحمة الله${ST.name ? ` يا ${esc(ST.name)}` : ""}، حياك الله. بماذا نبدأ: نراجع، أو أسمّع لك، أو أبني خطة يومك؟` };
+  if (/^(السلام|سلام|مرحبا|هلا|اهلا)/.test(n)) return { html: "يا مرحباً ومسهلاً، حياك الله، سعدنا بسماع صوتك." };
   if (/(مع السلامه|باي|انهي المكالمه|اقفل|سكر)/.test(n)) return { html: "في حفظ الله، وأعانك على وردك.", end: true };
   if (/(شكرا|جزاك|يعطيك العافيه|ما قصرت)/.test(n)) return { html: "وإياك، بارك الله فيك. هل تريد شيئاً آخر؟" };
   if (/(كيف حالك|كيفك|شلونك|وش اخبارك)/.test(n)) return { html: "الحمد لله بخير، وأسعد بصحبتك مع القرآن. كيف أعينك اليوم؟" };
