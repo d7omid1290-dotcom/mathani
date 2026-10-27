@@ -4295,7 +4295,7 @@ function playAdhan(nm) {
 }
 /* إعلان صوتي بعد النغمة: «حان الآن وقت صلاة …» بصوت الجهاز */
 function announce(nm) {
-  try { const S = window.speechSynthesis; if (!S || !window.SpeechSynthesisUtterance) return;
+  try { const S = window.speechSynthesis; if (LG === "ar" || !S || !window.SpeechSynthesisUtterance) return; // بالعربية النغمة فقط، بلا صوت آلي
     const txt = nm ? `حان الآن وقت صلاة ${nm}` : "حان الآن وقت الصلاة";
     const lang = LG === "en" ? "en" : LG === "ur" ? "ur" : "ar", say = LG === "ar" ? txt : tr(txt);
     let done = false; const go = () => { if (done) return; done = true; S.cancel(); const u = new SpeechSynthesisUtterance(say); const v = S.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith(lang));
@@ -4475,7 +4475,7 @@ function pickVoice() { try { const vs = speechSynthesis.getVoices().filter(x => 
   VOICE = vs.sort((a, b) => sc(b) - sc(a))[0] || null; } catch (e) {} }
 if (window.speechSynthesis) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {} }
 function sayText(text) { const d = document.createElement("div"); d.innerHTML = String(text); d.querySelectorAll(".aay,.asrc,.aacts").forEach(x => x.remove()); return d.textContent.replace(/\([^)]*\)|﴿[^﴾]*﴾/g, " ").replace(/[\u064B-\u0652\u0670]/g, "").replace(/[🌿🤍📞🔊]/gu, "").replace(/([٠-٩0-9]+) س و([٠-٩0-9]+) د/g, "$1 ساعة و$2 دقيقة").replace(/([٠-٩0-9]+) د(?=[؛.،\s]|$)/g, "$1 دقيقة").replace(/\s+/g, " ").trim(); }
-// عبارات المساعد الثابتة بتسجيل بشري حقيقي (web/voice)، والباقي بصوت الجهاز
+// عبارات المساعد الثابتة بتسجيل بشري حقيقي (web/voice)
 const VOICE_CLIPS = {};
 const VOICE_TEXT = { hi: "السلام عليكم. أنا معك، تفضل بسؤالك.", learn: MODE_HELLO.learn, tasmee: MODE_HELLO.tasmee, review: MODE_HELLO.review, tadabbur: MODE_HELLO.tadabbur, plan: MODE_HELLO.plan,
   surah: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها.", mulk: "سأستمع إليك من سورة الملك. ابدأ القراءة.", norec: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك." };
@@ -4489,7 +4489,8 @@ function say(text, done, force) {
   const src = LG === "ar" && VOICE_BY[vkey(ST.name ? String(text).replace(` يا ${ST.name}`, "") : text)];
   if (src) { const c = CLIP = new Audio(src), end = () => { if (CLIP === c) { CLIP = null; if (done) done(); } };
     c.onended = end; c.onerror = end; c.play().catch(end); return; }
-  if (!window.speechSynthesis) { if (done) done(); return; }
+  // بالعربية لا صوت آلياً: ما ليس له تسجيل بشري يظهر نصاً فقط
+  if (LG === "ar" || !window.speechSynthesis) { if (done) done(); return; }
   try { if (!VOICE) pickVoice();
     const parts = sayText(text).slice(0, 600).split(/(?<=[.،؛:!؟?])\s+/).reduce((a, x) => { if (a.length && (a[a.length - 1] + " " + x).length < 160) a[a.length - 1] += " " + x; else a.push(x); return a; }, []).filter(Boolean);
     if (!parts.length) { if (done) done(); return; }
