@@ -1535,6 +1535,7 @@ function record(page, errors, detail, acc, kind) {
   (detail || []).forEach(d => ST.mistakes.push({ ...d, page, at: Date.now() }));
   ST.mistakes = ST.mistakes.slice(-300);
   if (acc != null) ST.sessions.push({ page, acc, at: Date.now(), kind: kind || "tasmee" });
+  if (acc != null && acc >= 0.95 && (kind || "tasmee") === "tasmee") setTimeout(() => playClip(acc >= 0.999 ? "praise2" : "praise1"), 700);
   ST.sessions = ST.sessions.slice(-200); save();
 }
 const DB = {
@@ -3957,7 +3958,7 @@ function playAdhan(nm) {
 }
 /* إعلان صوتي بعد النغمة: «حان الآن وقت صلاة …» بصوت الجهاز */
 function announce(nm) {
-  if (LG === "ar") { setTimeout(() => say(nm ? `حان الآن وقت صلاة ${nm}` : "", null, true), 1900); return; } // بالعربية بالصوت البشري إن وُجد، وإلا فالنغمة فقط
+  if (LG === "ar") { setTimeout(() => say(nm ? `حان الآن وقت صلاة ${nm}` : "", () => { if (nm === "العصر") setTimeout(() => playClip("adhkar"), 400); }, true), 1900); return; } // بالعربية بالصوت البشري إن وُجد، وإلا فالنغمة فقط
   try { const S = window.speechSynthesis; if (!S || !window.SpeechSynthesisUtterance) return;
     const txt = nm ? `حان الآن وقت صلاة ${nm}` : "حان الآن وقت الصلاة";
     const lang = LG === "en" ? "en" : LG === "ur" ? "ur" : "ar", say = LG === "ar" ? txt : tr(txt);
@@ -3979,6 +3980,9 @@ function adhanTick() {
   for (const [k, nm] of PRAY) {
     if (k === "sunrise" || !c.alerts[k]) continue;
     const diff = now - t[k];
+    if (diff >= -600000 && diff < -480000 && c.pre !== dk + k) { // اقترب وقت الصلاة
+      c.pre = dk + k; save(); playClip("pre_" + k);
+      try { if (window.Notification && Notification.permission === "granted") new Notification(tr("مثاني"), { body: tr(`اقترب الآن وقت صلاة ${nm}`) }); } catch (e) {} }
     if (diff >= 0 && diff < 120000 && c.fired !== dk + k) {
       c.fired = dk + k; save(); playAdhan(nm);
       const msg = tr(`حان الآن وقت صلاة ${nm}`);
@@ -4148,12 +4152,15 @@ const vkey = t => sayText(t).replace(/[^\u0621-\u064A]/g, "");
 const VOICE_BY = {}; for (const k in VOICE_TEXT) if (VOICE_CLIPS[k]) VOICE_BY[vkey(VOICE_TEXT[k])] = VOICE_CLIPS[k];
 let CLIP = null;
 function stopSay() { try { speechSynthesis.cancel(); } catch (e) {} if (CLIP) { const c = CLIP; CLIP = null; c.onended = c.onerror = null; c.pause(); } }
+function playSrc(src, done) { stopSay(); const c = CLIP = new Audio(src), end = () => { if (CLIP === c) { CLIP = null; if (done) done(); } };
+  c.onended = end; c.onerror = end; c.play().catch(end); }
+// مقطع بشري باسمه (تشجيع، تذكير)؛ لا شيء إن لم يوجد
+function playClip(key, done) { if (LG === "ar" && VOICE_CLIPS[key]) playSrc(VOICE_CLIPS[key], done); else if (done) done(); }
 function say(text, done, force) {
   if ((!AS.speak && !force) || !text) { if (done) done(); return; }
   stopSay();
   const src = LG === "ar" && VOICE_BY[vkey(ST.name ? String(text).replace(` يا ${ST.name}`, "") : text)];
-  if (src) { const c = CLIP = new Audio(src), end = () => { if (CLIP === c) { CLIP = null; if (done) done(); } };
-    c.onended = end; c.onerror = end; c.play().catch(end); return; }
+  if (src) return playSrc(src, done);
   // بالعربية لا صوت آلياً: ما ليس له تسجيل بشري يظهر نصاً فقط
   if (LG === "ar" || !window.speechSynthesis) { if (done) done(); return; }
   try { if (!VOICE) pickVoice();
