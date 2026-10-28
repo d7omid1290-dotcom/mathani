@@ -4500,12 +4500,20 @@ function numKeys(n) {
 const refKeys = (k, all) => { const [s, a] = k.split(":").map(Number); return [`s${s}`].concat(all || a > 1 ? ["f_aya", ...numKeys(a)] : []); };
 const LVK = { "متقن": "lv_mutqin", "جيد": "lv_jayyid", "يحتاج تثبيتاً": "lv_tathbeet", "لم يُحدَّد بعد": "lv_none" };
 const dayKeys = n => !n ? [] : ["f_streak"].concat(n === 1 ? ["f_day", "n1"] : n === 2 ? ["f_2days"] : [...numKeys(n), n <= 10 ? "f_days" : "f_dayA"]);
-let CLIP = null;
-function stopSay() { try { speechSynthesis.cancel(); } catch (e) {} if (CLIP) { const c = CLIP; CLIP = null; c.onended = c.onerror = null; c.pause(); } }
-function playSrc(src, done) { stopSay(); const c = CLIP = new Audio(src), end = () => { if (CLIP === c) { CLIP = null; if (done) done(); } };
-  c.onended = end; c.onerror = end; c.play().catch(end); }
+// عنصر صوت واحد يُفتح بأول لمسة: الجوال (خاصة آيفون) يمنع تشغيل عنصر جديد خارج اللمسة
+let CLIP = null, AUD = null, AUNLOCK = false;
+const aud = () => AUD || (AUD = new Audio());
+document.addEventListener("pointerdown", () => { if (AUNLOCK || LG !== "ar") return; AUNLOCK = true; const k = Object.keys(VOICE_CLIPS)[0]; if (!k) return;
+  const a = aud(); if (CLIP) return; a.muted = true; a.src = VOICE_CLIPS[k]; const pr = a.play(); if (pr && pr.then) pr.then(() => { if (!CLIP) a.pause(); a.muted = false; }, () => { a.muted = false; }); }, { capture: true });
+function stopSay() { try { speechSynthesis.cancel(); } catch (e) {} if (CLIP) { CLIP = null; const a = aud(); a.onended = a.onerror = null; a.pause(); } }
+function playSrc(src, done) { stopSay(); const a = aud(), tok = CLIP = {}, end = () => { if (CLIP === tok) { CLIP = null; if (done) done(); } };
+  a.onended = end; a.onerror = end; a.muted = false; a.src = src; const pr = a.play(); if (pr && pr.catch) pr.catch(end); }
+// الجملة المركّبة تُدمج مقطعاً واحداً (إطارات MP3 متتالية) فتُشغَّل بلمسة واحدة دون فراغات
+const B64 = {}; function mp3Bytes(k) { if (B64[k]) return B64[k]; const s = atob(VOICE_CLIPS[k].split(",")[1]), b = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+  let o = 0; if (b[0] === 73 && b[1] === 68 && b[2] === 51) o = 10 + ((b[6] & 127) << 21 | (b[7] & 127) << 14 | (b[8] & 127) << 7 | (b[9] & 127)); return B64[k] = b.subarray(o); }
+let SEQURL = null;
 function playSeq(keys, done) { if (LG !== "ar" || !keys || !keys.every(x => VOICE_CLIPS[x])) return false;
-  let i = 0; const next = () => { if (i < keys.length) playSrc(VOICE_CLIPS[keys[i++]], next); else if (done) done(); }; next(); return true; }
+  try { if (SEQURL) URL.revokeObjectURL(SEQURL); SEQURL = URL.createObjectURL(new Blob(keys.map(mp3Bytes), { type: "audio/mpeg" })); playSrc(SEQURL, done); return true; } catch (e) { return false; } }
 // مقطع بشري باسمه (تشجيع، تذكير)؛ لا شيء إن لم يوجد
 function playClip(key, done) { if (LG === "ar" && VOICE_CLIPS[key]) playSrc(VOICE_CLIPS[key], done); else if (done) done(); }
 function say(text, done, force, seq) {
