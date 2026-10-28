@@ -4147,6 +4147,8 @@ const VOICE_CLIPS = /*VOICE*/;
 const VOICE_TEXT = { hi: "السلام عليكم. أنا معك، تفضل بسؤالك.", learn: MODE_HELLO.learn, tasmee: MODE_HELLO.tasmee, review: MODE_HELLO.review, tadabbur: MODE_HELLO.tadabbur, plan: MODE_HELLO.plan,
   surah: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها.", mulk: "سأستمع إليك من سورة الملك. ابدأ القراءة.",
   st_hello: "يا مرحباً ومسهلاً، حياك الله، سعدنا بسماع صوتك.",
+  st_thanks: "وإياك، بارك الله فيك. هل تريد شيئاً آخر؟", st_how: "الحمد لله بخير، وأسعد بصحبتك مع القرآن. كيف أعينك اليوم؟", st_bye: "في حفظ الله، وأعانك على وردك.",
+  nomut: "لا متشابه مسجلاً لهذه الآية.", rf1: REFLECT[0], rf2: REFLECT[1], rf3: REFLECT[2],
   pr_fajr: "حان الآن وقت صلاة الفجر", pr_dhuhr: "حان الآن وقت صلاة الظهر", pr_asr: "حان الآن وقت صلاة العصر", pr_maghrib: "حان الآن وقت صلاة المغرب", pr_isha: "حان الآن وقت صلاة العشاء", norec: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك." };
 const vkey = t => sayText(t).replace(/[^\u0621-\u064A]/g, "");
 const VOICE_BY = {}; for (const k in VOICE_TEXT) if (VOICE_CLIPS[k]) VOICE_BY[vkey(VOICE_TEXT[k])] = VOICE_CLIPS[k];
