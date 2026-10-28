@@ -4092,13 +4092,13 @@ function answer(q, forced) {
   const k = askRef(q) || AS.k;
   if (mode === "tasmee") {
     const s = (askRef(q) || "").split(":")[0]; const key = s ? `${s}:1` : AS.k || DATA.pages[ST.last || 3][0];
-    return { html: `سأستمع إليك من ${ref(key)}. اقرأ من حفظك، وبعد الانتهاء أعطيك تقريراً بالأخطاء ومواضعها، ثم نعيد معاً ما يحتاج مراجعة.`, say: `سأستمع إليك من ${ref(key)}. ابدأ القراءة.`, acts: [["ابدأ التسميع", `tasm:${key}`]] };
+    return { html: `سأستمع إليك من ${ref(key)}. اقرأ من حفظك، وبعد الانتهاء أعطيك تقريراً بالأخطاء ومواضعها، ثم نعيد معاً ما يحتاج مراجعة.`, say: `سأستمع إليك من ${ref(key)}. ابدأ القراءة.`, seq: ["f_tas", ...refKeys(key), "f_start"], acts: [["ابدأ التسميع", `tasm:${key}`]] };
   }
   if (mode === "review") {
     const p = weakestPage();
     if (!p) return { html: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك.", acts: [["سمّعني الآن", `tas:${ST.last || 3}`]] };
     const r = ST.pages[p] || {};
-    return { html: `اخترت لك الوجه ${AR(p)} (سورة ${pageSurah(p)})، لأنه ${r.errors ? `سُجّل فيه ${AR(r.errors)} مواضع ضعف` : "حان وقت مراجعته"}. سمّعه الآن من حفظك.`, acts: [[`راجعني في الوجه ${AR(p)}`, `tas:${p}`]] };
+    return { html: `اخترت لك الوجه ${AR(p)} (سورة ${pageSurah(p)})، لأنه ${r.errors ? `سُجّل فيه ${AR(r.errors)} مواضع ضعف` : "حان وقت مراجعته"}. سمّعه الآن من حفظك.`, seq: ["f_wajh", ...numKeys(p), "f_rev_end"], acts: [[`راجعني في الوجه ${AR(p)}`, `tas:${p}`]] };
   }
   if (mode === "plan") { const P = planText(); return { html: "خطتك اليوم: " + P.txt, acts: P.acts }; }
   if (mode === "profile") {
@@ -4108,12 +4108,12 @@ function answer(q, forced) {
       <div><span>سجل التسميع</span><b>${AR(P.sessions)} جلسة</b></div><div><span>مستوى الإتقان</span><b>${P.level}${P.acc != null ? ` (${AR(Math.round(P.acc * 100))}٪)` : ""}</b></div>
       <div><span>الاستمرارية</span><b>${AR(P.s.cur)} يوم، وأطولها ${AR(P.s.best)}</b></div><div><span>آخر نشاط</span><b>${P.last ? `الوجه ${AR(P.last.page)}، ${new Date(P.last.at).toLocaleDateString(LG === "ar" ? "ar-SA" : LG)}` : "لا يوجد"}</b></div></div>
       ${P.rep.length ? `<div class="small" style="margin-top:8px"><b>أخطاء متكررة:</b> ${P.rep.map(([k, c]) => `<span>${ref(k)} (${AR(c)})</span>`).join("، ")}</div>` : ""}
-      ${P.weakP.length ? `<div class="small"><b>تحتاج مراجعة:</b> ${P.weakP.slice(0, 5).map(p => `<span>${FM("الوجه {0}", p)}</span>`).join("، ")}</div>` : ""}`, say: `مستوى إتقانك ${P.level}، واستمرارك ${P.s.cur} يوم.`, acts: [["تقدمي", "go:progress"]] };
+      ${P.weakP.length ? `<div class="small"><b>تحتاج مراجعة:</b> ${P.weakP.slice(0, 5).map(p => `<span>${FM("الوجه {0}", p)}</span>`).join("، ")}</div>` : ""}`, say: `مستوى إتقانك ${P.level}، واستمرارك ${P.s.cur} يوم.`, seq: ["f_level", LVK[P.level], ...dayKeys(P.s.cur)], acts: [["تقدمي", "go:progress"]] };
   }
   if (mode === "tadabbur") {
-    const kk = askRef(q) || tadabburAyah(); AS.k = kk; const qn = REFLECT[Math.floor(Date.now() / 864e5) % REFLECT.length];
+    const kk = askRef(q) || tadabburAyah(); AS.k = kk; const qi = Math.floor(Date.now() / 864e5) % REFLECT.length, qn = REFLECT[qi];
     return { html: `${ayahBox(kk)}<div class="small" style="margin-top:8px"><b>المعنى:</b> ${TF(kk)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}<div class="aq">🤍 <b>سؤال للتدبر:</b> ${qn}</div>`,
-      say: `اخترت لك آية من ${ref(kk)}. اقرأ معناها، ثم تأمل: ${qn}`, acts: [["افتح الوجه", `read:${V(kk).p}`]] };
+      say: `اخترت لك آية من ${ref(kk)}. اقرأ معناها، ثم تأمل: ${qn}`, seq: ["f_tad", ...refKeys(kk, true), "f_tad2", `rf${qi + 1}`], acts: [["افتح الوجه", `read:${V(kk).p}`]] };
   }
   // تعلّم
   if (!k) return { html: "اذكر الآية التي تسأل عنها: مثلاً «ما معنى سورة الملك آية ٢»، أو اقرأ جزءاً من الآية وسأتعرف عليها.", say: "اذكر اسم السورة ورقم الآية، أو اقرأ جزءاً منها." };
@@ -4152,17 +4152,30 @@ const VOICE_TEXT = { hi: "السلام عليكم. أنا معك، تفضل بس
   pr_fajr: "حان الآن وقت صلاة الفجر", pr_dhuhr: "حان الآن وقت صلاة الظهر", pr_asr: "حان الآن وقت صلاة العصر", pr_maghrib: "حان الآن وقت صلاة المغرب", pr_isha: "حان الآن وقت صلاة العشاء", norec: "لا يوجد لك سجل تسميع بعد. سمّع وجهاً واحداً على الأقل، وبعدها أختار لك ما تحتاج مراجعته من أخطائك." };
 const vkey = t => sayText(t).replace(/[^\u0621-\u064A]/g, "");
 const VOICE_BY = {}; for (const k in VOICE_TEXT) if (VOICE_CLIPS[k]) VOICE_BY[vkey(VOICE_TEXT[k])] = VOICE_CLIPS[k];
+// جمل متغيّرة تُركَّب من قطع بشرية: العبارة، ثم اسم السورة، ثم الرقم
+function numKeys(n) {
+  const h = Math.floor(n / 100), r = n % 100, u = r % 10, t = r - u, o = h ? [`h${h * 100}`] : [];
+  if (!r) return o;
+  if (r < 20) return o.concat(h ? (r < 10 ? `wn${r}` : `w${r}`) : `n${r}`);
+  return o.concat(u ? [h ? `wn${u}` : `n${u}`, `wt${t}`] : [h ? `wt${t}` : `t${t}`]);
+}
+const refKeys = (k, all) => { const [s, a] = k.split(":").map(Number); return [`s${s}`].concat(all || a > 1 ? ["f_aya", ...numKeys(a)] : []); };
+const LVK = { "متقن": "lv_mutqin", "جيد": "lv_jayyid", "يحتاج تثبيتاً": "lv_tathbeet", "لم يُحدَّد بعد": "lv_none" };
+const dayKeys = n => !n ? [] : ["f_streak"].concat(n === 1 ? ["f_day", "n1"] : n === 2 ? ["f_2days"] : [...numKeys(n), n <= 10 ? "f_days" : "f_dayA"]);
 let CLIP = null;
 function stopSay() { try { speechSynthesis.cancel(); } catch (e) {} if (CLIP) { const c = CLIP; CLIP = null; c.onended = c.onerror = null; c.pause(); } }
 function playSrc(src, done) { stopSay(); const c = CLIP = new Audio(src), end = () => { if (CLIP === c) { CLIP = null; if (done) done(); } };
   c.onended = end; c.onerror = end; c.play().catch(end); }
+function playSeq(keys, done) { if (LG !== "ar" || !keys || !keys.every(x => VOICE_CLIPS[x])) return false;
+  let i = 0; const next = () => { if (i < keys.length) playSrc(VOICE_CLIPS[keys[i++]], next); else if (done) done(); }; next(); return true; }
 // مقطع بشري باسمه (تشجيع، تذكير)؛ لا شيء إن لم يوجد
 function playClip(key, done) { if (LG === "ar" && VOICE_CLIPS[key]) playSrc(VOICE_CLIPS[key], done); else if (done) done(); }
-function say(text, done, force) {
+function say(text, done, force, seq) {
   if ((!AS.speak && !force) || !text) { if (done) done(); return; }
   stopSay();
   const src = LG === "ar" && VOICE_BY[vkey(ST.name ? String(text).replace(` يا ${ST.name}`, "") : text)];
   if (src) return playSrc(src, done);
+  if (seq && playSeq(seq, done)) return;
   // بالعربية لا صوت آلياً: ما ليس له تسجيل بشري يظهر نصاً فقط
   if (LG === "ar" || !window.speechSynthesis) { if (done) done(); return; }
   try { if (!VOICE) pickVoice();
@@ -4212,13 +4225,13 @@ function callReply(q) {
   const st = smallTalk(q), res = st || answer(q);
   asPush("me", esc(q)); asPush("bot", res.html, res.acts);
   const spoken = sayText(res.say || res.html); CALL.a = spoken; CALL.st = "speak"; callUI();
-  say(spoken, () => { if (st && st.end) endCall(); else callListen(); }, true);
+  say(spoken, () => { if (st && st.end) endCall(); else callListen(); }, true, res.seq);
 }
 function asPush(role, html, acts) { AS.msgs.push({ role, html, acts: acts || [] }); AS.msgs = AS.msgs.slice(-30); drawMsgs(); }
 function ask(q, forced) {
   if (q) asPush("me", esc(q));
   const r = answer(q || "", forced);
-  asPush("bot", r.html, r.acts); say(r.say || r.html);
+  asPush("bot", r.html, r.acts); say(r.say || r.html, null, false, r.seq);
 }
 function drawMsgs() {
   const box = $("#amsgs"); if (!box) return;
