@@ -1563,24 +1563,29 @@ function findUI() {
     return `<button class="fres" id="fRead"><span class="grow"><small>تعرّفتُ على الآية، اضغط للدخول</small><b>سورة ${DATA.surahs[v.s]}، الآية ${AR(v.a)}</b></span><span class="fgo">${ICON.chev.replace("<svg", '<svg width="18" height="18"')}</span></button>`; }
   if (FND.st === "idle") return "";
   const t = FND.st === "listen" ? (FND.heard ? `سمعتُ: «${esc(FND.heard.slice(-50))}»` : "أستمع إليك… اقرأ آية أو أكثر") : FND.st === "miss" ? "لم أتعرّف عليها، اقرأ آية كاملة مرة أخرى، أو اكتب كلمات منها" : FND.st === "denied" ? "لم يُسمح باستخدام الميكروفون، اسمح له من إعدادات المتصفح، أو اكتب كلمات من الآية" : FND.st === "nores" ? "لم أجد آية بهذه الكلمات، جرّب كلمات أكثر" : "التعرّف على الصوت غير متاح هنا، اكتب كلمات من الآية";
-  return `<div class="fmsg">${t}</div>${FND.st === "listen" ? "" : `<form class="ftyp" id="fTyp"><input id="fTxt" type="search" placeholder="اكتب ثلاث كلمات أو أكثر من الآية" aria-label="كلمات من الآية"><button class="btn primary">انتقل</button></form>`}`;
+  return `<div class="fmsg">${t}</div>${`<form class="ftyp" id="fTyp"><input id="fTxt" type="search" placeholder="اكتب ثلاث كلمات أو أكثر من الآية" aria-label="كلمات من الآية"><button class="btn primary">انتقل</button></form>`}`;
 }
 function drawFind() { const b = $("#findBox"); if (b) { b.innerHTML = findUI(); bindFind(); } const g = $("#findGo"); if (g) { g.classList.toggle("on", FND.st === "listen"); g.innerHTML = ICON.wave + (FND.st === "listen" ? "أستمع…" : "انتقل للآية"); } }
 function stopFind() { if (FND.sr) { try { FND.sr.stop(); } catch (e) {} FND.sr = null; } }
 function bindFind() {
   const g = $("#findGo"); if (g) g.onclick = () => FND.st === "listen" ? (stopFind(), FND.st = "idle", drawFind()) : startFind();
   const f = $("#fTyp"); if (f) f.onsubmit = e => { e.preventDefault(); const w = M.norm($("#fTxt").value); const r2 = w.length ? M.locate(w, locIdx(), DATA, ST.last || 1) : null;
-    if (r2) { FND.k = r2.k; FND.st = "found"; } else FND.st = "nores"; drawFind(); };
-  const r = $("#fRead"); if (r) r.onclick = () => { stopFind(); const k = FND.k; FND.st = "idle"; openReader(V(k).p, "mushaf"); };
+    if (r2) { stopFind(); return foundAyah(r2.k); } FND.st = "nores"; drawFind(); };
+  const r = $("#fRead"); if (r) r.onclick = () => openFound(FND.k);
 }
+// بعد التعرّف ينتقل مباشرة إلى وجه الآية ويُبرزها
+function openFound(k) { stopFind(); FND.st = "idle"; clearTimeout(FND.t); openReader(V(k).p, "mushaf");
+  setTimeout(() => { const els = document.querySelectorAll(`#lines [data-k="${k}"]`); els.forEach(x => x.classList.add("sel")); if (els[0]) els[0].scrollIntoView({ block: "center", behavior: "smooth" });
+    setTimeout(() => els.forEach(x => x.classList.remove("sel")), 2500); }, 350); }
+function foundAyah(k) { FND.k = k; FND.st = "found"; drawFind(); clearTimeout(FND.t); FND.t = setTimeout(() => { if (FND.st === "found" && FND.k === k && S.tab === "home" && !S.reader) openFound(k); }, 900); }
 function startFind() {
   if (!SR) { FND.st = "nosr"; return drawFind(); }
   stopFind(); FND.st = "listen"; FND.heard = ""; FND.k = null; drawFind(); locIdx();
   const sr = FND.sr = new SR(); sr.lang = "ar-SA"; sr.continuous = true; sr.interimResults = true;
   sr.onresult = e => { let t = ""; for (const r of e.results) t += r[0].transcript + " "; FND.heard = t.trim();
-    const w = M.norm(FND.heard); if (w.length >= 3) { const r = M.locate(w, locIdx(), DATA, ST.last || 1); if (r) { FND.k = r.k; FND.st = "found"; stopFind(); return drawFind(); } }
+    const w = M.norm(FND.heard); if (w.length >= 3) { const r = M.locate(w, locIdx(), DATA, ST.last || 1); if (r) { stopFind(); return foundAyah(r.k); } }
     if (w.length >= 25) { FND.st = "miss"; stopFind(); } drawFind(); };
-  let tries = 0;
+  let tries = 0; clearTimeout(FND.t); FND.t = setTimeout(() => { if (FND.st === "listen" && FND.sr === sr && !FND.heard) { FND.st = "miss"; stopFind(); drawFind(); } }, 8000);
   sr.onerror = e => { if (FND.st !== "listen") return; if (e.error === "no-speech" || e.error === "aborted") return;
     FND.st = e.error === "not-allowed" || e.error === "service-not-allowed" ? "denied" : "miss"; FND.sr = null; drawFind(); };
   sr.onend = () => { if (FND.st !== "listen" || FND.sr !== sr) return;
