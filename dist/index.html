@@ -2484,10 +2484,10 @@ function kashidaJustify(L, W) {
     const ws = [...ln.querySelectorAll(".a")]; if (ws.length < 2) continue;
     ln.classList.remove("short");
     if (ln.scrollWidth < wmax * (ln.classList.contains("ends") ? 0.7 : 0.72)) { ln.classList.add("short"); continue; }
-    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.92 / tw); if (n <= 0) continue;
+    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.6 / tw); if (n <= 0) continue;
     const C = ws.map(el => ({ el, t: el.dataset.o || el.textContent, sl: kashidaSlots(el.dataset.o || el.textContent), c: 0 }));
     const cand = C.filter(x => x.sl.length); if (!cand.length) continue;
-    const cap = 6;
+    const cap = 2;
     while (n > 0 && cand.some(x => x.c < cap * Math.min(2, x.sl.length))) {
       for (const x of cand) { if (n <= 0) break; if (x.c < cap * Math.min(2, x.sl.length)) { x.c++; n--; } }
     }
@@ -2635,7 +2635,8 @@ function turn(p, d, still) { const q = p + d; if (q < 1 || q > PAGES.length) ret
 function fitPage(root) {
   const pv = root || $("#rd"); if (!pv) return;
   const box = pv.querySelector(".rb"), L = pv.querySelector(".lines"); if (!box || !L) return;
-  const W = box.clientWidth, H = box.clientHeight; if (!W || !H) return;
+  const PX = Math.round(Math.min(14, Math.max(6, box.clientWidth * 0.022))); L.style.paddingInline = PX + "px";
+  const W = box.clientWidth - 2 * PX, H = box.clientHeight; if (!W || !H) return;
   const n = L.children.length, F0 = 20;
   L.querySelectorAll(".a[data-o]").forEach(el => { el.textContent = el.dataset.o; delete el.dataset.o; });
   pv.style.setProperty("--pf", F0 + "px");
