@@ -1308,6 +1308,15 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .rd .rf::before{content:"";position:absolute;top:50%;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--fr) 70%,transparent) 30%,transparent 46%,transparent 54%,color-mix(in srgb,var(--fr) 70%,transparent) 70%,transparent)}
 .rd .rf span,.rd[data-rt="light"] .rf span{position:relative;display:inline-grid;place-items:center;min-width:2.3em;height:2.3em;padding:0 .4em;border-radius:50%;border:1px solid var(--fr);background:var(--frs);color:var(--rink);font-size:.78rem;font-weight:600}
 
+/* صفحة المصحف على طراز تطبيقات المصحف (مثل ختمة): بلا إطار، النص بعرض الشاشة، وترويسة ورقم وجه هادئان */
+.rd{padding-inline:2px}
+.rd .frame{border:0;border-radius:0;box-shadow:none;padding:0}
+.rd .rh{border-bottom:0;margin:0;padding:6px 12px 0}
+.rd .rh::after,.rd .rf::before{display:none}
+.rd .rh span{font-size:.82rem}
+.rd .rf{padding:0 0 4px}
+.rd .rf span,.rd[data-rt="light"] .rf span{border:0;background:none;min-width:0;height:auto;padding:0;border-radius:0;font-size:.85rem;color:var(--rmut)}
+
 /* حركة وتفاعل: دخول متتابع للعناصر عند التنقل، وضغطة ناعمة، وانتقالات سلسة */
 @media (prefers-reduced-motion:no-preference){
   body.enter #view > *{animation:vin .5s cubic-bezier(.2,.8,.2,1) both}
@@ -2297,7 +2306,7 @@ function turn(p, d, still) { const q = p + d; if (q < 1 || q > PAGES.length) ret
 function fitPage(root) {
   const pv = root || $("#rd"); if (!pv) return;
   const box = pv.querySelector(".rb"), L = pv.querySelector(".lines"); if (!box || !L) return;
-  const PX = Math.round(Math.min(14, Math.max(6, box.clientWidth * 0.022))); L.style.paddingInline = PX + "px";
+  const PX = Math.round(Math.min(12, Math.max(8, box.clientWidth * 0.024))); L.style.paddingInline = PX + "px";
   const W = box.clientWidth - 2 * PX, H = box.clientHeight; if (!W || !H) return;
   const n = L.children.length, F0 = 20;
   L.querySelectorAll(".a[data-o]").forEach(el => { el.textContent = el.dataset.o; delete el.dataset.o; });
