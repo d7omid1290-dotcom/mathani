@@ -1379,6 +1379,19 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .asgo b{display:block;font-size:1.05rem}.asgo small{opacity:.8;font-size:.78rem}
 .asgo .asi{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.14)}
 .asgo .asi svg{width:22px;height:22px}
+
+/* صفحة المصحف بطراز مصحف المدينة في الجوال: ورق كريمي بلا إطار، ترويسة خضراء، علامات آيات دائرية خضراء */
+.rd[data-rt="sepia"]{--rpaper:#FDF6EA;--qg:#3E7D2E;--qgs:#DCEBCF;--qgb:#9CC48A}
+.rd[data-rt="light"]{--qg:#2F7A4F;--qgs:#DDEEE3;--qgb:#9BC7AC}
+.rd[data-rt="night"]{--qg:#8CC08A;--qgs:#1F3324;--qgb:#3F6B45}
+.rd .frame{border:0!important;box-shadow:none!important;border-radius:0;padding:0 4px}
+.rd .rh{border:0;margin:0;padding:10px 6px 14px}
+.rd .rh::after,.rd .rf::before{content:none!important}
+.rd .rh span,.rd .rh span:first-child{font-family:var(--naskh);font-size:1.05rem;font-weight:500;color:var(--qg)}
+.rd .rf{text-align:left;padding:10px 8px 12px;direction:ltr}
+.rd .rf span,.rd[data-rt="light"] .rf span{display:inline;min-width:0;height:auto;padding:0;border:0;border-radius:0;background:none;color:var(--qg);font-size:1rem;font-weight:500}
+.rd .ln .end,.rd .ln .end.m{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin:0 .2em;padding-top:.12em;font-family:var(--naskh);font-size:.4em;min-width:2.1em;height:2.1em;padding:0;border-radius:50%;border:1px solid var(--qgb);background:var(--qgs);color:var(--rink);box-shadow:none;font-weight:600;line-height:1}
+.rd .text .a.m + .end,.rd .ln .end.m{background:var(--gold-soft);border-color:var(--gold-2)}
 </style>
 </head>
 <body>
@@ -2115,7 +2128,7 @@ function layoutHTML(p, hide) {
       for (let i = i0; i <= i1 && i < T.length; i++) { words++;
         const w = UW[i] ?? T[i];
         if (w) row += `<span class="a${m}${hide ? " w" : ""}" data-k="${k}" data-i="${i}">${esc(w).replace(/ (?=[\u06D6-\u06DC])/g, "")}</span>`;
-        if (i === T.length - 1) row += `<span class="end${m}${ST.notes && ST.notes[k] ? " nt" : ""}" data-k="${k}">\u06DD${AR(V(k).a)}</span>`; }
+        if (i === T.length - 1) row += `<span class="end${m}${ST.notes && ST.notes[k] ? " nt" : ""}" data-k="${k}">${AR(V(k).a)}</span>`; }
     }
     // السطر الأخير من السورة وحده يجوز أن يقصر عن العرض، كما في المصحف المطبوع
     const [lk, , li1] = l[1].at(-1), [ls, la] = lk.split(":").map(Number);
@@ -2297,7 +2310,7 @@ function pageReader(p, dir) {
   if (document.fonts && !document.fonts.check('20px "DigitalKhatt Madina"', "بسم")) document.fonts.load('20px "DigitalKhatt Madina"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
 }
 function frameInner(p, main) {
-  return `<div class="rh"><span>سورة ${pageSurah(p)}</span><span>الجزء ${JUZ_NAMES[juzOf(p)]}</span></div>
+  return `<div class="rh"><span>الجزء ${AR(juzOf(p))}</span><span>${pageSurah(p)}</span></div>
         <div class="rb"${main ? ' id="rb"' : ""} style="overflow:hidden"><div${main ? ' id="ptext"' : ""} style="display:flex;flex-direction:column;flex:1;min-height:0">${main ? layoutHTML(p, S.hide) : layoutHTML(p, S.hide).replace(' id="lines"', "")}</div></div>
         <div class="rf"><span>${AR(p)}</span></div>`;
 }
