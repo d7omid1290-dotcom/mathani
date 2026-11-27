@@ -3946,8 +3946,8 @@ const WD = (() => {
     if (x === "r") w.rPos = (w.rPos || 0) + d.plan.r.length;
     if (complete(d) && !d.counted) { d.counted = true; if (w.catchup && w.catchup.left > 0) w.catchup.left--; }
     save();
-    if (!silent && complete(d)) setTimeout(() => openSheet(`<div class="empty" style="padding:8px 0">${garden1(true)}<h3 style="margin:10px 0 4px">${"أحسنت! أتممت وردك اليومي بنجاح 🌱"}</h3><p class="small muted" style="margin:0">${"أضفت نبتة جديدة إلى بستانك."}</p></div>
-      <button class="btn primary block" style="margin-top:14px" id="toGarden">${"افتح البستان"}</button>`), 300);
+    if (!silent && complete(d)) setTimeout(() => (playClip("wird_done"), openSheet(`<div class="empty" style="padding:8px 0">${garden1(true)}<h3 style="margin:10px 0 4px">${"أحسنت! أتممت وردك اليومي بنجاح 🌱"}</h3><p class="small muted" style="margin:0">${"أضفت نبتة جديدة إلى بستانك."}</p></div>
+      <button class="btn primary block" style="margin-top:14px" id="toGarden">${"افتح البستان"}</button>`)), 300);
     setTimeout(() => { const b = $("#toGarden"); if (b) b.onclick = () => { closeSheet(); go("garden"); }; }, 400);
   }
   // من التسميع: آيات الحفظ التي سُمّعت صحيحة، ووجه المراجعة إذا كانت الدقة عالية
@@ -4419,18 +4419,18 @@ function profileData() {
   return { w, s, acc, level, rep, weakP, due, last, mem: w ? (w.mem || []).length : Object.keys(ST.pages).length, ayat: w ? w.hAyat || 0 : 0, sessions: sess.length };
 }
 function planText() {
-  const P = profileData(), parts = [], acts = [];
+  const P = profileData(), parts = [], acts = []; let rest = false;
   const lastMis = (ST.mistakes || []).slice(-1)[0];
   if (lastMis) { const p = V(lastMis.k).p; parts.push(`راجع الموضع الذي أخطأت فيه مؤخراً: ${ref(lastMis.k)} (الوجه ${AR(p)}).`); acts.push([`سمّع الوجه ${AR(p)}`, `tas:${p}`]); }
   else if (P.weakP.length) { parts.push(`راجع الوجه ${AR(P.weakP[0])}، فهو أكثر أوجهك أخطاءً.`); acts.push([`سمّع الوجه ${AR(P.weakP[0])}`, `tas:${P.weakP[0]}`]); }
   if (P.w) { const d = WD.day(WD.today());
     if (d && !WD.complete(d)) { const left = WD.tasks(d).filter(x => !d.done[x]).map(x => TASKN[x][0]); parts.push(`ثم أكمل وردك اليومي: ${left.join("، ")}.`); acts.push(["افتح وردي", "go:wird"]); }
-    else if (d) parts.push("وردك اليوم مكتمل، بارك الله فيك 🌱."); else parts.push("اليوم يوم راحة في وردك؛ يكفيك مراجعة خفيفة."); }
+    else if (d) parts.push("وردك اليوم مكتمل، بارك الله فيك 🌱."); else { parts.push("اليوم يوم راحة في وردك؛ يكفيك مراجعة خفيفة."); rest = true; } }
   else { parts.push((parts.length ? "ثم " : "") + "حدّد وردك اليومي ليُبنى لك جدول حفظ وتلاوة ومراجعة."); acts.push(["حدّد وردي", "go:wirdSetup"]); }
   if (P.due.length > 1) parts.push(`لديك ${AR(P.due.length)} أوجه حان وقت مراجعتها.`);
   try { const n = nextPrayer(); parts.push(`صلاة ${n.n} ${leftTxt(n.at - Date.now())}؛ اجعل جزءاً من مراجعتك بعدها.`); } catch (e) {}
   if (P.s.cur >= 2) parts.push(`استمرارك ${AR(P.s.cur)} أيام متتالية، حافظ عليه.`);
-  return { txt: parts.join(" "), acts };
+  return { txt: parts.join(" "), acts, rest };
 }
 function weakestPage() {
   const P = profileData(), score = {};
@@ -4469,7 +4469,7 @@ function answer(q, forced) {
     const r = ST.pages[p] || {};
     return { html: `اخترت لك الوجه ${AR(p)} (سورة ${pageSurah(p)})، لأنه ${r.errors ? `سُجّل فيه ${AR(r.errors)} مواضع ضعف` : "حان وقت مراجعته"}. سمّعه الآن من حفظك.`, voice: "review", acts: [[`راجعني في الوجه ${AR(p)}`, `tas:${p}`]] };
   }
-  if (mode === "plan") { const P = planText(); return { html: "خطتك اليوم: " + P.txt, voice: "plan", acts: P.acts }; }
+  if (mode === "plan") { const P = planText(); return { html: "خطتك اليوم: " + P.txt, voice: P.rest ? "rest_day" : "plan", acts: P.acts }; }
   if (mode === "profile") {
     const P = profileData();
     return { html: `<b>ملفك القرآني</b><div class="aprof">
@@ -4477,7 +4477,7 @@ function answer(q, forced) {
       <div><span>سجل التسميع</span><b>${AR(P.sessions)} جلسة</b></div><div><span>مستوى الإتقان</span><b>${P.level}${P.acc != null ? ` (${AR(Math.round(P.acc * 100))}٪)` : ""}</b></div>
       <div><span>الاستمرارية</span><b>${AR(P.s.cur)} يوم، وأطولها ${AR(P.s.best)}</b></div><div><span>آخر نشاط</span><b>${P.last ? `الوجه ${AR(P.last.page)}، ${new Date(P.last.at).toLocaleDateString(LG === "ar" ? "ar-SA" : LG)}` : "لا يوجد"}</b></div></div>
       ${P.rep.length ? `<div class="small" style="margin-top:8px"><b>أخطاء متكررة:</b> ${P.rep.map(([k, c]) => `<span>${ref(k)} (${AR(c)})</span>`).join("، ")}</div>` : ""}
-      ${P.weakP.length ? `<div class="small"><b>تحتاج مراجعة:</b> ${P.weakP.slice(0, 5).map(p => `<span>${FM("الوجه {0}", p)}</span>`).join("، ")}</div>` : ""}`, say: `مستوى إتقانك ${P.level}، واستمرارك ${P.s.cur} يوم.`, acts: [["تقدمي", "go:progress"]] };
+      ${P.weakP.length ? `<div class="small"><b>تحتاج مراجعة:</b> ${P.weakP.slice(0, 5).map(p => `<span>${FM("الوجه {0}", p)}</span>`).join("، ")}</div>` : ""}`, say: `مستوى إتقانك ${P.level}، واستمرارك ${P.s.cur} يوم.`, voice: "g_prof", acts: [["تقدمي", "go:progress"]] };
   }
   if (mode === "tadabbur") {
     const kk = askRef(q) || tadabburAyah(); AS.k = kk; const qi = Math.floor(Date.now() / 864e5) % REFLECT.length, qn = REFLECT[qi];
@@ -4490,15 +4490,15 @@ function answer(q, forced) {
   if (has("متشابه", "المتشابهات")) {
     const m = DATA.mutashabihat[k] || [];
     return { html: `${ayahBox(k)}${m.length ? `<div class="small"><b>متشابهاتها:</b> ${m.slice(0, 6).map(x => `<button class="chip" data-mut="${k}">${ref(x.k)}</button>`).join(" ")}</div>` : `<div class="small">لا متشابه مسجّلاً لهذه الآية في فهرس المتشابهات.</div>`}${srcTag("فهرس المتشابهات في مثاني (حساب نصي آلي)")}`,
-      say: m.length ? `لهذه الآية ${m.length} من المتشابهات، أولها ${ref(m[0].k)}.` : "لا متشابه مسجلاً لهذه الآية.", acts: m.length ? [["قارن بينها", `mut:${k}`]] : [] };
+      say: m.length ? `لهذه الآية ${m.length} من المتشابهات، أولها ${ref(m[0].k)}.` : "لا متشابه مسجلاً لهذه الآية.", voice: m.length ? "g_mut" : "nomut", acts: m.length ? [["قارن بينها", `mut:${k}`]] : [] };
   }
   if (has("كلمة", "كلمه")) {
     const qw = M.norm(q).filter(w => !STOPQ.has(w)), g = (v.gh || []).find(x => qw.some(w => M.wordEq(M.norm(x.w).join(""), w) || M.norm(x.w).join("").includes(w))) || (v.gh || [])[0];
     if (g) return { html: `${ayahBox(k)}<div class="small"><b>${esc(g.w)}:</b> ${esc(g.m)}</div>${srcTag("السراج في بيان غريب القرآن")}`, say: `${M.norm(g.w).join("")}: ${g.m}` };
-    return { html: `${ayahBox(k)}<div class="small">لا توجد كلمة غريبة مشروحة لهذه الآية في السراج. هذا معنى الآية:</div><div class="small">${TF(k)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}`, say: v.tf };
+    return { html: `${ayahBox(k)}<div class="small">لا توجد كلمة غريبة مشروحة لهذه الآية في السراج. هذا معنى الآية:</div><div class="small">${TF(k)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}`, say: v.tf, voice: "g_mean" };
   }
   if (has("سؤال")) { const qn = REFLECT[v.a % REFLECT.length]; return { html: `${ayahBox(k)}<div class="aq">🤍 <b>سؤال للتدبر:</b> ${qn}</div>`, say: qn }; }
-  return { html: `${ayahBox(k)}<div class="small" style="line-height:1.9"><b>المعنى:</b> ${TF(k)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}`, say: v.tf, acts: [["افتح الوجه", `read:${v.p}`], ["متشابهاتها", `ask:ما المتشابهات في ${ref(k)}`]] };
+  return { html: `${ayahBox(k)}<div class="small" style="line-height:1.9"><b>المعنى:</b> ${TF(k)}</div>${srcTag("التفسير الميسر، مجمع الملك فهد")}`, say: v.tf, voice: "g_mean", acts: [["افتح الوجه", `read:${v.p}`], ["متشابهاتها", `ask:ما المتشابهات في ${ref(k)}`]] };
 }
 const MODE_HELLO = {
   learn: "اسألني عن معنى آية أو كلمة أو متشابهاتها. مثال: «ما معنى سورة الملك آية ٢».",
@@ -4569,7 +4569,7 @@ function callUI() {
 }
 function startCall() {
   if (!SR) { asPush("bot", "المكالمة الصوتية تحتاج متصفح Google Chrome أو Safari."); return; }
-  stopAsk(); CALL.on = true; CALL.q = ""; CALL.a = ""; const hi = `السلام عليكم${ST.name ? ` يا ${ST.name}` : ""}. أنا معك، تفضل بسؤالك.`;
+  stopAsk(); CALL.on = true; CALL.q = ""; CALL.a = ""; CALL.miss = 0; const hi = `السلام عليكم${ST.name ? ` يا ${ST.name}` : ""}. أنا معك، تفضل بسؤالك.`;
   CALL.st = "speak"; CALL.a = hi; callUI(); say(hi, callListen, true);
 }
 function endCall() { CALL.on = false; stopSay(); if (CALL.rec) { const r = CALL.rec; CALL.rec = null; try { r.abort(); } catch (e) {} } callUI(); }
@@ -4578,8 +4578,8 @@ function callListen() {
   const r = new SR(); r.lang = "ar-SA"; r.interimResults = true; r.continuous = false; CALL.rec = r; CALL.st = "listen"; CALL.q = ""; callUI();
   let fin = "", got = false;
   r.onresult = e => { let t = ""; for (let i = 0; i < e.results.length; i++) { t += e.results[i][0].transcript; if (e.results[i].isFinal) fin = t; } CALL.q = t; const q = $(".acq"); if (q) q.textContent = `«${t}»`; else callUI(); };
-  r.onend = () => { if (CALL.rec !== r) return; CALL.rec = null; const v = (fin || CALL.q).trim(); if (!CALL.on) return; if (!v) { setTimeout(callListen, 250); return; } got = true; callReply(v); };
-  r.onerror = e => { if (CALL.rec !== r) return; CALL.rec = null; if (e.error === "not-allowed" || e.error === "service-not-allowed") { CALL.st = "idle"; CALL.a = tr("اسمح للتطبيق باستخدام الميكروفون ثم أعد الاتصال."); callUI(); return; } if (CALL.on) setTimeout(callListen, 400); };
+  r.onend = () => { if (CALL.rec !== r) return; CALL.rec = null; const v = (fin || CALL.q).trim(); if (!CALL.on) return; if (!v) { CALL.miss = (CALL.miss || 0) + 1; if (CALL.miss === 2 && VOICE_CLIPS.not_heard && LG === "ar") { CALL.st = "speak"; callUI(); playClip("not_heard", callListen); } else setTimeout(callListen, 250); return; } CALL.miss = 0; got = true; callReply(v); };
+  r.onerror = e => { if (CALL.rec !== r) return; CALL.rec = null; if (e.error === "not-allowed" || e.error === "service-not-allowed") { CALL.st = "idle"; CALL.a = tr("اسمح للتطبيق باستخدام الميكروفون ثم أعد الاتصال."); callUI(); playClip("mic_denied"); return; } if (CALL.on) setTimeout(callListen, 400); };
   try { r.start(); } catch (e) { setTimeout(callListen, 500); }
 }
 function callReply(q) {
@@ -4606,6 +4606,7 @@ function drawMsgs() {
 }
 const ASUGG = ["وش أسوي اليوم؟", "سمّع لي سورة الملك", "راجعني", "ما معنى سورة الملك آية ٢", "ما المتشابهات في سورة البقرة آية ٢", "ملفي"];
 function assistant() {
+  if (!AS.msgs.length && AS.speak) setTimeout(() => { if ($("#amsgs")) playClip("welcome"); }, 350);
   if (!AS.msgs.length) asPush("bot", `السلام عليكم${ST.name ? ` يا ${esc(ST.name)}` : ""}، أنا رفيقك في رحلتك مع القرآن: أشرح لك من التفسير الميسر، وأسمّع لك، وأراجع معك أخطاءك، وأبني خطتك اليومية. اضغط الميكروفون وتحدث، أو اكتب سؤالك.`, [["وش أسوي اليوم؟", "ask:وش اسوي اليوم"], ["ملفي القرآني", "ask:ملفي"]]);
   $("#view").innerHTML = bar("المساعد القرآني", "رفيقك من الحفظ إلى الإتقان", true, `<button class="ibtn" id="aSpk" aria-label="الرد الصوتي">${AS.speak ? HICON.spk : HICON.mute}</button>`) + `
     <button class="acallbtn" id="aCall"><span class="aci">${HICON.phone}</span><b>مكالمة صوتية</b><span>تحدّث معه كأنك في مكالمة</span></button>
