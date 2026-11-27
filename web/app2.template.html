@@ -5,7 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A3D30">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="مثاني">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>مثاني</title>
+<script>
+/* سجل الاختبار: يلتقط الأخطاء من أول لحظة ليُرفق في «أبلغ عن مشكلة» */
+(function () {
+  var K = "mathani.testlog", L = [];
+  try { L = JSON.parse(localStorage.getItem(K) || "[]"); } catch (e) {}
+  function add(kind, msg) {
+    L.push({ t: new Date().toISOString(), k: kind, m: String(msg).slice(0, 600) }); if (L.length > 40) L = L.slice(-40);
+    try { localStorage.setItem(K, JSON.stringify(L)); } catch (e) {}
+    if (window.TESTUI) window.TESTUI.badge();
+  }
+  window.TLOG = { add: add, all: function () { return L; }, clear: function () { L = []; try { localStorage.removeItem(K); } catch (e) {} } };
+  window.addEventListener("error", function (e) {
+    if (e.message) add("خطأ", e.message + (e.filename ? " @" + String(e.filename).split("/").pop() + ":" + e.lineno + ":" + e.colno : ""));
+    else if (e.target && (e.target.src || e.target.href)) add("تحميل", "تعذّر تحميل " + (e.target.src || e.target.href));
+  }, true);
+  window.addEventListener("unhandledrejection", function (e) { var r = e.reason; add("وعد", r && (r.stack || r.message) || r); });
+  var ce = console.error; console.error = function () { try { add("console", Array.prototype.map.call(arguments, function (a) { return a && a.stack || (typeof a === "object" ? JSON.stringify(a) : a); }).join(" ")); } catch (e) {} return ce.apply(console, arguments); };
+})();
+</script>
 <style>
 :root{
   /* الهوية: كحلي وسماوي */
@@ -3316,6 +3341,7 @@ async function profile() {
       <div class="row"><span class="grow"><b>وقت التذكير</b></span><input type="time" id="nAt" value="${NOTIF().at}" style="width:auto"></div>
       <div class="row"><span class="grow"><b>تنبيه الأذان</b><div class="tiny muted">تختار الصلوات من شاشة الصلاة</div></span><button class="btn" id="nAdhan">الصلاة</button></div>
       <div class="tiny muted">تعمل التذكيرات ما دام التطبيق مفتوحاً.</div></div>
+    <div class="card row"><div class="grow"><b>صوت تنبيه الصلاة</b><div class="tiny muted">اسمع الصوت اللي يطلع لك عند دخول وقت الصلاة</div></div><button class="btn" id="tryAdhan">${ICON.listen || ""}جرّب</button></div>
     <div class="sec"><h2>تسجيلاتي</h2></div><div id="recs"><div class="info">جارٍ التحميل…</div></div>
     <div class="sec"><h2>مراجعة المحتوى</h2><span class="badge draft">للمتخصص الشرعي</span></div>
     <div class="card"><div class="small muted">موضوع الوجه والفوائد ومقاصد السورة مسوداتٌ تظهر بشارة «بانتظار المراجعة» حتى يعتمدها المتخصص بعد مطابقتها بالمختصر في التفسير.</div>
@@ -3326,7 +3352,7 @@ async function profile() {
     <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
   $("#langBtn").onclick = langSheet; document.querySelectorAll("[data-th]").forEach(b => b.onclick = () => setTheme(b.dataset.th));
   $("#name").onchange = e => { ST.name = e.target.value.trim(); save(); };
-  $("#openReview").onclick = reviewSheet;
+  $("#openReview").onclick = reviewSheet; $("#tryAdhan").onclick = () => { let nm = ""; try { nm = nextPrayer().n; } catch (e) {} playAdhan(nm); };
   if ($("#nPerm")) $("#nPerm").onclick = () => { try { Notification.requestPermission().then(profile); } catch (e) {} };
   document.querySelectorAll("[data-nt]").forEach(b => b.onclick = () => { const n = NOTIF(), k = b.dataset.nt; n[k] = !n[k]; save(); b.setAttribute("aria-checked", n[k]); if (n[k]) askNotify(); });
   $("#nAt").onchange = e => { if (e.target.value) { NOTIF().at = e.target.value; NOTIF().fired = ""; save(); } };
@@ -3986,12 +4012,12 @@ const adhanOn = () => !!(ADHAN_AUDIO && !ADHAN_AUDIO.paused && !ADHAN_AUDIO.ende
 function stopAdhan() { try { if (ADHAN_AUDIO) ADHAN_AUDIO.pause(); } catch (e) {} adhanUI(); }
 function adhanUI() { document.querySelectorAll("[data-adhan]").forEach(b => { b.textContent = tr(adhanOn() ? "إيقاف" : "استمع"); b.classList.toggle("primary", adhanOn()); }); }
 function playAdhan(nm) {
-  if (ADHAN_URL) { try { ADHAN_AUDIO = ADHAN_AUDIO || new Audio(ADHAN_URL); ADHAN_AUDIO.currentTime = 0; ADHAN_AUDIO.onplay = ADHAN_AUDIO.onpause = ADHAN_AUDIO.onended = adhanUI; ADHAN_AUDIO.play().catch(() => { chime(); announce(nm); }); return; } catch (e) {} }
-  chime(); announce(nm);
+  if (ADHAN_URL) { try { ADHAN_AUDIO = ADHAN_AUDIO || new Audio(ADHAN_URL); ADHAN_AUDIO.currentTime = 0; ADHAN_AUDIO.onplay = ADHAN_AUDIO.onpause = ADHAN_AUDIO.onended = adhanUI; ADHAN_AUDIO.play().catch(() => announce(nm)); return; } catch (e) {} }
+  announce(nm);
 }
 /* إعلان صوتي بعد النغمة: «حان الآن وقت صلاة …» بصوت الجهاز */
 function announce(nm) {
-  if (LG === "ar") { setTimeout(() => say(nm ? `حان الآن وقت صلاة ${nm}` : "", () => { if (nm === "العصر") setTimeout(() => playClip("adhkar"), 400); }, true), 1900); return; } // بالعربية بالصوت البشري إن وُجد، وإلا فالنغمة فقط
+  if (LG === "ar") { setTimeout(() => say(nm ? `حان الآن وقت صلاة ${nm}` : "", () => { if (nm === "العصر") setTimeout(() => playClip("adhkar"), 400); }, true), 200); return; } // بالعربية بالصوت البشري إن وُجد، وإلا فالنغمة فقط
   try { const S = window.speechSynthesis; if (!S || !window.SpeechSynthesisUtterance) return;
     const txt = nm ? `حان الآن وقت صلاة ${nm}` : "حان الآن وقت الصلاة";
     const lang = LG === "en" ? "en" : LG === "ur" ? "ur" : "ar", say = LG === "ar" ? txt : tr(txt);
@@ -4306,6 +4332,57 @@ function stopAsk() { if (AS.rec) { const r = AS.rec; AS.rec = null; try { r.stop
 
 applyTheme(); TR.start(); render(); setTimeout(() => { if (S.tab === "home") wirdMorning(); }, 900);
 LIVE.boot();
+
+/* ---------- النسخة التجريبية: زر «أبلغ عن مشكلة» والتثبيت وعامل الخدمة ---------- */
+const BUILD = "/*BUILD*/";
+const TESTUI = window.TESTUI = (() => {
+  const on = /[?&]test=1/.test(location.search) || /\/test\//.test(location.pathname);
+  const standalone = () => !!(navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let fab = null;
+  function badge() { if (!fab) return; const n = TLOG.all().filter(x => x.k !== "ملاحظة").length; fab.querySelector("i").textContent = n ? AR(n) : ""; fab.classList.toggle("has", !!n); }
+  function info() {
+    return [
+      "مثاني (نسخة تجريبية) " + BUILD,
+      "الشاشة: " + S.tab + (S.reader ? " / قارئ" : ""),
+      "الجهاز: " + navigator.userAgent,
+      "المقاس: " + innerWidth + "×" + innerHeight + " @" + devicePixelRatio,
+      "مثبّت كتطبيق: " + (standalone() ? "نعم" : "لا") + "، متصل: " + (navigator.onLine ? "نعم" : "لا"),
+      "التعرف على الكلام: " + (window.SpeechRecognition || window.webkitSpeechRecognition ? "متاح" : "غير متاح") + (typeof LAST_MIC_ERR !== "undefined" && LAST_MIC_ERR ? "، آخر خطأ ميكروفون: " + LAST_MIC_ERR : "")
+    ].join("\n");
+  }
+  function report() {
+    const errs = TLOG.all().slice(-15).reverse();
+    openSheet(`<h2 style="margin:0 0 6px">أبلغ عن مشكلة</h2>
+      <p class="small muted" style="margin:0 0 10px">اكتب وش صار، وأنا أرفق معلومات الجهاز والأخطاء تلقائياً.</p>
+      <textarea id="tDesc" rows="4" style="width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="مثال: ضغطت «سمّع» في صفحة ٣ والميكروفون ما اشتغل"></textarea>
+      <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" id="tShare">مشاركة</button><button class="btn ghost" id="tCopy">نسخ</button><button class="btn ghost" id="tWa">واتساب</button><button class="btn ghost" id="tClr">مسح السجل</button>
+      </div>
+      <div class="tiny muted" id="tMsg" style="margin-top:6px;min-height:1em"></div>
+      <details style="margin-top:8px"><summary class="small">التفاصيل المرفقة (${AR(errs.length)} خطأ)</summary>
+        <pre style="white-space:pre-wrap;unicode-bidi:plaintext;text-align:start;font-size:.72rem;max-height:40vh;overflow:auto">${esc(info())}\n\n${errs.map(e => esc(e.t.slice(11, 19) + " [" + e.k + "] " + e.m)).join("\n") || "لا أخطاء مسجّلة"}</pre></details>
+      ${!standalone() && ios ? `<p class="small" style="margin-top:10px">لتثبيته كتطبيق: اضغط زر المشاركة في Safari ثم «إضافة إلى الشاشة الرئيسية».</p>` : ""}`);
+    const text = () => { const d = $("#tDesc").value.trim(); return "بلاغ مثاني\n" + (d ? "الوصف: " + d + "\n" : "") + "\n" + info() + "\n\nالأخطاء:\n" + (errs.map(e => e.t.slice(5, 19).replace("T", " ") + " [" + e.k + "] " + e.m).join("\n") || "لا يوجد"); };
+    const msg = m => { $("#tMsg").textContent = m; };
+    $("#tShare").onclick = async () => { const s = text(); if (navigator.share) { try { await navigator.share({ title: "بلاغ مثاني", text: s }); msg("تمت المشاركة"); return; } catch (e) { if (e && e.name === "AbortError") return; } } copy(s); };
+    const copy = async s => { try { await navigator.clipboard.writeText(s); msg("نُسخ البلاغ، الصقه في المحادثة"); } catch (e) { const ta = $("#tDesc"); ta.value = s; ta.select(); msg("حدد النص وانسخه يدوياً"); } };
+    $("#tCopy").onclick = () => copy(text());
+    $("#tWa").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(text().slice(0, 3500)), "_blank");
+    $("#tClr").onclick = () => { TLOG.clear(); badge(); msg("مُسح السجل"); };
+  }
+  function boot() {
+    if ("serviceWorker" in navigator && location.protocol === "https:" && !/claude|usercontent/.test(location.hostname)) navigator.serviceWorker.register("sw.js").catch(e => TLOG.add("تثبيت", "sw: " + e.message));
+    if (!on) return;
+    const st = document.createElement("style");
+    st.textContent = ".tfab{position:fixed;inset-inline-start:12px;bottom:calc(108px + env(safe-area-inset-bottom,0px));z-index:60;width:44px;height:44px;border-radius:50%;border:0;background:#B4472F;color:#fff;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.25);display:grid;place-items:center;opacity:.85}.tfab i{position:absolute;top:-4px;inset-inline-end:-4px;min-width:18px;height:18px;border-radius:9px;background:#fff;color:#B4472F;font:700 11px/18px sans-serif;font-style:normal;display:none}.tfab.has i{display:block}body.immersive .tfab{opacity:.35}";
+    document.head.appendChild(st);
+    fab = document.createElement("button"); fab.className = "tfab"; fab.setAttribute("aria-label", "أبلغ عن مشكلة"); fab.innerHTML = "🐞<i></i>"; fab.onclick = report;
+    document.body.appendChild(fab); badge();
+  }
+  return { on, badge, report, boot, info };
+})();
+TESTUI.boot();
 </script>
 </body>
 </html>

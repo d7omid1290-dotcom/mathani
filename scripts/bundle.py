@@ -38,5 +38,16 @@ os.makedirs(f"{root}/dist/tafsir", exist_ok=True)
 for f in glob.glob(f"{root}/data/tafsir/*.json"): shutil.copy(f, f"{root}/dist/tafsir/")
 os.makedirs(f"{root}/dist/audio", exist_ok=True)
 for f in glob.glob(f"{root}/web/audio/*.mp3"): shutil.copy(f, f"{root}/dist/audio/")
+# رقم النسخة (التاريخ + آخر commit) يظهر في البلاغات ويجدد ذاكرة عامل الخدمة
+import subprocess, datetime
+try: rev = subprocess.run(["git", "-C", root, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+except Exception: rev = ""
+BUILD = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M") + (f"-{rev}" if rev else "")
+html = html.replace("/*BUILD*/", BUILD)
+# التثبيت على الجوال (PWA): البيان والأيقونات وعامل الخدمة
+os.makedirs(f"{root}/dist/icons", exist_ok=True)
+for f in glob.glob(f"{root}/web/pwa/icons/*.png"): shutil.copy(f, f"{root}/dist/icons/")
+shutil.copy(f"{root}/web/pwa/manifest.webmanifest", f"{root}/dist/")
+open(f"{root}/dist/sw.js", "w", encoding="utf-8").write(rd("web/pwa/sw.js").replace("/*BUILD*/", BUILD))
 open(f"{root}/dist/index.html", "w", encoding="utf-8").write(html)
 print("dist/index.html", round(len(html.encode()) / 1024), "KB | dorar:", len(dorar_files), "surahs")
