@@ -1395,6 +1395,8 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .rd .lines,.rd .ln .a,.rd .ln.bsm{font-family:"KFGQPC Hafs","DigitalKhatt Madina",serif}
 .rd .ln .end,.rd .ln .end.m{border:1.5px solid var(--qg);background:radial-gradient(circle,var(--rpaper) 52%,var(--qgs) 54%);box-shadow:0 0 0 1.5px var(--rpaper),0 0 0 2.5px var(--qgb);color:var(--qg);font-weight:700}
 .rd .text .a.m + .end,.rd .ln .end.m{border-color:var(--gold);background:radial-gradient(circle,var(--rpaper) 52%,var(--gold-soft) 54%);box-shadow:0 0 0 1.5px var(--rpaper),0 0 0 2.5px var(--gold-2);color:var(--gold)}
+.rd .ln{column-gap:.07em;line-height:1.38}.rd .lines.measure .ln{column-gap:.07em}
+.rd .lines{-webkit-text-stroke:.35px currentColor;paint-order:stroke fill}.rd[data-rt="sepia"] .lines{color:#1A1209}
 </style>
 </head>
 <body>
@@ -2171,7 +2173,7 @@ function kashidaJustify(L, W) {
     const ws = [...ln.querySelectorAll(".a")]; if (ws.length < 2) continue;
     ln.classList.remove("short");
     if (ln.scrollWidth < wmax * (ln.classList.contains("ends") ? 0.7 : 0.72)) { ln.classList.add("short"); continue; }
-    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.6 / tw); if (n <= 0) continue;
+    const slack = W - ln.scrollWidth; let n = Math.floor(slack * 0.35 / tw); if (n <= 0) continue;
     const C = ws.map(el => ({ el, t: el.dataset.o || el.textContent, sl: kashidaSlots(el.dataset.o || el.textContent), c: 0 }));
     const cand = C.filter(x => x.sl.length); if (!cand.length) continue;
     const cap = 2;
@@ -2332,7 +2334,7 @@ function fitPage(root) {
   const txt = [...L.children].filter(ln => !ln.classList.contains("hdr") && !ln.classList.contains("bsm"));
   const ws = txt.map(ln => ln.scrollWidth).sort((a, b) => b - a);
   // سطر واحد أعرض من البقية لا يُصغّر الوجه كله: يُضبط خط ذلك السطر وحده
-  let w0 = Math.max(1, ws[Math.floor(ws.length * 0.25)] || 1, (ws[0] || 1) * 0.88);
+  let w0 = Math.max(1, ws[Math.floor(ws.length * 0.25)] || 1, (ws[0] || 1) * 0.84);
   for (const ln of L.children) w0 = Math.max(w0, ln.classList.contains("hdr") || ln.classList.contains("bsm") ? ln.scrollWidth : 0);
   txt.forEach(ln => { const w = ln.scrollWidth; if (w > w0) ln.style.fontSize = (w0 / w).toFixed(4) + "em"; });
   L.classList.remove("measure");
