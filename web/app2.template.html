@@ -1392,6 +1392,9 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .rd .rf span,.rd[data-rt="light"] .rf span{display:inline;min-width:0;height:auto;padding:0;border:0;border-radius:0;background:none;color:var(--qg);font-size:1rem;font-weight:500}
 .rd .ln .end,.rd .ln .end.m{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin:0 .2em;padding-top:.12em;font-family:var(--naskh);font-size:.4em;min-width:2.1em;height:2.1em;padding:0;border-radius:50%;border:1px solid var(--qgb);background:var(--qgs);color:var(--rink);box-shadow:none;font-weight:600;line-height:1}
 .rd .text .a.m + .end,.rd .ln .end.m{background:var(--gold-soft);border-color:var(--gold-2)}
+.rd .lines,.rd .ln .a,.rd .ln.bsm{font-family:"KFGQPC Hafs","DigitalKhatt Madina",serif}
+.rd .ln .end,.rd .ln .end.m{border:1.5px solid var(--qg);background:radial-gradient(circle,var(--rpaper) 52%,var(--qgs) 54%);box-shadow:0 0 0 1.5px var(--rpaper),0 0 0 2.5px var(--qgb);color:var(--qg);font-weight:700}
+.rd .text .a.m + .end,.rd .ln .end.m{border-color:var(--gold);background:radial-gradient(circle,var(--rpaper) 52%,var(--gold-soft) 54%);box-shadow:0 0 0 1.5px var(--rpaper),0 0 0 2.5px var(--gold-2);color:var(--gold)}
 </style>
 </head>
 <body>
@@ -2335,7 +2338,7 @@ function fitPage(root) {
   L.classList.remove("measure");
   // سقف موحّد: لا يكبر خط وجهٍ قصير الأسطر عن بقية الأوجه، فيبقى الحجم ثابتاً عند التقليب
   const cen = L.classList.contains("c");  // الفاتحة وأول البقرة: أسطر قليلة في الوسط، فتكبر لتملأ الوجه
-  const byW = F0 * (W / Math.max(w0, (cen ? 8 : 15.5) * F0)) * (cen ? 0.96 : 0.99), byH = H / (n * (cen ? 2.4 : 1.62));
+  const byW = F0 * (W / Math.max(w0, (cen ? 8 : 12) * F0)) * (cen ? 0.96 : 0.99), byH = H / (n * (cen ? 2.4 : 1.62));
   let F = Math.max(13, Math.min(byW, byH, 40 * (ST.fs || 1)));
   pv.style.setProperty("--pf", F + "px");
   // تصحيح بالقياس الفعلي لارتفاع الأسطر (يختلف بحسب مقاييس الخط)
