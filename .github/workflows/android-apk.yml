@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [claude/project-thread-cvzz3l]
-    paths: ["web/**", "data/**", "scripts/bundle.py", "android/**", "package*.json", "capacitor.config.ts", ".github/workflows/android-apk.yml"]
+    paths: ["web/**", "data/**", "scripts/bundle.py", "android/**", "package*.json", "capacitor.config.json", ".github/workflows/android-apk.yml"]
 
 permissions:
   contents: write
