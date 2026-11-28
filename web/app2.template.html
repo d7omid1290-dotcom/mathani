@@ -75,6 +75,56 @@
   NSR.prototype.abort = function () { try { P().stop().catch(function () {}); } catch (e) {} this._finish(false); };
   window.SpeechRecognition = window.webkitSpeechRecognition = NSR;
 })();
+/* آيفون: التعرف المستمر (continuous) في Safari لا يُرجع نتائج غالباً، فنشغّله جلسات قصيرة متتالية ونقدّمها للتطبيق جلسةً مستمرة واحدة، ونسجّل ما يحدث في سجل الاختبار */
+(function () {
+  var Base = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (!Base || !IOS || (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform())) return;
+  var log = function (m) { if (window.TLOG) TLOG.add("ميكروفون", m); };
+  var fin = function (r) { var o = [{ transcript: r[0].transcript, confidence: r[0].confidence }]; o.isFinal = true; return o; };
+  var hintT = 0;
+  function hint() {
+    if (document.getElementById("srHint")) return;
+    var d = document.createElement("div"); d.id = "srHint";
+    d.style.cssText = "position:fixed;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:99;background:#0D1A2D;color:#fff;padding:12px 14px;border-radius:14px;font-size:.85rem;line-height:1.6;box-shadow:0 6px 20px rgba(0,0,0,.3)";
+    d.innerHTML = "ما وصلني كلام من الميكروفون. في الآيفون تأكد من: الإعدادات، ثم عام، ثم لوحة المفاتيح، ثم «تفعيل الإملاء»، وأن لوحة المفاتيح العربية مضافة. وجرّب أيضاً من Safari مباشرة بدل أيقونة الشاشة الرئيسية. <b style='float:left'>إغلاق</b>";
+    d.onclick = function () { d.remove(); }; document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, 15000);
+  }
+  function W() { this.lang = "ar-SA"; this.interimResults = false; this.continuous = false; this.maxAlternatives = 1; this._on = false; }
+  W.prototype.start = function () {
+    if (this._on) throw new Error("InvalidStateError: already started");
+    this._on = true; this._stopping = false; this._done = []; this._got = 0; this._spawns = 0; this._t0 = Date.now();
+    var s = this; clearTimeout(this._ht); this._ht = setTimeout(function () { if (s._on && !s._got) { log("لا نتائج بعد 8 ثوانٍ (جلسات: " + s._spawns + ")"); if (Date.now() - hintT > 60000) { hintT = Date.now(); hint(); } } }, 8000);
+    this._spawn(true);
+  };
+  W.prototype._spawn = function (first) {
+    var s = this, r = new Base(), cur = []; s._r = r; s._spawns++;
+    r.lang = s.lang; r.interimResults = s.interimResults; r.maxAlternatives = s.maxAlternatives; r.continuous = false;
+    if (first) r.onstart = function () { if (s.onstart) s.onstart({}); };
+    r.onresult = function (e) {
+      s._got++; cur = []; for (var i = 0; i < e.results.length; i++) cur.push(e.results[i]);
+      if (s.onresult) s.onresult({ results: s._done.concat(cur), resultIndex: s._done.length + (e.resultIndex || 0) });
+    };
+    r.onerror = function (e) {
+      if (e.error !== "no-speech" && e.error !== "aborted") log("خطأ: " + e.error + (e.message ? " " + e.message : ""));
+      if ((e.error === "no-speech" || e.error === "aborted") && s.continuous && !s._stopping) return;
+      if (s.onerror) s.onerror(e);
+    };
+    r.onend = function () {
+      if (s._r !== r) return;
+      var hadInterim = false;
+      for (var i = 0; i < cur.length; i++) { if (cur[i].isFinal) s._done.push(cur[i]); else { s._done.push(fin(cur[i])); hadInterim = true; } }
+      if (hadInterim && s.onresult) s.onresult({ results: s._done.slice(), resultIndex: s._done.length - 1 });
+      if (s._on && s.continuous && !s._stopping) { setTimeout(function () { if (s._on && s._r === r) { try { s._spawn(false); } catch (e) { log("إعادة التشغيل: " + e.message); s._end(); } } }, 120); return; }
+      s._end();
+    };
+    r.start();
+  };
+  W.prototype._end = function () { if (!this._on) return; this._on = false; clearTimeout(this._ht); var h = document.getElementById("srHint"); if (h && this._got) h.remove(); if (this.onend) this.onend({}); };
+  W.prototype.stop = function () { this._stopping = true; try { this._r && this._r.stop(); } catch (e) { this._end(); } };
+  W.prototype.abort = function () { this._stopping = true; try { this._r && this._r.abort(); } catch (e) {} this._end(); };
+  window.SpeechRecognition = window.webkitSpeechRecognition = W;
+})();
 </script>
 <style>
 :root{
