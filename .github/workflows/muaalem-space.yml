@@ -1,0 +1,38 @@
+name: نشر خادم فحص الحركات (Hugging Face)
+# يرفع مجلد server/muaalem إلى Space مجاني على Hugging Face.
+# يحتاج سراً واحداً في إعدادات المستودع: HF_TOKEN (رمز Hugging Face بصلاحية write). لا يُكتب الرمز في المستودع.
+on:
+  workflow_dispatch:
+    inputs:
+      space:
+        description: "اسم الـ Space"
+        default: "mathani-muaalem"
+        required: true
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "huggingface_hub>=0.24"
+      - name: رفع الخادم
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          SPACE: ${{ inputs.space }}
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          user = api.whoami()["name"]
+          repo = f"{user}/{os.environ['SPACE']}"
+          api.create_repo(repo, repo_type="space", space_sdk="docker", exist_ok=True)
+          api.upload_folder(repo_id=repo, repo_type="space", folder_path="server/muaalem",
+                            commit_message="تحديث خادم فحص الحركات من مستودع مثاني")
+          host = repo.replace("/", "-").replace("_", "-").lower()
+          print(f"::notice::الخادم: https://{host}.hf.space  (صفحة الـ Space: https://huggingface.co/spaces/{repo})")
+          PY

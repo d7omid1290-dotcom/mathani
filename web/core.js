@@ -123,7 +123,7 @@
       const a = perAyah[cur];
       const w = { op: o.op, word: display[o.e] };
       if (o.op === "sub") { w.heard = heard[o.h]; a.segment.push(heard[o.h]); a.errors++; }
-      else if (o.op === "ok") a.segment.push(heard[o.h]);
+      else if (o.op === "ok") { a.segment.push(heard[o.h]); if (heard[o.h] !== exp[o.e]) w.near = heard[o.h]; } // قُبلت بتسامح حرف: تُعلَّم للتحقق من نطقها
       else a.errors++;
       a.words.push(w);
     }

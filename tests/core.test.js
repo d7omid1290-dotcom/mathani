@@ -37,6 +37,15 @@ t("حرف العطف خطأ حفظ وليس تسامحاً صوتياً", () => 
   assert.strictEqual(M.wordEq("يومنون", "يؤمنون".replace("ؤ","و")), true);
 });
 
+t("كلمة قُبلت بتسامح حرف واحد تُعلَّم للتحقق من نطقها (لا تُحسب خطأ)", () => {
+  const w = M.norm(V("2:2")); const i = w.findIndex(x => x.length >= 5);
+  const orig = w[i]; w[i] = orig.slice(0, -1) + (orig.at(-1) === "ن" ? "م" : "ن");
+  const r = M.evaluate(["2:2"], w.join(" "), data).results[0];
+  assert.strictEqual(r.status, "ok");
+  const near = r.words.filter(x => x.near); assert.strictEqual(near.length, 1); assert.strictEqual(near[0].near, w[i]);
+  assert.ok(!M.evaluate(["2:2"], V("2:2"), data).results[0].words.some(x => x.near));
+});
+
 t("التوقف في منتصف الوجه: الآيات التالية 'لم تُسمَّع'", () => {
   const r = M.evaluate(["2:2", "2:3", "2:4"], V("2:2"), data);
   assert.deepStrictEqual(r.results.map(x => x.status), ["ok", "notReached", "notReached"]);

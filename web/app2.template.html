@@ -374,6 +374,13 @@ textarea{width:100%;min-height:150px;background:var(--surface-2);border:1px soli
 .w-sub{color:var(--err);box-shadow:inset 0 -2px 0 var(--err)}
 .w-note{font-family:var(--ui);font-size:.66rem;color:var(--err);vertical-align:super;margin-inline-start:2px}
 .w-ins{font-family:var(--ui);font-size:.72rem;color:var(--err);background:var(--err-soft);border-radius:5px;padding:0 5px}
+.w-near{box-shadow:inset 0 -2px 0 var(--gold-2);background:var(--gold-soft);border-radius:4px}
+.w-near-note{font-family:var(--ui);font-size:.66rem;color:var(--gold);vertical-align:super;margin-inline-start:2px}
+.w-har{color:var(--err);background:var(--err-soft);border-radius:5px;padding:0 3px}
+.harl{list-style:none;margin:8px 0 0;padding:0;font-size:.86rem}
+.harl li{padding:5px 0;border-top:1px dashed var(--line)}
+.harl .hph{display:block;font-size:.74rem;color:var(--muted)}
+.ainote{font-size:.86rem;line-height:1.7;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--gold-soft)}
 
 /* اختبار */
 .opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
@@ -1555,6 +1562,15 @@ const dsec = (sec, open) => sec ? `<details class="dsec" ${open ? "open" : ""}><
 /* عنوان خادم التعرف على التلاوة (اختياري): إن وُضع، يُرسل إليه التسجيل بدل نموذج Whisper داخل المتصفح */
 const ASR_ENDPOINT = "";
 const WHISPER_MODEL = "Xenova/whisper-base";
+/* خادم فحص الحركات والنطق بنموذج «المعلّم» (server/muaalem، يُنشر على Hugging Face). فارغ = الميزة مخفية */
+const MUAALEM_ENDPOINT = "";
+/* تنبيه رخصة «المعلّم» (QML 1.0): يُعرض قبل أول فحص، ويبقى ظاهراً مع النتيجة وفي المصادر */
+const MUAALEM_NOTICE = "هذا المعلّم القرآني نموذج ذكاء اصطناعي قد يخطئ؛ فهو للإعانة فقط ولا يُعتمد عليه، وليس بديلاً عن معلّمٍ مُتقِنٍ مُجاز؛ لأنّ القرآن لا يُؤخذ إلا بالمشافهة.";
+const muaalemURL = () => window.__MUAALEM || MUAALEM_ENDPOINT;
+const MUAALEM_NOTICE_TR = { // الرخصة تشترط التنبيه بكل لغة للواجهة، وبالعربية دائماً (الإنجليزية نص الرخصة الرسمي)
+  en: "This Quranic Teacher is an artificial-intelligence model that may make mistakes. It is intended for assistance only and must not be relied upon. It is not a replacement for a proficient, authorized teacher, because the Quran is only received through oral transmission (mushafahah).",
+  ur: "یہ قرآنی معلّم مصنوعی ذہانت کا ایک ماڈل ہے جو غلطی کر سکتا ہے؛ یہ صرف مدد کے لیے ہے اور اس پر انحصار نہیں کیا جانا چاہیے، اور یہ کسی ماہر اور مجاز استاد کا متبادل نہیں، کیونکہ قرآن صرف مشافہہ (استاد سے براہِ راست سن کر) ہی حاصل کیا جاتا ہے۔" };
+const muaalemNotice = (st = "") => `<div class="ainote" style="${st}"><div data-noi18n>${MUAALEM_NOTICE}</div>${MUAALEM_NOTICE_TR[LG] ? `<div data-noi18n dir="${LG === "en" ? "ltr" : "rtl"}" style="margin-top:6px">${MUAALEM_NOTICE_TR[LG]}</div>` : ""}</div>`;
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/transformers.min.js";
 
 const M = window.Mathani;
@@ -1744,7 +1760,7 @@ function findAyah() { S.T.mode = "live"; openTasmee(ST.last || 1); S.T.forceLoc 
 function openTasmee(p) {
   stopRec(true); resetT(); S.T.noLoc = false; S.T.forceLoc = false; S.T.page = +p; S.T.surah = null; S.T.from = null; S.T.to = null; S.tab = "tasmee"; S.reader = null; render(); scrollTo(0, 0);
 }
-function resetT() { F = null; if (S.T.url) { /* يبقى الرابط صالحاً للتسجيلات المحفوظة */ } Object.assign(S.T, { phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, recId: null }); }
+function resetT() { F = null; if (S.T.url) { /* يبقى الرابط صالحاً للتسجيلات المحفوظة */ } Object.assign(S.T, { phase: "ready", transcript: "", blob: null, url: null, dur: 0, result: null, hintLvl: 0, hintFor: null, err: "", prog: 0, recId: null, har: null }); }
 
 function render() {
   setTimeout(() => { highlight(); drawMP(); }, 0);
@@ -3254,14 +3270,15 @@ function tResult() {
   const done = res.results.filter(r => r.status !== "notReached");
   const okN = done.filter(r => r.status === "ok").length, trN = done.filter(r => r.status === "transition").length;
   const pct = Math.round(res.accuracy * 100);
-  const words = r => r.words.map(w => w.op === "ok" ? esc(w.word) : w.op === "del" ? `<span class="w-del">${esc(w.word)}</span>`
+  const words = r => r.words.map(w => w.op === "ok" ? (w.near ? `<span class="w-near">${esc(w.word)}</span><span class="w-near-note">تحقّق من نطقها، سُمعت: ${esc(w.near)}</span>` : esc(w.word)) : w.op === "del" ? `<span class="w-del">${esc(w.word)}</span>`
     : w.op === "sub" ? `<span class="w-sub">${esc(w.word)}</span><span class="w-note">قلتَ: ${esc(w.heard)}</span>` : `<span class="w-ins">+ ${esc(w.heard)}</span>`).join(" ");
   $("#view").innerHTML = bar("نتيجة التسميع", `الوجه ${AR(T.page)}: سورة ${pageSurah(T.page)}`, true) + `
     <div class="card score"><div class="ring" style="--p:${pct}"><b>${AR(pct)}٪</b></div>
       <div class="grow"><b style="font-size:1.05rem">${okN === done.length ? "تسميع متقن، بارك الله فيك" : `${AR(done.length - okN)} من ${AR(done.length)} تحتاج علاجاً`}</b>
         <div class="small muted">${trN ? `منها ${trN === 1 ? "انتقال واحد" : AR(trN) + " انتقالات"} إلى آية متشابهة` : "لا انتقال إلى متشابه"}${res.stoppedAt < res.results.length - 1 ? "، وتوقفتَ قبل نهاية المقطع" : ""}</div></div></div>
     ${T.url ? `<div class="player"><button class="play" id="playBtn" aria-label="تشغيل">${ICON.play}</button><div class="ptrack"><i id="pbar"></i></div><span class="tiny muted">تسجيلك</span></div><audio id="aud" src="${T.url}"></audio>` : ""}
-    <div class="sec"><h2>تفصيل الآيات</h2><span class="tiny muted">الأحمر: سقط أو أُبدل، الذهبي: متشابه</span></div>
+    ${T.blob && muaalemURL() ? `<div id="harBox">${harakatCard()}</div>` : ""}
+    <div class="sec"><h2>تفصيل الآيات</h2><span class="tiny muted">الأحمر: سقط أو أُبدل، الذهبي: متشابه أو نطق يحتاج تحقّقاً</span></div>
     ${res.results.map(r => r.status === "notReached" ? `<div class="res notReached"><div class="tag muted">${ref(r.k)}: لم تُسمَّع</div></div>` : `
       <div class="res ${r.status}"><div class="tag" style="color:${r.status === "ok" ? "var(--ok)" : r.status === "transition" ? "var(--gold)" : "var(--err)"}">
         ${ref(r.k)}: ${r.status === "ok" ? "صحيحة" : r.status === "transition" ? `انتقلتَ إلى صيغة ${ref(r.transition.k)}` : "فيها خطأ"}</div><div class="ayah">${words(r)}</div></div>
@@ -3270,10 +3287,71 @@ function tResult() {
     <p class="tiny muted" style="text-align:center;margin-top:12px">سُجّلت أخطاؤك، وسيعود هذا الوجه في ورد المراجعة بحسبها.</p>`;
   $("#back").onclick = () => { resetT(); tasmee(); };
   $("#again").onclick = () => { resetT(); tasmee(); };
+  bindHarakat();
   const aud = $("#aud"); if (aud) { const pb = $("#playBtn"); pb.onclick = () => aud.paused ? aud.play() : aud.pause();
     aud.onplay = () => pb.innerHTML = ICON.pause; aud.onpause = aud.onended = () => pb.innerHTML = ICON.play;
     aud.ontimeupdate = () => { const d = isFinite(aud.duration) && aud.duration ? aud.duration : T.dur / 1000; $("#pbar").style.width = Math.min(100, aud.currentTime / d * 100) + "%"; }; }
   bindAll();
+}
+/* ---------- فحص الحركات والنطق (نموذج «المعلّم») ---------- */
+function harKeys() {
+  const { res, keys } = S.T.result, done = res.results.filter(r => r.status !== "notReached").map(r => r.k);
+  return done.length ? done : keys;
+}
+function harIdx(k, i, w) { // فهرس الكلمة عند الخادم ← فهرسها في الرسم العثماني عندنا (يتطابقان إلا في آيات قليلة)
+  const U = UTH.verses[k] || [], sk = x => M.norm(x).join("");
+  if (!U.length || sk(U[i] || "") === sk(w)) return i;
+  for (const d of [1, -1, 2, -2]) if (U[i + d] && sk(U[i + d]) === sk(w)) return i + d;
+  return Math.min(i, U.length - 1);
+}
+const kalimat = n => n === 1 ? "كلمة واحدة" : n === 2 ? "كلمتان" : n % 100 >= 3 && n % 100 <= 10 ? AR(n) + " كلمات" : AR(n) + " كلمة";
+function harakatCard() {
+  const H = S.T.har || {};
+  const head = `<div class="sec"><h2>الحركات والنطق</h2><span class="tiny muted">نموذج «المعلّم»</span></div>`;
+  const notice = muaalemNotice();
+  if (H.state === "busy") return head + `<div class="card"><div class="prog"><i style="width:60%"></i></div><div class="small muted" style="margin-top:8px">يفحص المعلّم نطقك حرفاً حرفاً… قد يستغرق أول فحص دقيقة حتى يستيقظ الخادم.</div></div>`;
+  if (H.state !== "done") return head + `<div class="card"><div class="small">يستمع المعلّم إلى تسجيلك، ويكشف أخطاء الحركات والمدود والحروف في كل كلمة.</div>
+    ${H.err ? `<div class="alert" style="margin-top:8px">${H.err}</div>` : ""}
+    <button class="btn primary block" style="margin-top:10px" id="harGo">${ICON.check}${H.err ? "أعد المحاولة" : "افحص الحركات والنطق"}</button>${notice}</div>`;
+  const by = {};
+  for (const x of H.words) if (x.errors) { const k = x.s + ":" + x.a; (by[k] = by[k] || {})[harIdx(k, x.i, x.w)] = x; }
+  const ks = Object.keys(by);
+  if (!ks.length) return head + `<div class="res ok"><div class="tag" style="color:var(--ok)">فحص المعلّم ${kalimat(H.words.length)}، ولم يجد خطأً في الحركات والنطق</div></div>${notice}`;
+  const n = ks.reduce((a, k) => a + Object.keys(by[k]).length, 0);
+  return head + `<div class="small muted">فحص المعلّم ${kalimat(H.words.length)}، وفي ${n === 1 ? "كلمة واحدة" : n === 2 ? "كلمتين" : kalimat(n)} منها خطأ نطق</div>` + ks.map(k => {
+    const U = UTH.verses[k] || M.tokens(V(k).t), E = by[k];
+    return `<div class="res error"><div class="tag" style="color:var(--err)">${ref(k)}</div>
+      <div class="ayah">${U.map((w, i) => E[i] ? `<span class="w-har">${esc(w)}</span>` : esc(w)).join(" ")}</div>
+      <ul class="harl">${Object.keys(E).map(i => `<li><b class="ayah" style="font-size:1.1rem">${esc(U[i] || E[i].w)}</b>: ${E[i].errors.map(e => esc(e.msg)).join("، ")}
+        <span class="hph">بالرسم الصوتي: الصواب «${esc(E[i].ref)}»، والمسموع «${esc(E[i].heard || "لا شيء")}»</span></li>`).join("")}</ul></div>`;
+  }).join("") + notice;
+}
+function bindHarakat() {
+  const b = $("#harGo"); if (!b) return;
+  b.onclick = () => {
+    if (ST.muaalemOk) return runHarakat();
+    openSheet(`<h3>قبل الفحص</h3>${muaalemNotice("font-size:1rem")}
+      <div class="small muted" style="margin-top:10px">يُرسَل تسجيلك إلى خادم الفحص ليُحلَّل ثم لا يُحفظ هناك.</div>
+      <button class="btn primary block" style="margin-top:14px" id="harOk">فهمت، افحص تلاوتي</button>`);
+    $("#harOk").onclick = () => { ST.muaalemOk = true; save(); closeSheet(); runHarakat(); };
+  };
+}
+async function runHarakat() {
+  const T = S.T, draw = () => { const box = $("#harBox"); if (box) { box.innerHTML = harakatCard(); bindHarakat(); } };
+  T.har = { state: "busy" }; draw();
+  try {
+    const fd = new FormData(); fd.append("audio", T.blob, "recitation"); fd.append("keys", harKeys().join(","));
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 180000);
+    const r = await fetch(muaalemURL().replace(/\/$/, "") + "/check", { method: "POST", body: fd, signal: ctl.signal });
+    clearTimeout(tm);
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.detail || "server");
+    if (j.empty || !j.words || !j.words.length) { T.har = { err: "لم يسمع المعلّم تلاوة واضحة في التسجيل. سجّل بصوت أوضح وأقرب إلى الميكروفون." }; return draw(); }
+    T.har = { state: "done", words: j.words };
+  } catch (e) {
+    T.har = { err: typeof e.message === "string" && /[\u0600-\u06FF]/.test(e.message) ? e.message : "تعذّر الوصول إلى خادم الفحص. تأكد من الاتصال بالإنترنت ثم أعد المحاولة." };
+  }
+  draw();
 }
 function rangeSheet() {
   const T = S.T;
@@ -3442,7 +3520,7 @@ async function profile() {
     <div class="card"><div class="small muted">موضوع الوجه والفوائد ومقاصد السورة مسوداتٌ تظهر بشارة «بانتظار المراجعة» حتى يعتمدها المتخصص بعد مطابقتها بالمختصر في التفسير.</div>
       <div class="row" style="margin-top:12px"><div class="grow"><b>${AR(Object.values(ST.approved).filter(Boolean).length)}</b> <span class="small muted">من ${AR(Object.keys(CONTENT.pages).length)} وجهاً معتمد</span></div><button class="btn" id="openReview">افتح المراجعة</button></div></div>
     <div class="sec"><h2>الميكروفون</h2></div><div class="card row"><div class="grow small muted">إذا لم يعمل التسجيل، افحص السبب.</div><button class="btn" data-diag>افحص الميكروفون</button></div>
-    <details class="card small pfsrc"><summary><b>المصادر</b><span class="tiny muted">${AR(Object.keys(DATA.sources).length + 2)}</span></summary>${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">رسم صفحات المصحف: النص العثماني لمجمع الملك فهد لطباعة المصحف الشريف (Uthmanic Hafs)، بخط DigitalKhatt Madina</div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div>${Object.keys(VOICE_CLIPS).length ? `<div style="padding:4px 0">صوت المساعد: صوت «موفّق» من مكتبة أصوات ElevenLabs (<a href="https://elevenlabs.io" target="_blank" rel="noopener" data-noi18n>elevenlabs.io</a>)، ولا يقرأ أي آية.</div>` : ""}<div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></details>
+    <details class="card small pfsrc"><summary><b>المصادر</b><span class="tiny muted">${AR(Object.keys(DATA.sources).length + 2)}</span></summary>${Object.values(DATA.sources).map(s => `<div style="padding:4px 0">${esc(s)}</div>`).join("")}<div style="padding:4px 0">نص المصحف من مشروع تنزيل: <a href="https://tanzil.net" target="_blank" rel="noopener" data-noi18n>tanzil.net</a></div><div style="padding:4px 0">رسم صفحات المصحف: النص العثماني لمجمع الملك فهد لطباعة المصحف الشريف (Uthmanic Hafs)، بخط DigitalKhatt Madina</div><div style="padding:4px 0">الأوامر والنواهي: اقتباس حرفي من نص الآية، يُتحقق منه آلياً.</div><div style="padding:4px 0">التعرف على التلاوة المسجلة: نموذج Whisper داخل المتصفح.</div>${muaalemURL() ? `<div style="padding:4px 0">فحص الحركات والنطق: نموذج «المعلّم» (obadx/muaalem-model-v3_2) ومكتبتا quran-muaalem وquran-transcript، من ورقة «Automatic Pronunciation Error Detection and Correction of the Holy Quran's Learners Using Deep Learning».${muaalemNotice()}</div>` : ""}${Object.keys(VOICE_CLIPS).length ? `<div style="padding:4px 0">صوت المساعد: صوت «موفّق» من مكتبة أصوات ElevenLabs (<a href="https://elevenlabs.io" target="_blank" rel="noopener" data-noi18n>elevenlabs.io</a>)، ولا يقرأ أي آية.</div>` : ""}<div style="padding:4px 0">مقدمات السور، والمعنى الإجمالي، وأسباب النزول، والفوائد: موسوعة التفسير — مؤسسة الدرر السنية (dorar.net)، بإذن الجهة المنظمة.</div><div style="padding:4px 0">أسماء السور وتصنيفها: الموسوعة القرآنية (quranpedia.net).</div></details>
     <div class="sec"><h2>بياناتي</h2></div>
     <div class="card small muted">سجلّك وتسجيلاتك محفوظة على هذا الجهاز فقط.<div><button class="btn ghost" style="margin-top:10px;color:var(--err)" id="reset">احذف سجلّي وتسجيلاتي</button></div></div>`;
   $("#langBtn").onclick = langSheet; document.querySelectorAll("[data-th]").forEach(b => b.onclick = () => setTheme(b.dataset.th));
