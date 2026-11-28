@@ -1,0 +1,68 @@
+# يبني ملف APK تجريبياً لأندرويد (Capacitor) وينشره في إصدار «android-test» برابط تنزيل ثابت.
+# يعمل تلقائياً عند الدفع إلى فرع النسخة التجريبية، أو يدوياً من تبويب Actions.
+name: بناء APK أندرويد
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/project-thread-cvzz3l]
+    paths: ["web/**", "data/**", "scripts/bundle.py", "android/**", "package*.json", "capacitor.config.json", ".github/workflows/android-apk.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      # Android SDK مثبّت مسبقاً على ubuntu-latest (ANDROID_HOME)، وGradle ينزّل ما ينقصه
+      - name: البناء والاختبار
+        run: |
+          npm ci
+          python scripts/bundle.py
+          npm test
+
+      - name: مزامنة Capacitor وبناء APK
+        run: |
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../mathani-test.apk
+
+      - name: نشر الملف في إصدار android-test
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="نسخة تجريبية لأندرويد من الفرع ${GITHUB_REF_NAME} (commit ${GITHUB_SHA::7}). نزّل mathani-test.apk وثبّته (اسمح بالتثبيت من مصادر غير معروفة)."
+          if gh release view android-test >/dev/null 2>&1; then
+            gh release upload android-test mathani-test.apk --clobber
+            gh release edit android-test --notes "$NOTES"
+          else
+            gh release create android-test mathani-test.apk --prerelease --target "$GITHUB_SHA" --title "مثاني: نسخة أندرويد التجريبية" --notes "$NOTES"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mathani-test-apk
+          path: mathani-test.apk
