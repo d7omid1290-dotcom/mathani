@@ -3911,7 +3911,7 @@ function wirdMorning() {
 
 
 /* ---------- مواقيت الصلاة والأذان والقبلة: حساب فلكي على الجهاز، بلا خادم ---------- */
-const ADHAN_URL = "audio/adhan.mp3"; // أذان المسجد النبوي (انظر PERMISSIONS.md)؛ إن تعذّر تشغيله يُستخدم تنبيه صوتي هادئ مع إعلان
+const ADHAN_URL = ""; // بلا تسجيل أذان (بطلب صاحب المشروع): عند دخول الوقت إعلان هادئ «حان الآن وقت صلاة…» فقط
 const PT = (() => {
   const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
   const sin = d => Math.sin(rad(d)), cos = d => Math.cos(rad(d)), tan = d => Math.tan(rad(d));

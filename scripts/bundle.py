@@ -27,7 +27,7 @@ FONTS = "".join([face("Amiri Quran", "amiri-quran-arabic-400-normal.woff2", 400,
 html = html.replace("<style>", "<style>" + FONTS, 1)
 # صوت المساعد البشري: تسجيلات محفوظة الحقوق لصاحبها، لا تُحفظ في المستودع (انظر PERMISSIONS.md).
 # تُضمَّن فقط عند البناء الخاص: VOICE_DIR=<مجلد المقاطع> python3 scripts/bundle.py، وإلا فالرد بصوت الجهاز.
-vd = os.environ.get("VOICE_DIR")
+vd = os.environ.get("VOICE_DIR") or (f"{root}/web/voice-elevenlabs" if os.path.isdir(f"{root}/web/voice-elevenlabs") else None)  # صوت «موفق» من ElevenLabs يُضمَّن افتراضياً
 VOICE = {os.path.basename(f)[:-4]: "data:audio/mpeg;base64," + base64.b64encode(open(f, "rb").read()).decode() for f in sorted(glob.glob(f"{vd}/*.mp3"))} if vd else {}
 html = html.replace("/*VOICE*/", json.dumps(VOICE))
 html = html.replace("/*SFRAME*/", base64.b64encode(open(f"{root}/web/img/surah-frame.svg", "rb").read()).decode())
