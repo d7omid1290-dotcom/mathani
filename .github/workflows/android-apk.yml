@@ -35,8 +35,7 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - uses: android-actions/setup-android@v3
-
+      # Android SDK مثبّت مسبقاً على ubuntu-latest (ANDROID_HOME)، وGradle ينزّل ما ينقصه
       - name: البناء والاختبار
         run: |
           npm ci
