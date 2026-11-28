@@ -75,39 +75,40 @@
   NSR.prototype.abort = function () { try { P().stop().catch(function () {}); } catch (e) {} this._finish(false); };
   window.SpeechRecognition = window.webkitSpeechRecognition = NSR;
 })();
-/* آيفون: التعرف المستمر (continuous) في Safari لا يُرجع نتائج غالباً، فنشغّله جلسات قصيرة متتالية ونقدّمها للتطبيق جلسةً مستمرة واحدة، ونسجّل ما يحدث في سجل الاختبار */
+/* آيفون: Safari يوقف التعرف على الكلام بين حين وآخر، ولا يسمح بإعادة تشغيله إلا بلمسة. نقدّم للتطبيق جلسة مستمرة واحدة:
+   نحاول الوضع المتواصل، وإن توقف نعيد التشغيل تلقائياً، وإن رفض الآيفون نُظهر زر «تابع» ليلمسه الطالب، ونسجّل كل ذلك في سجل الاختبار */
 (function () {
   var Base = window.SpeechRecognition || window.webkitSpeechRecognition;
   var IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   if (!Base || !IOS || (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform())) return;
   var log = function (m) { if (window.TLOG) TLOG.add("ميكروفون", m); };
   var fin = function (r) { var o = [{ transcript: r[0].transcript, confidence: r[0].confidence }]; o.isFinal = true; return o; };
-  var hintT = 0;
-  function hint() {
-    if (document.getElementById("srHint")) return;
-    var d = document.createElement("div"); d.id = "srHint";
-    d.style.cssText = "position:fixed;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:99;background:#0D1A2D;color:#fff;padding:12px 14px;border-radius:14px;font-size:.85rem;line-height:1.6;box-shadow:0 6px 20px rgba(0,0,0,.3)";
-    d.innerHTML = "ما وصلني كلام من الميكروفون. في الآيفون تأكد من: الإعدادات، ثم عام، ثم لوحة المفاتيح، ثم «تفعيل الإملاء»، وأن لوحة المفاتيح العربية مضافة. وجرّب أيضاً من Safari مباشرة بدل أيقونة الشاشة الرئيسية. <b style='float:left'>إغلاق</b>";
-    d.onclick = function () { d.remove(); }; document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, 15000);
-  }
+  var box = function (html, onTap) {
+    var d = document.getElementById("srBox"); if (d) d.remove();
+    d = document.createElement("div"); d.id = "srBox";
+    d.style.cssText = "position:fixed;left:12px;right:12px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:99;background:#0B3D2C;color:#fff;padding:12px 14px;border-radius:16px;font-size:.88rem;line-height:1.6;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center";
+    d.innerHTML = html; document.body.appendChild(d);
+    d.onclick = function (e) { var b = e.target.closest("[data-a]"); if (!b) return; d.remove(); if (onTap) onTap(b.dataset.a); };
+    return d;
+  };
+  var unbox = function () { var d = document.getElementById("srBox"); if (d) d.remove(); };
   function W() { this.lang = "ar-SA"; this.interimResults = false; this.continuous = false; this.maxAlternatives = 1; this._on = false; }
   W.prototype.start = function () {
     if (this._on) throw new Error("InvalidStateError: already started");
-    this._on = true; this._stopping = false; this._done = []; this._got = 0; this._spawns = 0; this._t0 = Date.now();
-    var s = this; clearTimeout(this._ht); this._ht = setTimeout(function () { if (s._on && !s._got) { log("لا نتائج بعد 8 ثوانٍ (جلسات: " + s._spawns + ")"); if (Date.now() - hintT > 60000) { hintT = Date.now(); hint(); } } }, 8000);
+    this._on = true; this._stopping = false; this._done = []; this._got = 0; this._fails = 0; unbox();
     this._spawn(true);
   };
   W.prototype._spawn = function (first) {
-    var s = this, r = new Base(), cur = []; s._r = r; s._spawns++;
-    r.lang = s.lang; r.interimResults = s.interimResults; r.maxAlternatives = s.maxAlternatives; r.continuous = false;
+    var s = this, r = new Base(), cur = [], t0 = Date.now(), gotHere = 0; s._r = r;
+    r.lang = s.lang; r.interimResults = s.interimResults; r.maxAlternatives = s.maxAlternatives; r.continuous = s.continuous;
     if (first) r.onstart = function () { if (s.onstart) s.onstart({}); };
     r.onresult = function (e) {
-      s._got++; cur = []; for (var i = 0; i < e.results.length; i++) cur.push(e.results[i]);
+      s._got++; gotHere++; s._fails = 0; cur = []; for (var i = 0; i < e.results.length; i++) cur.push(e.results[i]);
       if (s.onresult) s.onresult({ results: s._done.concat(cur), resultIndex: s._done.length + (e.resultIndex || 0) });
     };
     r.onerror = function (e) {
-      if (e.error !== "no-speech" && e.error !== "aborted") log("خطأ: " + e.error + (e.message ? " " + e.message : ""));
-      if ((e.error === "no-speech" || e.error === "aborted") && s.continuous && !s._stopping) return;
+      log("خطأ: " + e.error + (e.message ? " " + e.message : "") + " بعد " + Math.round((Date.now() - t0) / 1000) + "ث");
+      if (s.continuous && !s._stopping && (e.error === "no-speech" || e.error === "aborted" || e.error === "audio-capture" || e.error === "network")) return;
       if (s.onerror) s.onerror(e);
     };
     r.onend = function () {
@@ -115,13 +116,22 @@
       var hadInterim = false;
       for (var i = 0; i < cur.length; i++) { if (cur[i].isFinal) s._done.push(cur[i]); else { s._done.push(fin(cur[i])); hadInterim = true; } }
       if (hadInterim && s.onresult) s.onresult({ results: s._done.slice(), resultIndex: s._done.length - 1 });
-      if (s._on && s.continuous && !s._stopping) { setTimeout(function () { if (s._on && s._r === r) { try { s._spawn(false); } catch (e) { log("إعادة التشغيل: " + e.message); s._end(); } } }, 120); return; }
-      s._end();
+      if (!s._on || !s.continuous || s._stopping) return s._end();
+      if (!gotHere) s._fails++;
+      log("توقف المايك بعد " + Math.round((Date.now() - t0) / 1000) + "ث (نتائج: " + gotHere + ")");
+      if (s._fails >= 3) return s._ask(true);
+      // إعادة تلقائية؛ إن رفضها الآيفون نطلب لمسة
+      setTimeout(function () { if (!s._on || s._r !== r) return; try { s._spawn(false); } catch (e) { log("رفض إعادة التشغيل: " + e.message); s._ask(false); } }, 150);
     };
-    r.start();
+    try { r.start(); } catch (e) { if (first) throw e; throw e; }
   };
-  W.prototype._end = function () { if (!this._on) return; this._on = false; clearTimeout(this._ht); var h = document.getElementById("srHint"); if (h && this._got) h.remove(); if (this.onend) this.onend({}); };
-  W.prototype.stop = function () { this._stopping = true; try { this._r && this._r.stop(); } catch (e) { this._end(); } };
+  W.prototype._ask = function (suggest) {
+    var s = this;
+    box("<span style='flex:1'>" + (suggest ? "المايك ما يلتقط صوتك في الآيفون. جرّب «تابع»، أو استخدم وضع «تسجيل صوتي» فهو أثبت." : "توقف المايك. المس «تابع» لنكمل من حيث وقفت.") + "</span><button data-a='go' style='border:0;border-radius:12px;padding:8px 14px;background:#fff;color:#0B3D2C;font:inherit;font-weight:700'>تابع</button><button data-a='x' style='border:0;background:none;color:#fff;opacity:.7;font:inherit'>إيقاف</button>",
+      function (a) { if (a === "go" && s._on) { s._fails = 0; try { s._spawn(false); } catch (e) { log("تابع: " + e.message); s._end(); } } else s._end(); });
+  };
+  W.prototype._end = function () { if (!this._on) return; this._on = false; unbox(); if (this.onend) this.onend({}); };
+  W.prototype.stop = function () { this._stopping = true; unbox(); try { this._r && this._r.stop(); } catch (e) { this._end(); } };
   W.prototype.abort = function () { this._stopping = true; try { this._r && this._r.abort(); } catch (e) {} this._end(); };
   window.SpeechRecognition = window.webkitSpeechRecognition = W;
 })();
@@ -1517,6 +1527,30 @@ body.lsmode{background:#0B1F19}body.lsmode #live,body.lsmode #tabs{display:none!
 .rd .text .a.m + .end,.rd .ln .end.m{border-color:var(--gold);background:radial-gradient(circle,var(--rpaper) 52%,var(--gold-soft) 54%);box-shadow:0 0 0 1.5px var(--rpaper),0 0 0 2.5px var(--gold-2);color:var(--gold)}
 .rd .ln{column-gap:.07em;line-height:1.38}.rd .lines.measure .ln{column-gap:.07em}
 .rd .lines{-webkit-text-stroke:.35px currentColor;paint-order:stroke fill}.rd[data-rt="sepia"] .lines{color:#1A1209}
+
+/* طراز مثاني للصفحة (28 نوفمبر): إطار أخضر مزدوج رفيع، ترويسة باسم السورة داخل خرطوشة، رقم الوجه في زخرفة، علامات آيات مزخرفة */
+.rd[data-rt="night"]{--rpaper:#0F1A15}
+.rd .frame{position:relative;border:1.5px solid var(--qgb)!important;border-radius:14px;box-shadow:inset 0 0 0 3px var(--rpaper),inset 0 0 0 4.5px color-mix(in srgb,var(--qg) 55%,transparent)!important;padding:2px 8px 0!important;margin:4px 2px}
+.rd .rh{display:flex;align-items:center;justify-content:space-between;padding:10px 6px 8px;margin:0 2px;border:0;position:relative}
+.rd .rh::after{content:""!important;position:absolute;left:10%;right:10%;bottom:2px;height:1px;background:linear-gradient(90deg,transparent,var(--qgb),transparent)}
+.rd .rh .rhs{font-family:var(--naskh);font-size:1rem;font-weight:700;color:var(--qg);padding:3px 16px;border-radius:999px;background:var(--qgs);border:1px solid var(--qgb)}
+.rd .rh .rhj{font-family:var(--naskh);font-size:.85rem;font-weight:500;color:var(--qg);opacity:.85}
+.rd .rf{display:flex!important;align-items:center;justify-content:center;gap:10px;text-align:center!important;direction:rtl!important;padding:6px 0 10px!important}
+.rd .rf::before,.rd .rf::after{content:""!important;display:block!important;position:static!important;flex:0 1 70px;height:1px;background:linear-gradient(90deg,transparent,var(--qgb),transparent)}
+.rd .rf span,.rd[data-rt="light"] .rf span{display:inline-grid!important;place-items:center;min-width:2.4em!important;height:2.4em!important;padding:0 .3em!important;border-radius:50%!important;border:1.5px solid var(--qg)!important;background:radial-gradient(circle,var(--rpaper) 55%,var(--qgs) 57%)!important;box-shadow:0 0 0 2px var(--rpaper),0 0 0 3px var(--qgb);color:var(--qg)!important;font-family:var(--naskh);font-size:.82rem!important;font-weight:700!important}
+.rd .ln .end,.rd .ln .end.m{position:relative;border:0!important;background:none!important;box-shadow:none!important;z-index:0}
+.rd .ln .end::before{content:"";position:absolute;inset:-.12em;z-index:-1;background:var(--qg);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23000'%3E%3Ccircle cx='20' cy='20' r='13.5' stroke-width='2.2'/%3E%3Ccircle cx='20' cy='20' r='10.5' stroke-width='.9'/%3E%3Cpath stroke-width='1.6' stroke-linejoin='round' d='M20 2.5l3.2 4.2 5.2-1 .9 5.2 4.6 2.6-2.2 4.8 2.2 4.8-4.6 2.6-.9 5.2-5.2-1L20 37.5l-3.2-4.2-5.2 1-.9-5.2-4.6-2.6 2.2-4.8-2.2-4.8 4.6-2.6.9-5.2 5.2 1z'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23000'%3E%3Ccircle cx='20' cy='20' r='13.5' stroke-width='2.2'/%3E%3Ccircle cx='20' cy='20' r='10.5' stroke-width='.9'/%3E%3Cpath stroke-width='1.6' stroke-linejoin='round' d='M20 2.5l3.2 4.2 5.2-1 .9 5.2 4.6 2.6-2.2 4.8 2.2 4.8-4.6 2.6-.9 5.2-5.2-1L20 37.5l-3.2-4.2-5.2 1-.9-5.2-4.6-2.6 2.2-4.8-2.2-4.8 4.6-2.6.9-5.2 5.2 1z'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat}
+.rd .ln .end::after{content:"";position:absolute;inset:.42em;z-index:-2;border-radius:50%;background:var(--qgs)}
+.rd .ln .end.m::before{background:var(--gold)}.rd .ln .end.m::after{background:var(--gold-soft)}
+.rd .ln .end{color:var(--qg)!important;font-weight:700;font-size:.44em!important;min-width:2.3em!important;height:2.3em!important}
+/* الفاصل: شريطة خضراء معلّقة من أعلى الصفحة */
+.bmrib{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;width:26px;min-height:44px;padding:0;border:0;background:#1F7A4D;color:#fff;cursor:pointer;clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 10px),0 100%);box-shadow:0 2px 6px rgba(0,0,0,.2);display:flex;justify-content:center}
+.bmrib span{display:none;writing-mode:vertical-rl;font:600 .7rem/1 var(--sans,inherit);max-height:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em}
+.bmlist{display:flex;flex-direction:column;gap:8px}
+.bmcard{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.bmcard b{display:block}.bmcard small{color:var(--muted);font-size:.78rem}
+.bmcard .bmtag{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:10px;background:#E3F1E9;color:#1F7A4D}.bmcard .bmtag svg{width:18px;height:18px}
+.bmcard .bmgo{color:var(--muted);display:grid}.bmcard .bmgo svg{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -2667,20 +2701,18 @@ function dailyCard() {
     <div class="dtf">${esc(v.tf)}</div>
     <div class="dft"><span class="dsrc">التفسير الميسر، مجمع الملك فهد</span><button class="link" data-read="${v.p}">اقرأ في المصحف</button></div></section>`;
 }
-/* الفواصل: يسمّيها الطالب ويختار لونها */
-const BMC = ["#C0392B", "#E67E22", "#D4A82A", "#1E8E5A", "#2E86C1", "#8E44AD"];
+/* الفواصل: يسمّيها الطالب، وكلها بلون أخضر واحد */
+const BMG = "#1F7A4D";
 const BMI = on => `<svg viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>`;
 const bmOf = p => (ST.bms || []).find(b => b.p === +p);
 function bmSheet(p) {
-  const cur = bmOf(p); let col = cur ? cur.c : BMC[0];
+  const cur = bmOf(p);
   const list = (ST.bms || []).filter(b => b.p !== +p);
   openSheet(`<h3>فاصل الوجه ${AR(p)}</h3>
     <input class="psq" id="bmN" maxlength="24" placeholder="سمّ الفاصل، مثلاً: مراجعة الأحد" value="${esc(cur ? cur.n : "")}">
-    <div class="bmcols">${BMC.map(c => `<button class="bmc" data-c="${c}" style="background:${c}" aria-pressed="${c === col}"></button>`).join("")}</div>
     <div class="two"><button class="btn primary" id="bmSave">${cur ? "حفظ" : "ضع الفاصل"}</button>${cur ? `<button class="btn" id="bmDel">أزل الفاصل</button>` : ""}</div>
-    ${list.length ? `<h4 style="margin:18px 0 8px">فواصلك</h4>${list.map(b => `<button class="item" data-bm="${b.p}"><span class="bmdot" style="color:${b.c}">${BMI(true)}</span><span class="grow"><b>${esc(b.n)}</b><div class="tiny muted">سورة ${pageSurah(b.p)}، الوجه ${AR(b.p)}</div></span></button>`).join("")}` : ""}`);
-  document.querySelectorAll(".bmc").forEach(b => b.onclick = () => { col = b.dataset.c; document.querySelectorAll(".bmc").forEach(x => x.setAttribute("aria-pressed", x === b)); });
-  $("#bmSave").onclick = () => { const n = $("#bmN").value.trim() || "فاصل"; ST.bms = (ST.bms || []).filter(b => b.p !== +p).concat({ p: +p, n, c: col, at: Date.now() }); save(); closeSheet(); pageReader(p); };
+    ${list.length ? `<h4 style="margin:18px 0 8px">فواصلك</h4><div class="bmlist">${list.sort((a, b) => a.p - b.p).map(b => `<button class="bmcard" data-bm="${b.p}"><span class="bmtag">${BMI(true)}</span><span class="grow"><b>${esc(b.n)}</b><small>سورة ${pageSurah(b.p)}، الوجه ${AR(b.p)}</small></span><span class="bmgo">${ICON.prev || "‹"}</span></button>`).join("")}</div>` : ""}`);
+  $("#bmSave").onclick = () => { const n = $("#bmN").value.trim() || "فاصل"; ST.bms = (ST.bms || []).filter(b => b.p !== +p).concat({ p: +p, n, c: BMG, at: Date.now() }); save(); closeSheet(); pageReader(p); };
   const d = $("#bmDel"); if (d) d.onclick = () => { ST.bms = ST.bms.filter(b => b.p !== +p); save(); closeSheet(); pageReader(p); };
   document.querySelectorAll("[data-bm]").forEach(b => b.onclick = () => { closeSheet(); openReader(+b.dataset.bm, "mushaf"); });
 }
@@ -2724,10 +2756,11 @@ function pageReader(p, dir) {
       <div class="frame">
         ${frameInner(p, true)}
       </div>
+      ${bmOf(p) ? `<button class="bmrib" id="bmRib" aria-label="الفاصل: ${esc(bmOf(p).n)}"><span>${esc(bmOf(p).n)}</span></button>` : ""}
     </div>
     <div class="rtop"><button class="ibtn" id="back" aria-label="رجوع">${ICON.back}</button>
       <div class="t"><b>سورة ${pageSurah(p)}</b><small>الجزء ${JUZ_NAMES[juzOf(p)]}، الوجه ${AR(p)}</small></div>
-      <button class="ibtn bmb" id="bmBtn" aria-label="فاصل" ${bmOf(p) ? `style="color:${bmOf(p).c}"` : ""}>${BMI(!!bmOf(p))}</button>
+      <button class="ibtn bmb" id="bmBtn" aria-label="فاصل" ${bmOf(p) ? `style="color:${BMG}"` : ""}>${BMI(!!bmOf(p))}</button>
       <button class="ibtn" id="hideSw" aria-pressed="${S.hide}" aria-label="إخفاء الآيات" style="${S.hide ? "background:var(--green);color:var(--on)" : ""}">${EYE}</button>
       <button class="ibtn" id="more" aria-label="المزيد">${DOTS}</button></div>
     <div class="rbot"><button class="ibtn" id="pgPrev" aria-label="الوجه السابق" ${p <= 1 ? "disabled" : ""}>${ICON.prev}</button>
@@ -2741,6 +2774,7 @@ function pageReader(p, dir) {
   $("#back").onclick = () => { document.body.classList.remove("immersive"); go(S.tab === "tasmee" ? "mushaf" : S.tab); };
   $("#hideSw").onclick = () => { S.hide = !S.hide; S.ui = true; pageReader(p); };
   $("#bmBtn").onclick = () => bmSheet(p);
+  const rib = $("#bmRib"); if (rib) rib.onclick = e => { e.stopPropagation(); bmSheet(p); };
   $("#more").onclick = () => moreSheet(p);
   $("#pgPrev").onclick = () => turn(p, -1);
   $("#pgNext").onclick = () => turn(p, 1);
@@ -2773,7 +2807,7 @@ function pageReader(p, dir) {
   if (document.fonts && !document.fonts.check('20px "DigitalKhatt Madina"', "بسم")) document.fonts.load('20px "DigitalKhatt Madina"', "بسم").then(() => { if (S.reader === p && $("#lines")) fitPage(); }).catch(() => {});
 }
 function frameInner(p, main) {
-  return `<div class="rh"><span>الجزء ${AR(juzOf(p))}</span><span>${pageSurah(p)}</span></div>
+  return `<div class="rh"><span class="rhs">سورة ${pageSurah(p)}</span><span class="rhj">الجزء ${AR(juzOf(p))}</span></div>
         <div class="rb"${main ? ' id="rb"' : ""} style="overflow:hidden"><div${main ? ' id="ptext"' : ""} style="display:flex;flex-direction:column;flex:1;min-height:0">${main ? layoutHTML(p, S.hide) : layoutHTML(p, S.hide).replace(' id="lines"', "")}</div></div>
         <div class="rf"><span>${AR(p)}</span></div>`;
 }
@@ -4767,7 +4801,7 @@ applyTheme(); TR.start(); render(); setTimeout(() => { if (S.tab === "home") wir
 LIVE.boot();
 
 /* ---------- النسخة التجريبية: زر «أبلغ عن مشكلة» والتثبيت وعامل الخدمة ---------- */
-const BUILD = "20261128-0211-c57ff8c";
+const BUILD = "20261128-1923-f6afdf0";
 const TESTUI = window.TESTUI = (() => {
   const native = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
   const on = native || /[?&]test=1/.test(location.search) || /\/test\//.test(location.pathname);
