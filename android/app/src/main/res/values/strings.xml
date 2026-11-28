@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">مثاني</string>
+    <string name="title_activity_main">مثاني</string>
+    <string name="package_name">com.mathani.app</string>
+    <string name="custom_url_scheme">com.mathani.app</string>
+</resources>

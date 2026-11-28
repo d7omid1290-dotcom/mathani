@@ -30,6 +30,51 @@
   window.addEventListener("unhandledrejection", function (e) { var r = e.reason; add("وعد", r && (r.stack || r.message) || r); });
   var ce = console.error; console.error = function () { try { add("console", Array.prototype.map.call(arguments, function (a) { return a && a.stack || (typeof a === "object" ? JSON.stringify(a) : a); }).join(" ")); } catch (e) {} return ce.apply(console, arguments); };
 })();
+/* داخل تطبيق أندرويد (Capacitor) لا يوجد SpeechRecognition في المتصفح الداخلي، فنربطه بخدمة التعرف على الكلام في الجهاز بالواجهة نفسها */
+(function () {
+  var C = window.Capacitor;
+  if (!C || !C.isNativePlatform || !C.isNativePlatform() || window.SpeechRecognition || window.webkitSpeechRecognition) return;
+  var P = function () { return C.Plugins && C.Plugins.SpeechRecognition; }, cur = null, hooked = false;
+  function hook(p) { if (hooked) return; hooked = true;
+    p.addListener("partialResults", function (d) { if (!cur || !d || !d.matches || !d.matches.length) return; cur._txt = d.matches[0]; cur._emit(false); }); }
+  function NSR() { this.lang = "ar-SA"; this.interimResults = false; this.continuous = false; this.maxAlternatives = 1; this._on = false; }
+  NSR.prototype._emit = function (fin) {
+    if (!fin && !this.interimResults) return;
+    var r = [{ transcript: this._txt, confidence: 0.9 }]; r.isFinal = fin; r.item = function (i) { return r[i]; };
+    var res = [r]; res.item = function (i) { return res[i]; };
+    if (this.onresult) this.onresult({ results: res, resultIndex: 0 });
+  };
+  NSR.prototype._finish = function (emit) {
+    if (!this._on) return; this._on = false; clearInterval(this._iv); if (cur === this) cur = null;
+    if (emit !== false && this._txt) this._emit(true);
+    if (this.onend) this.onend({});
+  };
+  NSR.prototype._err = function (code) { if (window.TLOG) TLOG.add("ميكروفون", "native SR: " + code); if (this.onerror) this.onerror({ error: code }); this._finish(false); };
+  NSR.prototype.start = function () {
+    var s = this, p = P();
+    if (s._on) throw new Error("InvalidStateError: already started");
+    s._on = true; s._txt = ""; s._t0 = Date.now(); s._ending = false;
+    if (!p) { setTimeout(function () { s._err("service-not-allowed"); }); return; }
+    (async function () {
+      try {
+        var pm = await p.checkPermissions();
+        if (pm.speechRecognition !== "granted") pm = await p.requestPermissions();
+        if (pm.speechRecognition !== "granted") return s._err("not-allowed");
+        if (!s._on) return;
+        hook(p); if (cur && cur !== s) cur._finish(); cur = s;
+        await p.start({ language: s.lang || "ar-SA", maxResults: 1, partialResults: true, popup: false });
+        if (s.onstart) s.onstart({});
+        s._iv = setInterval(async function () {
+          if (!s._on || s._ending) return;
+          try { var l = await p.isListening(); if (!l.listening && Date.now() - s._t0 > 1200) { s._ending = true; setTimeout(function () { s._finish(); }, 500); } } catch (e) {}
+        }, 700);
+      } catch (e) { s._err(/permission/i.test(e && e.message) ? "not-allowed" : "network"); }
+    })();
+  };
+  NSR.prototype.stop = function () { var s = this; if (!s._on) return; try { P().stop().catch(function () {}); } catch (e) {} s._ending = true; setTimeout(function () { s._finish(); }, 350); };
+  NSR.prototype.abort = function () { try { P().stop().catch(function () {}); } catch (e) {} this._finish(false); };
+  window.SpeechRecognition = window.webkitSpeechRecognition = NSR;
+})();
 </script>
 <style>
 :root{
@@ -4336,7 +4381,8 @@ LIVE.boot();
 /* ---------- النسخة التجريبية: زر «أبلغ عن مشكلة» والتثبيت وعامل الخدمة ---------- */
 const BUILD = "/*BUILD*/";
 const TESTUI = window.TESTUI = (() => {
-  const on = /[?&]test=1/.test(location.search) || /\/test\//.test(location.pathname);
+  const native = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+  const on = native || /[?&]test=1/.test(location.search) || /\/test\//.test(location.pathname);
   const standalone = () => !!(navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   let fab = null;
@@ -4347,7 +4393,7 @@ const TESTUI = window.TESTUI = (() => {
       "الشاشة: " + S.tab + (S.reader ? " / قارئ" : ""),
       "الجهاز: " + navigator.userAgent,
       "المقاس: " + innerWidth + "×" + innerHeight + " @" + devicePixelRatio,
-      "مثبّت كتطبيق: " + (standalone() ? "نعم" : "لا") + "، متصل: " + (navigator.onLine ? "نعم" : "لا"),
+      "مثبّت كتطبيق: " + (native ? "APK أندرويد" : standalone() ? "نعم" : "لا") + "، متصل: " + (navigator.onLine ? "نعم" : "لا"),
       "التعرف على الكلام: " + (window.SpeechRecognition || window.webkitSpeechRecognition ? "متاح" : "غير متاح") + (typeof LAST_MIC_ERR !== "undefined" && LAST_MIC_ERR ? "، آخر خطأ ميكروفون: " + LAST_MIC_ERR : "")
     ].join("\n");
   }
@@ -4372,7 +4418,7 @@ const TESTUI = window.TESTUI = (() => {
     $("#tClr").onclick = () => { TLOG.clear(); badge(); msg("مُسح السجل"); };
   }
   function boot() {
-    if ("serviceWorker" in navigator && location.protocol === "https:" && !/claude|usercontent/.test(location.hostname)) navigator.serviceWorker.register("sw.js").catch(e => TLOG.add("تثبيت", "sw: " + e.message));
+    if (!native && "serviceWorker" in navigator && location.protocol === "https:" && !/claude|usercontent/.test(location.hostname)) navigator.serviceWorker.register("sw.js").catch(e => TLOG.add("تثبيت", "sw: " + e.message));
     if (!on) return;
     const st = document.createElement("style");
     st.textContent = ".tfab{position:fixed;inset-inline-start:12px;bottom:calc(108px + env(safe-area-inset-bottom,0px));z-index:60;width:44px;height:44px;border-radius:50%;border:0;background:#B4472F;color:#fff;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.25);display:grid;place-items:center;opacity:.85}.tfab i{position:absolute;top:-4px;inset-inline-end:-4px;min-width:18px;height:18px;border-radius:9px;background:#fff;color:#B4472F;font:700 11px/18px sans-serif;font-style:normal;display:none}.tfab.has i{display:block}body.immersive .tfab{opacity:.35}";
